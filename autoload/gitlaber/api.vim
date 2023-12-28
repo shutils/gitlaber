@@ -90,7 +90,7 @@ function! gitlaber#api#get_project_id() abort
   let name_space = split(project_url, "/")[-2]
   let project_path = split(project_url, "/")[-1]
   let project_path = substitute(project_path, ".git", "", "")
-  let cmd = 'curl -s --request GET --url "' . url . '/api/v4/projects/' . name_space . '%2F' . project_path . '"'
+  let cmd = 'curl -s --request GET -H "PRIVATE-TOKEN: ' . token . '" --url "' . url . '/api/v4/projects/' . name_space . '%2F' . project_path . '"'
   try
     let project_json = system(cmd)
     let decoded_project = json_decode(project_json)

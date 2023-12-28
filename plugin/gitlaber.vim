@@ -1,1 +1,1 @@
-command! -nargs=0 GitlaberOpenProIssues call gitlaber#open_project_issues()
+command! -nargs=0 Gitlaber call gitlaber#open_main_panel()
