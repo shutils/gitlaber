@@ -14,4 +14,5 @@ endfunction
 function! gitlaber#keymap#set_issue_list_panel_keymap() abort
   nnoremap <buffer> <silent> p :call gitlaber#core#open_issue_preview()<CR>
   nnoremap <buffer> <silent> d :call gitlaber#core#delete_project_issue()<CR>
+  nnoremap <buffer> <silent> r :call gitlaber#core#reload_project_issues()<CR>
 endfunction

@@ -16,6 +16,7 @@ endfunction
 
 function! gitlaber#ui#open_project_issue_list_panel() abort
   vertical botright new
+  setlocal buftype=nofile
   call gitlaber#keymap#set_base_keymap()
   call gitlaber#keymap#set_issue_list_panel_keymap()
 endfunction

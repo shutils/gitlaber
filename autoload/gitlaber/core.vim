@@ -1,17 +1,23 @@
 function! gitlaber#core#open_project_issues() abort
+  call gitlaber#ui#open_project_issue_list_panel()
+  call gitlaber#core#set_issues_display()
+endfunction
+
+function! gitlaber#core#set_issues_display() abort
   let projcet_id = gitlaber#api#get_project_id()
   let t:project_issues = gitlaber#api#get_project_issues(projcet_id)
-  let issues_index_max_width = len(string(t:project_issues[-1]['iid'])) + 1
-  let project_issue_titles = []
-  for issue in t:project_issues
-    let line = '#' . string(issue.iid) . repeat(' ', (issues_index_max_width - len(string(issue.iid)))) . ' ' . issue.title
-    call add(project_issue_titles, line)
-  endfor
-  call gitlaber#ui#open_project_issue_list_panel()
+  let project_issue_titles = gitlaber#util#make_issue_title_list(t:project_issues)
+  setlocal modifiable
   call append(0, project_issue_titles)
   normal! ddgg
-  setlocal buftype=nofile
   setlocal nomodifiable
+endfunction
+
+function! gitlaber#core#reload_project_issues() abort
+  setlocal modifiable
+  silent %delete
+  setlocal nomodifiable
+  call gitlaber#core#set_issues_display()
 endfunction
 
 function! gitlaber#core#open_issue_preview() abort
