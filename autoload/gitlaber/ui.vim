@@ -18,7 +18,6 @@ function! gitlaber#ui#open_project_issue_list_panel() abort
   vertical botright new
   call gitlaber#keymap#set_base_keymap()
   call gitlaber#keymap#set_issue_list_panel_keymap()
-  call gitlaber#ui#set_base_option()
 endfunction
 
 function! gitlaber#ui#open_issue_preview_panel() abort
@@ -29,4 +28,5 @@ endfunction
 function! gitlaber#ui#set_base_option() abort
   setlocal buftype=nofile
   setlocal nonumber
+  setlocal nomodifiable
 endfunction
