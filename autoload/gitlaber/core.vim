@@ -24,6 +24,10 @@ function! gitlaber#core#open_issue_preview() abort
   let index = line('.') - 1
   let issue_node = t:project_issues[index]
   let description = issue_node['description']
+  if description == v:null
+    echo "This issue does not have a description."
+    return
+  endif
   let lines = split(description, '\n')
   call gitlaber#ui#open_issue_preview_panel()
   call append(0, lines)
