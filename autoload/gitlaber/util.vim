@@ -7,7 +7,8 @@ function! gitlaber#util#save_temp_json(attr_dict) abort
   new
   execute 'buffer ' . temp_bufnr
   execute 'write ' . tempfile
-  quit
+  setlocal buftype=nofile
+  bdelete
   return tempfile
 endfunction
 
