@@ -6,7 +6,7 @@ function! gitlaber#util#save_temp_json(attr_dict) abort
   let tempfile = tempname()
   new
   execute 'buffer ' . temp_bufnr
-  execute 'write ' . tempfile
+  execute 'silent write ' . tempfile
   setlocal buftype=nofile
   bdelete
   return tempfile

@@ -26,3 +26,19 @@ function! gitlaber#core#open_issue_preview() abort
   setlocal buftype=nofile
   setlocal nomodifiable
 endfunction
+
+function! gitlaber#core#create_project_issue() abort
+  let title = input("Enter new issue title: ")
+  if title == "" || title == v:null
+    echo 'Creation of new issue has been canceled.'
+    return
+  endif
+  let attr_dict = {"title": title}
+  let project_id = gitlaber#api#get_project_id()
+  let result = gitlaber#api#create_project_issue(project_id, attr_dict)
+  if has_key(result, 'message')
+    echo 'Failed to create new issue. reason: ' . result['message']
+    return
+  endif
+  echo 'Successfully created a new issue.'
+endfunction

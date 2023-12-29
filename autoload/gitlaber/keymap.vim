@@ -8,6 +8,7 @@ endfunction
 
 function! gitlaber#keymap#set_issue_panel_keymap() abort
   nnoremap <buffer> <silent> l :call gitlaber#core#open_project_issues()<CR>
+  nnoremap <buffer> <silent> n :call gitlaber#core#create_project_issue()<CR>
 endfunction
 
 function! gitlaber#keymap#set_issue_list_panel_keymap() abort
