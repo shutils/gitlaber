@@ -42,3 +42,20 @@ function! gitlaber#core#create_project_issue() abort
   endif
   echo 'Successfully created a new issue.'
 endfunction
+
+function! gitlaber#core#delete_project_issue() abort
+  let confirm = input("Are you sure you want to delete the issue? y/N: ")
+  if confirm != "y"
+    return
+  endif
+  let index = line('.') - 1
+  let issue_node = t:project_issues[index]
+  let iid = issue_node['iid']
+  let project_id = gitlaber#api#get_project_id()
+  let status_code = gitlaber#api#delete_project_issue(project_id, iid)
+  if status_code != 204
+    echom "Failed to delete issue."
+    return
+  endif
+    echom "Successfully to delete issue."
+endfunction

@@ -81,6 +81,17 @@ function! gitlaber#api#create_project_issue(project_id, attr_dict) abort
   endtry
 endfunction
 
+function! gitlaber#api#delete_project_issue(project_id, iid) abort
+  let token = $GITLAB_TOKEN
+  let url = $GITLAB_URL
+  let cmd = 'curl -s --request DELETE -o /dev/null -w "%{http_code}\n" -H "PRIVATE-TOKEN: ' . token . '" --url "' . url . '/api/v4/projects/' . string(a:project_id) . '/issues/' . a:iid . '"'
+  try
+    return system(cmd)
+  catch
+    echom "An error occurred while deleting the issue."
+  endtry
+endfunction
+
 function! gitlaber#api#get_project_id() abort
   let token = $GITLAB_TOKEN
   let url = $GITLAB_URL
