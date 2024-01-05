@@ -19,7 +19,7 @@ function! gitlaber#denops#delete_pro_issue() abort
 endfunction
 
 function! gitlaber#denops#reload_pro_issue() abort
-  call denops#request('gitlaber', 'reloadProjectIssues', [])
+  call denops#notify('gitlaber', 'reloadProjectIssues', [])
 endfunction
 
 function! gitlaber#denops#open_pro_issue_preview() abort

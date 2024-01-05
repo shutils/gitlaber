@@ -33,9 +33,6 @@ const loadProjectIssues = async (denops: Denops) => {
     1,
     "$",
   );
-  if (!(bufLines.length == 1 && bufLines[0] == "")) {
-    await fn.deletebufline(denops, await fn.bufname(denops), 1, "$");
-  }
   const nodes: Array<BaseNode | IssueNode> = [];
   const projectId = await getProjectId();
   const projectIssues = await getProjectIssues(projectId);
@@ -54,12 +51,20 @@ const loadProjectIssues = async (denops: Denops) => {
       issue: issue,
     });
   });
+  if (bufLines.length > nodes.length) {
+    await fn.deletebufline(
+      denops,
+      await fn.bufname(denops),
+      nodes.length + 1,
+      "$",
+    );
+  }
   await setNodesOnBuf(denops, nodes);
   await vars.b.set(denops, "nodes", nodes);
   await setNoModifiable(denops);
 };
 
-export async function main(denops: Denops) {
+export function main(denops: Denops) {
   setGlobalMapping(denops);
   denops.dispatcher = {
     async openGitlaber(): Promise<void> {
