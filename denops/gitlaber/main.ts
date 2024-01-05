@@ -174,6 +174,7 @@ export async function main(denops: Denops) {
       }
       if (currentIssue.issue.description == null) {
         console.log("This issue does not have a description.");
+        return;
       }
       const lines = currentIssue.issue.description.split("\n");
       const nodes: Array<BaseNode> = [];
