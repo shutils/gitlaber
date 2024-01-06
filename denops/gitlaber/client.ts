@@ -6,6 +6,7 @@ import {
   NewIssueAttributes,
   SingleProjectResponse,
 } from "./types.ts";
+import { GITLAB_DEFAULT_URL } from "./constant.ts";
 
 const isHttpPath = (path: string) => {
   return path.startsWith("http");
@@ -57,7 +58,7 @@ const getGitlabUrl = (cwd?: string) => {
     if (gitlabUrl) {
       return gitlabUrl;
     } else {
-      throw new Error("Unable to get GitLab URL");
+      return GITLAB_DEFAULT_URL;
     }
   }
 };
