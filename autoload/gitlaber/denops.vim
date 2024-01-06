@@ -29,3 +29,11 @@ endfunction
 function! gitlaber#denops#get_current_node() abort
   return denops#request('gitlaber', '_getCurrentNode', [])
 endfunction
+
+function! gitlaber#denops#open_pro_issue_edit() abort
+  call denops#request('gitlaber', 'openProjectIssueEditBuf', [])
+endfunction
+
+function! gitlaber#denops#edit_issue() abort
+  return denops#request('gitlaber', 'editProjectIssue', [])
+endfunction

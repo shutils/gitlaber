@@ -77,5 +77,11 @@ export const setProjectIssuesPanelMapping = async (denops: Denops) => {
     "<Cmd>call gitlaber#denops#open_pro_issue_preview()<CR>",
     mapOption,
   );
+  await mapping.map(
+    denops,
+    "e",
+    "<Cmd>call gitlaber#denops#open_pro_issue_edit()<CR>",
+    mapOption,
+  );
   await setBaseMapping(denops);
 };

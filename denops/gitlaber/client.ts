@@ -1,6 +1,7 @@
 import { parse } from "https://deno.land/std@0.210.0/path/mod.ts";
 
 import {
+  EditIssueAttributes,
   IssueResponse,
   NewIssueAttributes,
   SingleProjectResponse,
@@ -144,4 +145,23 @@ export const requestDeleteProjectIssue = async (
     throw new Error("Failed to delete issue.");
   }
   console.log("Successfully delete a issue.");
+};
+
+export const requestEditProjectIssue = async (
+  attributes: EditIssueAttributes,
+): Promise<void> => {
+  const gitlabUrl = getGitlabUrl();
+  const projectId = attributes.id;
+  const issue_iid = attributes.issue_iid;
+  const gitlabApiPath =
+    `${gitlabUrl}/api/v4/projects/${projectId}/issues/${issue_iid}`;
+  const res = await fetch(gitlabApiPath, {
+    method: "PUT",
+    headers: getHeaders(),
+    body: JSON.stringify(attributes),
+  });
+  if (!(res.status == 200 || res.status == 201)) {
+    throw new Error("Failed to edit issue.");
+  }
+  console.log("Successfully edit a issue.");
 };

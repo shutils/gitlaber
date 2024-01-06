@@ -1,4 +1,4 @@
-import { Denops, fn, helper, vars } from "./deps.ts";
+import { autocmd, Denops, fn, helper, unknownutil, vars } from "./deps.ts";
 
 import {
   getProjectId,
@@ -6,6 +6,7 @@ import {
   getSingleProjectResponse,
   requestCreateNewProjectIssue,
   requestDeleteProjectIssue,
+  requestEditProjectIssue,
 } from "./client.ts";
 
 import {
@@ -23,7 +24,7 @@ import {
   setNoModifiable,
 } from "./util.ts";
 
-import { BaseNode, IssueNode } from "./types.ts";
+import { BaseNode, EditIssueAttributes, IssueNode } from "./types.ts";
 
 const loadProjectIssues = async (denops: Denops) => {
   await setModifiable(denops);
@@ -195,6 +196,64 @@ export function main(denops: Denops) {
       await setBaseMapping(denops);
     },
 
+    async openProjectIssueEditBuf(): Promise<void> {
+      const projectId = await getProjectId();
+      const currentIssue = await getCurrentNode(denops);
+      if (!("issue" in currentIssue)) {
+        return;
+      }
+      let lines = [""];
+      if (currentIssue.issue.description != null) {
+        lines = currentIssue.issue.description.split("\n");
+      }
+      const nodes: Array<BaseNode> = [];
+      lines.map((line) => {
+        nodes.push({
+          display: line,
+          kind: "other",
+        });
+      });
+      await fn.execute(denops, "new");
+      const bufnr = await fn.bufadd(denops, await fn.tempname(denops));
+      await fn.bufload(denops, bufnr);
+      await fn.execute(denops, `buffer ${bufnr}`);
+      await setNodesOnBuf(denops, nodes);
+      await vars.b.set(denops, "nodes", nodes);
+      await vars.b.set(denops, "gitlaber_project_id", projectId);
+      await vars.b.set(denops, "gitlaber_issue_iid", currentIssue.issue.iid);
+      await autocmd.define(
+        denops,
+        "BufWritePost",
+        "*",
+        "call gitlaber#denops#edit_issue()",
+      );
+      await setBaseMapping(denops);
+    },
+
+    async editProjectIssue(): Promise<void> {
+      const lines = await fn.getbufline(
+        denops,
+        await fn.bufname(denops),
+        1,
+        "$",
+      );
+      const description = lines.join("\n");
+      const projectId = await vars.b.get(denops, "gitlaber_project_id");
+      if (!unknownutil.isNumber(projectId)) {
+        return;
+      }
+      const issue_iid = await vars.b.get(denops, "gitlaber_issue_iid");
+      if (!unknownutil.isNumber(issue_iid)) {
+        return;
+      }
+      const attributes: EditIssueAttributes = {
+        id: projectId,
+        issue_iid: issue_iid,
+        description: description,
+      };
+      await requestEditProjectIssue(attributes);
+    },
+
     async reloadProjectIssues(): Promise<void> {
       await loadProjectIssues(denops);
     },
@@ -205,4 +264,3 @@ export function main(denops: Denops) {
     },
   };
 }
-

@@ -44,6 +44,27 @@ export type NewIssueAttributes = {
   iid?: number;
 };
 
+export type EditIssueAttributes = {
+  id: number;
+  issue_iid: number;
+  add_labels?: string;
+  assignee_ids?: number[];
+  confidential?: boolean;
+  description?: string;
+  discussion_locked?: boolean;
+  due_data?: string;
+  epic_id?: number;
+  epic_iid?: number;
+  issue_type?: "issue" | "incident" | "test_case" | "task";
+  labels?: string;
+  milestone_id?: number;
+  remove_labels?: string;
+  state_event?: "close" | "reopen";
+  title?: string;
+  updated_at?: string;
+  weight?: number;
+};
+
 export type BaseNode = {
   display: string;
   kind: NodeKind;
