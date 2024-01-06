@@ -1,13 +1,13 @@
 function! gitlaber#denops#open_main_panel() abort
-  call denops#request('gitlaber', 'openGitlaber', [])
+  call denops#notify('gitlaber', 'openGitlaber', [])
 endfunction
 
 function! gitlaber#denops#open_issue_panel() abort
-  call denops#request('gitlaber', 'openProjectIssuePanel', [])
+  call denops#notify('gitlaber', 'openProjectIssuePanel', [])
 endfunction
 
 function! gitlaber#denops#open_issues_panel() abort
-  call denops#request('gitlaber', 'openProjectIssuesPanel', [])
+  call denops#notify('gitlaber', 'openProjectIssuesPanel', [])
 endfunction
 
 function! gitlaber#denops#create_new_pro_issue() abort
