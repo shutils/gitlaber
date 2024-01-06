@@ -11,6 +11,15 @@ export const setNofile = async (denops: Denops) => {
   );
 };
 
+export const setFileType = async (denops: Denops) => {
+  await fn.setbufvar(
+    denops,
+    await fn.bufname(denops),
+    "&filetype",
+    "markdown",
+  );
+};
+
 export const setModifiable = async (denops: Denops) => {
   await fn.setbufvar(
     denops,

@@ -18,6 +18,7 @@ import {
 } from "./keymap.ts";
 import {
   getCurrentNode,
+  setFileType,
   setModifiable,
   setNodesOnBuf,
   setNofile,
@@ -194,6 +195,7 @@ export function main(denops: Denops) {
       await vars.b.set(denops, "nodes", nodes);
       await setNoModifiable(denops);
       await setBaseMapping(denops);
+      await setFileType(denops);
     },
 
     async openProjectIssueEditBuf(): Promise<void> {
@@ -228,6 +230,7 @@ export function main(denops: Denops) {
         "call gitlaber#denops#edit_issue()",
       );
       await setBaseMapping(denops);
+      await setFileType(denops);
     },
 
     async editProjectIssue(): Promise<void> {
