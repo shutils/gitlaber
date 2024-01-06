@@ -216,19 +216,18 @@ export function main(denops: Denops) {
         });
       });
       await fn.execute(denops, "new");
-      const bufnr = await fn.bufadd(denops, await fn.tempname(denops));
+      const bufname = await fn.tempname(denops);
+      const bufnr = await fn.bufadd(denops, bufname);
       await fn.bufload(denops, bufnr);
       await fn.execute(denops, `buffer ${bufnr}`);
       await setNodesOnBuf(denops, nodes);
       await vars.b.set(denops, "nodes", nodes);
       await vars.b.set(denops, "gitlaber_project_id", projectId);
       await vars.b.set(denops, "gitlaber_issue_iid", currentIssue.issue.iid);
-      await autocmd.define(
-        denops,
-        "BufWritePost",
-        "*",
-        "call gitlaber#denops#edit_issue()",
-      );
+      await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
+        helper.remove("BufWritePost");
+        helper.define("BufWritePost", bufname, "call gitlaber#denops#edit_issue()");
+      });
       await setBaseMapping(denops);
       await setFileType(denops);
     },
