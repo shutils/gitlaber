@@ -126,6 +126,7 @@ export const requestCreateNewProjectIssue = async (
   if (res.status != 201) {
     throw new Error("Failed to create new issue.");
   }
+  console.log("Successfully created a new issue.");
 };
 
 export const requestDeleteProjectIssue = async (
@@ -142,4 +143,5 @@ export const requestDeleteProjectIssue = async (
   if (res.status != 204) {
     throw new Error("Failed to delete issue.");
   }
+  console.log("Successfully delete a issue.");
 };

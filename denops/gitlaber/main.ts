@@ -140,11 +140,10 @@ export function main(denops: Denops) {
         return;
       }
       try {
-        await requestCreateNewProjectIssue(projectId, {
+        requestCreateNewProjectIssue(projectId, {
           id: projectId,
           title: title,
         });
-        console.log("Successfully created a new issue.");
       } catch (e) {
         console.log(e.message);
       }
@@ -165,8 +164,7 @@ export function main(denops: Denops) {
         return;
       }
       try {
-        await requestDeleteProjectIssue(projectId, issue_iid);
-        console.log("Successfully delete a issue.");
+        requestDeleteProjectIssue(projectId, issue_iid);
       } catch (e) {
         console.log(e.message);
       }
