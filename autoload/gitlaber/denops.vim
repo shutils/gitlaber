@@ -25,3 +25,7 @@ endfunction
 function! gitlaber#denops#open_pro_issue_preview() abort
   call denops#request('gitlaber', 'openProjectIssuePreview', [])
 endfunction
+
+function! gitlaber#denops#get_current_node() abort
+  return denops#request('gitlaber', '_getCurrentNode', [])
+endfunction

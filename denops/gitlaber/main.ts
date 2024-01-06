@@ -198,6 +198,11 @@ export function main(denops: Denops) {
     async reloadProjectIssues(): Promise<void> {
       await loadProjectIssues(denops);
     },
+
+    async _getCurrentNode(): Promise<BaseNode | IssueNode> {
+      const currentNode = await getCurrentNode(denops);
+      return currentNode;
+    },
   };
 }
 

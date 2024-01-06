@@ -14,6 +14,12 @@ export const setBaseMapping = async (denops: Denops) => {
     "<Cmd>bd!<CR>",
     mapOption,
   );
+  await mapping.map(
+    denops,
+    "I",
+    "<Cmd>echo gitlaber#denops#get_current_node()<CR>",
+    mapOption,
+  );
 };
 
 export const setGlobalMapping = async (denops: Denops) => {
