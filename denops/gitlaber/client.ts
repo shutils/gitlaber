@@ -1,9 +1,9 @@
 import { parse } from "https://deno.land/std@0.210.0/path/mod.ts";
 
 import {
-  EditIssueAttributes,
+  IssueEditAttributes,
   Issue,
-  NewIssueAttributes,
+  IssueCreateNewAttributes,
   Project,
   Wiki,
   WikiCreateAttributes,
@@ -121,7 +121,7 @@ export const getProjectId = async () => {
 
 export const requestCreateNewProjectIssue = async (
   projectId: number,
-  attributes: NewIssueAttributes,
+  attributes: IssueCreateNewAttributes,
 ): Promise<void> => {
   const gitlabUrl = getGitlabUrl();
   const gitlabApiPath = gitlabUrl + "/api/v4/projects/" + projectId + "/issues";
@@ -152,7 +152,7 @@ export const requestDeleteIssue = async (
 };
 
 export const requestEditIssue = async (
-  attributes: EditIssueAttributes,
+  attributes: IssueEditAttributes,
 ): Promise<void> => {
   const gitlabUrl = getGitlabUrl();
   const projectId = attributes.id;

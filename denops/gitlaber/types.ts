@@ -77,14 +77,14 @@ export type WikiDeleteAttributes = {
   slug: string;
 };
 
-export type NewIssueAttributes = {
+export type IssueCreateNewAttributes = {
   id: number;
   title?: string;
   description?: string;
   iid?: number;
 };
 
-export type EditIssueAttributes = {
+export type IssueEditAttributes = {
   id: number;
   issue_iid: number;
   add_labels?: string;
