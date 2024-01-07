@@ -2,9 +2,9 @@ import { parse } from "https://deno.land/std@0.210.0/path/mod.ts";
 
 import {
   EditIssueAttributes,
-  IssueResponse,
+  Issue,
   NewIssueAttributes,
-  SingleProjectResponse,
+  Project,
 } from "./types.ts";
 import { GITLAB_DEFAULT_URL } from "./constant.ts";
 
@@ -83,8 +83,8 @@ const getHeaders = () => {
   };
 };
 
-export const getSingleProjectResponse = async (): Promise<
-  SingleProjectResponse
+export const getSingleProject = async (): Promise<
+  Project
 > => {
   const gitlabUrl = getGitlabUrl();
   const projectPath = getUrlEncodedPath(getRemoteUrl());
@@ -98,7 +98,7 @@ export const getSingleProjectResponse = async (): Promise<
 
 export const getProjectIssues = async (
   projectId: number,
-): Promise<IssueResponse[]> => {
+): Promise<Issue[]> => {
   const gitlabUrl = getGitlabUrl();
   const gitlabApiPath = gitlabUrl + "/api/v4/projects/" + projectId + "/issues";
   const res = await fetch(gitlabApiPath, {
@@ -109,7 +109,7 @@ export const getProjectIssues = async (
 };
 
 export const getProjectId = async () => {
-  const singleProject = await getSingleProjectResponse();
+  const singleProject = await getSingleProject();
   const id = singleProject.id;
   return await Promise.resolve(id);
 };
@@ -131,7 +131,7 @@ export const requestCreateNewProjectIssue = async (
   console.log("Successfully created a new issue.");
 };
 
-export const requestDeleteProjectIssue = async (
+export const requestDeleteIssue = async (
   projectId: number,
   issue_iid: number,
 ): Promise<void> => {
@@ -148,7 +148,7 @@ export const requestDeleteProjectIssue = async (
   console.log("Successfully delete a issue.");
 };
 
-export const requestEditProjectIssue = async (
+export const requestEditIssue = async (
   attributes: EditIssueAttributes,
 ): Promise<void> => {
   const gitlabUrl = getGitlabUrl();

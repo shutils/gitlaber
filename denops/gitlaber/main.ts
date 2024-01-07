@@ -3,10 +3,10 @@ import { autocmd, Denops, fn, helper, unknownutil, vars } from "./deps.ts";
 import {
   getProjectId,
   getProjectIssues,
-  getSingleProjectResponse,
+  getSingleProject,
   requestCreateNewProjectIssue,
-  requestDeleteProjectIssue,
-  requestEditProjectIssue,
+  requestDeleteIssue,
+  requestEditIssue,
 } from "./client.ts";
 
 import {
@@ -72,7 +72,7 @@ export function main(denops: Denops) {
     async openGitlaber(): Promise<void> {
       const nodes: Array<BaseNode | IssueNode> = [];
       await fn.execute(denops, "tabnew");
-      const singleProject = await getSingleProjectResponse();
+      const singleProject = await getSingleProject();
       nodes.push({
         display: "Main Panel",
         kind: "other",
@@ -166,7 +166,7 @@ export function main(denops: Denops) {
         return;
       }
       try {
-        requestDeleteProjectIssue(projectId, issue_iid);
+        requestDeleteIssue(projectId, issue_iid);
       } catch (e) {
         console.log(e.message);
       }
@@ -253,7 +253,7 @@ export function main(denops: Denops) {
         issue_iid: issue_iid,
         description: description,
       };
-      await requestEditProjectIssue(attributes);
+      await requestEditIssue(attributes);
     },
 
     async reloadProjectIssues(): Promise<void> {

@@ -13,7 +13,7 @@ type IssueState = "open" | "closed";
 
 type NodeKind = "other" | "issue";
 
-export type SingleProjectResponse = {
+export type Project = {
   id: number;
   description: string;
   name: string;
@@ -24,7 +24,7 @@ export type SingleProjectResponse = {
   _links: Links;
 };
 
-export type IssueResponse = {
+export type Issue = {
   id: number;
   iid: number;
   description: string;
@@ -71,5 +71,5 @@ export type BaseNode = {
 };
 
 export type IssueNode = BaseNode & {
-  issue: IssueResponse;
+  issue: Issue;
 };
