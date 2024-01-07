@@ -31,15 +31,7 @@ import {
   setNoModifiable,
 } from "./util.ts";
 
-import {
-  BaseNode,
-  EditIssueAttributes,
-  IssueNode,
-  WikiCreateAttributes,
-  WikiDeleteAttributes,
-  WikiEditAttributes,
-  WikiNode,
-} from "./types.ts";
+import { BaseNode, IssueNode, WikiNode } from "./types.ts";
 
 const loadProjectIssues = async (denops: Denops) => {
   await setModifiable(denops);
@@ -187,12 +179,13 @@ export function main(denops: Denops) {
         return;
       }
       try {
-        requestCreateNewProjectIssue(projectId, {
+        await requestCreateNewProjectIssue(projectId, {
           id: projectId,
           title: title,
         });
+        helper.echo(denops, "Successfully created a new issue.");
       } catch (e) {
-        console.log(e.message);
+        helper.echoerr(denops, e.message);
       }
     },
 
@@ -211,9 +204,10 @@ export function main(denops: Denops) {
         return;
       }
       try {
-        requestDeleteIssue(projectId, issue_iid);
+        await requestDeleteIssue(projectId, issue_iid);
+        helper.echo(denops, "Successfully delete a issue.");
       } catch (e) {
-        console.log(e.message);
+        helper.echoerr(denops, e.message);
       }
     },
 
@@ -223,7 +217,7 @@ export function main(denops: Denops) {
         return;
       }
       if (currentIssue.issue.description == null) {
-        console.log("This issue does not have a description.");
+        helper.echo(denops, "This issue does not have a description.");
         return;
       }
       const lines = currentIssue.issue.description.split("\n");
@@ -297,12 +291,16 @@ export function main(denops: Denops) {
       if (!unknownutil.isNumber(issue_iid)) {
         return;
       }
-      const attributes: EditIssueAttributes = {
-        id: projectId,
-        issue_iid: issue_iid,
-        description: description,
-      };
-      await requestEditIssue(attributes);
+      try {
+        await requestEditIssue({
+          id: projectId,
+          issue_iid: issue_iid,
+          description: description,
+        });
+        helper.echo(denops, "Successfully edit a issue.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
     },
 
     async reloadProjectIssues(): Promise<void> {
@@ -378,12 +376,16 @@ export function main(denops: Denops) {
       if (!unknownutil.isString(title)) {
         return;
       }
-      const attributes: WikiCreateAttributes = {
-        id: projectId,
-        title: title,
-        content: content,
-      };
-      await requestCreateNewProjectWiki(attributes);
+      try {
+        await requestCreateNewProjectWiki({
+          id: projectId,
+          title: title,
+          content: content,
+        });
+        helper.echo(denops, "Successfully create a new wiki.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
     },
 
     async openProjectWikiPreview(): Promise<void> {
@@ -464,13 +466,17 @@ export function main(denops: Denops) {
       if (!unknownutil.isString(slug)) {
         return;
       }
-      const attributes: WikiEditAttributes = {
-        id: projectId,
-        title: title,
-        content: content,
-        slug: slug,
-      };
-      requestEditWiki(attributes);
+      try {
+        await requestEditWiki({
+          id: projectId,
+          title: title,
+          content: content,
+          slug: slug,
+        });
+        helper.echo(denops, "Successfully edit a wiki.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
     },
 
     async deleteProjectWiki(): Promise<void> {
@@ -487,14 +493,14 @@ export function main(denops: Denops) {
       if (confirm !== "y") {
         return;
       }
-      const attributes: WikiDeleteAttributes = {
-        id: projectId,
-        slug: slug,
-      };
       try {
-        requestDeleteWiki(attributes);
+        await requestDeleteWiki({
+          id: projectId,
+          slug: slug,
+        });
+        helper.echo(denops, "Successfully delete a wiki.");
       } catch (e) {
-        console.log(e.message);
+        helper.echoerr(denops, e.message);
       }
     },
 

@@ -133,7 +133,6 @@ export const requestCreateNewProjectIssue = async (
   if (res.status != 201) {
     throw new Error("Failed to create new issue.");
   }
-  console.log("Successfully created a new issue.");
 };
 
 export const requestDeleteIssue = async (
@@ -150,7 +149,6 @@ export const requestDeleteIssue = async (
   if (res.status != 204) {
     throw new Error("Failed to delete issue.");
   }
-  console.log("Successfully delete a issue.");
 };
 
 export const requestEditIssue = async (
@@ -169,7 +167,6 @@ export const requestEditIssue = async (
   if (!(res.status == 200 || res.status == 201)) {
     throw new Error("Failed to edit issue.");
   }
-  console.log("Successfully edit a issue.");
 };
 
 export const requestCreateNewProjectWiki = async (
@@ -186,7 +183,6 @@ export const requestCreateNewProjectWiki = async (
   if (!(res.status == 201)) {
     throw new Error("Failed to create a new wiki.");
   }
-  console.log("Successfully create a new wiki.");
 };
 
 export const getProjectWikis = async (
@@ -194,7 +190,8 @@ export const getProjectWikis = async (
 ): Promise<Wiki[]> => {
   const gitlabUrl = getGitlabUrl();
   const projectId = attributes.id;
-  const gitlabApiPath = `${gitlabUrl}/api/v4/projects/${projectId}/wikis?with_content=1`;
+  const gitlabApiPath =
+    `${gitlabUrl}/api/v4/projects/${projectId}/wikis?with_content=1`;
   const res = await fetch(gitlabApiPath, {
     method: "GET",
     headers: getHeaders(),
@@ -216,10 +213,8 @@ export const requestEditWiki = async (
     body: JSON.stringify(attributes),
   });
   if (!(res.status == 200 || res.status == 201)) {
-    console.log(res.status);
     throw new Error("Failed to edit wiki.");
   }
-  console.log("Successfully edit a wiki.");
 };
 
 export const requestDeleteWiki = async (
@@ -237,5 +232,4 @@ export const requestDeleteWiki = async (
   if (res.status != 204) {
     throw new Error("Failed to delete a wiki.");
   }
-  console.log("Successfully delete a wiki.");
 };

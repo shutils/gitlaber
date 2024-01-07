@@ -19,11 +19,11 @@ function! gitlaber#denops#open_wikis_panel() abort
 endfunction
 
 function! gitlaber#denops#create_new_pro_issue() abort
-  call denops#request('gitlaber', 'createNewProjectIssue', [])
+  call denops#notify('gitlaber', 'createNewProjectIssue', [])
 endfunction
 
 function! gitlaber#denops#delete_pro_issue() abort
-  call denops#request('gitlaber', 'deleteProjectIssue', [])
+  call denops#notify('gitlaber', 'deleteProjectIssue', [])
 endfunction
 
 function! gitlaber#denops#reload_pro_issue() abort
@@ -39,7 +39,7 @@ function! gitlaber#denops#open_create_new_pro_wiki_buf() abort
 endfunction
 
 function! gitlaber#denops#create_new_pro_wiki() abort
-  call denops#request('gitlaber', 'createProjectNewWiki', [])
+  call denops#notify('gitlaber', 'createProjectNewWiki', [])
 endfunction
 
 function! gitlaber#denops#open_pro_wiki_preview() abort
@@ -47,11 +47,11 @@ function! gitlaber#denops#open_pro_wiki_preview() abort
 endfunction
 
 function! gitlaber#denops#open_edit_pro_wiki_buf() abort
-  call denops#request('gitlaber', 'openEditProjectWikiBuf', [])
+  call denops#notify('gitlaber', 'openEditProjectWikiBuf', [])
 endfunction
 
 function! gitlaber#denops#edit_wiki() abort
-  return denops#request('gitlaber', 'editProjectWiki', [])
+  return denops#notify('gitlaber', 'editProjectWiki', [])
 endfunction
 
 function! gitlaber#denops#reload_pro_wikis() abort
@@ -59,7 +59,7 @@ function! gitlaber#denops#reload_pro_wikis() abort
 endfunction
 
 function! gitlaber#denops#delete_pro_wiki() abort
-  call denops#request('gitlaber', 'deleteProjectWiki', [])
+  call denops#notify('gitlaber', 'deleteProjectWiki', [])
 endfunction
 
 function! gitlaber#denops#get_current_node() abort
@@ -71,5 +71,5 @@ function! gitlaber#denops#open_pro_issue_edit() abort
 endfunction
 
 function! gitlaber#denops#edit_issue() abort
-  return denops#request('gitlaber', 'editProjectIssue', [])
+  return denops#notify('gitlaber', 'editProjectIssue', [])
 endfunction
