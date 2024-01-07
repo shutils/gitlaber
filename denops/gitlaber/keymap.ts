@@ -39,6 +39,12 @@ export const setMainPanelMapping = async (denops: Denops) => {
     "<Cmd>call gitlaber#denops#open_issue_panel()<CR>",
     mapOption,
   );
+  await mapping.map(
+    denops,
+    "w",
+    "<Cmd>call gitlaber#denops#open_wiki_panel()<CR>",
+    mapOption,
+  );
   await setBaseMapping(denops);
 };
 
@@ -85,3 +91,48 @@ export const setProjectIssuesPanelMapping = async (denops: Denops) => {
   );
   await setBaseMapping(denops);
 };
+
+export const setProjectWikiPanelMapping = async (denops: Denops) => {
+  await mapping.map(
+    denops,
+    "l",
+    "<Cmd>call gitlaber#denops#open_wikis_panel()<CR>",
+    mapOption,
+  );
+  await mapping.map(
+    denops,
+    "n",
+    "<Cmd>call gitlaber#denops#open_create_new_pro_wiki_buf()<CR>",
+    mapOption,
+  );
+  await setBaseMapping(denops);
+};
+
+export const setProjectWikisPanelMapping = async (denops: Denops) => {
+  await mapping.map(
+    denops,
+    "d",
+    "<Cmd>call gitlaber#denops#delete_pro_wiki()<CR>",
+    mapOption,
+  );
+  await mapping.map(
+    denops,
+    "r",
+    "<Cmd>call gitlaber#denops#reload_pro_wikis()<CR>",
+    mapOption,
+  );
+  await mapping.map(
+    denops,
+    "p",
+    "<Cmd>call gitlaber#denops#open_pro_wiki_preview()<CR>",
+    mapOption,
+  );
+  await mapping.map(
+    denops,
+    "e",
+    "<Cmd>call gitlaber#denops#open_edit_pro_wiki_buf()<CR>",
+    mapOption,
+  );
+  await setBaseMapping(denops);
+};
+

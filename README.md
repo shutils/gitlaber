@@ -106,11 +106,11 @@ This plugin will implement the following functions.
   - [ ] Create related merge request
   - [ ] Open in browser
 - [ ] Wiki operation
-  - [ ] Create a new wiki
-  - [ ] View wiki list
-  - [ ] View a wiki
-  - [ ] Edit a wiki
-  - [ ] Delete a wiki
+  - [x] Create a new wiki
+  - [x] View wiki list
+  - [x] View a wiki
+  - [x] Edit a wiki
+  - [x] Delete a wiki
   - [ ] View change history
 - [ ] Merge request operation
   - [ ] Create a new mr

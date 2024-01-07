@@ -1,6 +1,6 @@
 import { Denops, fn, vars } from "./deps.ts";
 
-import { BaseNode, IssueNode } from "./types.ts";
+import { BaseNode, IssueNode, WikiNode } from "./types.ts";
 
 export const setNofile = async (denops: Denops) => {
   await fn.setbufvar(
@@ -49,8 +49,8 @@ export const setNodesOnBuf = async (
 
 export const getCurrentNode = async (
   denops: Denops,
-): Promise<BaseNode | IssueNode> => {
-  const nodes: Array<BaseNode | IssueNode> = await vars.b.get(
+): Promise<BaseNode | IssueNode | WikiNode> => {
+  const nodes: Array<BaseNode | IssueNode | WikiNode> = await vars.b.get(
     denops,
     "nodes",
   );

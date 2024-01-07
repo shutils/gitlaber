@@ -5,6 +5,11 @@ import {
   Issue,
   NewIssueAttributes,
   Project,
+  Wiki,
+  WikiCreateAttributes,
+  WikiDeleteAttributes,
+  WikiEditAttributes,
+  WikisGetAttributes,
 } from "./types.ts";
 import { GITLAB_DEFAULT_URL } from "./constant.ts";
 
@@ -165,4 +170,72 @@ export const requestEditIssue = async (
     throw new Error("Failed to edit issue.");
   }
   console.log("Successfully edit a issue.");
+};
+
+export const requestCreateNewProjectWiki = async (
+  attributes: WikiCreateAttributes,
+): Promise<void> => {
+  const gitlabUrl = getGitlabUrl();
+  const projectId = attributes.id;
+  const gitlabApiPath = `${gitlabUrl}/api/v4/projects/${projectId}/wikis`;
+  const res = await fetch(gitlabApiPath, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(attributes),
+  });
+  if (!(res.status == 201)) {
+    throw new Error("Failed to create a new wiki.");
+  }
+  console.log("Successfully create a new wiki.");
+};
+
+export const getProjectWikis = async (
+  attributes: WikisGetAttributes,
+): Promise<Wiki[]> => {
+  const gitlabUrl = getGitlabUrl();
+  const projectId = attributes.id;
+  const gitlabApiPath = `${gitlabUrl}/api/v4/projects/${projectId}/wikis?with_content=1`;
+  const res = await fetch(gitlabApiPath, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return res.json();
+};
+
+export const requestEditWiki = async (
+  attributes: WikiEditAttributes,
+): Promise<void> => {
+  const gitlabUrl = getGitlabUrl();
+  const projectId = attributes.id;
+  const slug = attributes.slug;
+  const gitlabApiPath =
+    `${gitlabUrl}/api/v4/projects/${projectId}/wikis/${slug}`;
+  const res = await fetch(gitlabApiPath, {
+    method: "PUT",
+    headers: getHeaders(),
+    body: JSON.stringify(attributes),
+  });
+  if (!(res.status == 200 || res.status == 201)) {
+    console.log(res.status);
+    throw new Error("Failed to edit wiki.");
+  }
+  console.log("Successfully edit a wiki.");
+};
+
+export const requestDeleteWiki = async (
+  attributes: WikiDeleteAttributes,
+): Promise<void> => {
+  const gitlabUrl = getGitlabUrl();
+  const projectId = attributes.id;
+  const slug = attributes.slug;
+  const gitlabApiPath =
+    `${gitlabUrl}/api/v4/projects/${projectId}/wikis/${slug}`;
+  const res = await fetch(gitlabApiPath, {
+    method: "DELETE",
+    headers: getHeaders(),
+  });
+  if (res.status != 204) {
+    throw new Error("Failed to delete a wiki.");
+  }
+  console.log("Successfully delete a wiki.");
 };
