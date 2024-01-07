@@ -86,7 +86,7 @@ This plugin will implement the following functions.
 ### Core feature
 
 - [ ] Project operation
-  - [ ] Summary representation
+  - [x] View summary
   - [ ] Open in browser
   - [ ] View members
   - [ ] List of milestones
