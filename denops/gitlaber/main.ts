@@ -73,7 +73,7 @@ const loadProjectIssues = async (denops: Denops, projectId: number) => {
     );
   }
   await setNodesOnBuf(denops, nodes);
-  await vars.b.set(denops, "nodes", nodes);
+  await vars.b.set(denops, "gitlaber_nodes", nodes);
   await setNoModifiable(denops);
 };
 
@@ -106,7 +106,7 @@ const loadProjectWikis = async (denops: Denops, projectId: number) => {
     );
   }
   await setNodesOnBuf(denops, nodes);
-  await vars.b.set(denops, "nodes", nodes);
+  await vars.b.set(denops, "gitlaber_nodes", nodes);
   await setNoModifiable(denops);
 };
 
@@ -185,7 +185,7 @@ export function main(denops: Denops) {
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
       await setMainPanelMapping(denops);
-      await vars.b.set(denops, "nodes", nodes);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
       await setNoModifiable(denops);
     },
 
@@ -199,7 +199,7 @@ export function main(denops: Denops) {
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
       await setProjectIssuePanelMapping(denops);
-      await vars.b.set(denops, "nodes", nodes);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
       await setNoModifiable(denops);
     },
 
@@ -279,7 +279,7 @@ export function main(denops: Denops) {
       await fn.execute(denops, "new");
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
-      await vars.b.set(denops, "nodes", nodes);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
       await setNoModifiable(denops);
       await setBaseMapping(denops);
       await setFileType(denops);
@@ -309,7 +309,7 @@ export function main(denops: Denops) {
       await fn.bufload(denops, bufnr);
       await fn.execute(denops, `buffer ${bufnr}`);
       await setNodesOnBuf(denops, nodes);
-      await vars.b.set(denops, "nodes", nodes);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
       await vars.b.set(denops, "gitlaber_project_id", projectId);
       await vars.b.set(denops, "gitlaber_issue_iid", currentIssue.issue.iid);
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
@@ -373,7 +373,7 @@ export function main(denops: Denops) {
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
       await setProjectWikiPanelMapping(denops);
-      await vars.b.set(denops, "nodes", nodes);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
       await setNoModifiable(denops);
     },
 
@@ -458,7 +458,7 @@ export function main(denops: Denops) {
       await fn.execute(denops, "new");
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
-      await vars.b.set(denops, "nodes", nodes);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
       await setNoModifiable(denops);
       await setBaseMapping(denops);
       await setFileType(denops);
@@ -485,7 +485,7 @@ export function main(denops: Denops) {
       await fn.bufload(denops, bufnr);
       await fn.execute(denops, `buffer ${bufnr}`);
       await setNodesOnBuf(denops, nodes);
-      await vars.b.set(denops, "nodes", nodes);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
       await vars.b.set(denops, "gitlaber_project_id", projectId);
       await vars.b.set(denops, "gitlaber_wiki_title", currentWiki.wiki.title);
       await vars.b.set(denops, "gitlaber_wiki_slug", currentWiki.wiki.slug);
