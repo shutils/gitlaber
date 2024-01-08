@@ -336,9 +336,6 @@ export function main(denops: Denops) {
         "$",
       );
       const description = lines.join("\n");
-      if (!unknownutil.isNumber(projectId)) {
-        return;
-      }
       const issue_iid = await vars.b.get(denops, "gitlaber_issue_iid");
       if (!unknownutil.isNumber(issue_iid)) {
         return;
@@ -429,9 +426,6 @@ export function main(denops: Denops) {
         "$",
       );
       const content = lines.join("\n");
-      if (!unknownutil.isNumber(projectId)) {
-        return;
-      }
       const title = await vars.b.get(denops, "gitlaber_new_wiki_title");
       if (!unknownutil.isString(title)) {
         return;
@@ -519,9 +513,6 @@ export function main(denops: Denops) {
         "$",
       );
       const content = lines.join("\n");
-      if (!unknownutil.isNumber(projectId)) {
-        return;
-      }
       const title = await vars.b.get(denops, "gitlaber_wiki_title");
       if (!unknownutil.isString(title)) {
         return;
