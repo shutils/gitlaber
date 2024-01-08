@@ -1,6 +1,12 @@
 import { Denops, fn, vars } from "./deps.ts";
 
-import { BaseNode, IssueNode, WikiNode } from "./types.ts";
+import {
+  BaseNode,
+  GitlaberVar,
+  isGitlaberVar,
+  IssueNode,
+  WikiNode,
+} from "./types.ts";
 
 export const setNofile = async (denops: Denops) => {
   await fn.setbufvar(
@@ -56,4 +62,38 @@ export const getCurrentNode = async (
   );
   const index = await fn.line(denops, ".") - 1;
   return nodes[index];
+};
+
+export const getGitlaberVar = async (denops: Denops): Promise<GitlaberVar> => {
+  try {
+    const gitlaberVar = await vars.g.get(denops, "gitlaber_var");
+    if (!gitlaberVar) {
+      return [];
+    }
+    if (!isGitlaberVar(gitlaberVar)) {
+      return [];
+    }
+    return gitlaberVar;
+  } catch {
+    return [];
+  }
+};
+
+export const getCurrentGitlaberInstanceIndex = (
+  gitalberVar: GitlaberVar,
+  cwd: string,
+) => {
+  return gitalberVar.findIndex((gitlaber) => gitlaber.cwd === cwd);
+};
+
+export const getCurrentGitlaberInstance = async (
+  denops: Denops,
+) => {
+  const cwd = await fn.getcwd(denops);
+  const gitlaberVar = await getGitlaberVar(denops);
+  const index = getCurrentGitlaberInstanceIndex(gitlaberVar, cwd);
+  if (index === -1) {
+    throw new Error("Not found current gitlaber instance");
+  }
+  return gitlaberVar[index];
 };

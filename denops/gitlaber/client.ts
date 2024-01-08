@@ -1,9 +1,12 @@
 import { parse } from "https://deno.land/std@0.210.0/path/mod.ts";
+import { unknownutil as u } from "./deps.ts";
 
 import {
-  IssueEditAttributes,
+  isIssue,
+  isProject,
   Issue,
   IssueCreateNewAttributes,
+  IssueEditAttributes,
   Project,
   Wiki,
   WikiCreateAttributes,
@@ -88,17 +91,21 @@ const getHeaders = () => {
   };
 };
 
-export const getSingleProject = async (): Promise<
+export const getSingleProject = async (cwd?: string): Promise<
   Project
 > => {
-  const gitlabUrl = getGitlabUrl();
-  const projectPath = getUrlEncodedPath(getRemoteUrl());
+  const gitlabUrl = getGitlabUrl(cwd);
+  const projectPath = getUrlEncodedPath(getRemoteUrl(cwd));
   const gitlabApiPath = gitlabUrl + "/api/v4/projects/" + projectPath;
   const res = await fetch(gitlabApiPath, {
     method: "GET",
     headers: getHeaders(),
   });
-  return res.json();
+  const project = await res.json();
+  if (!isProject(project)) {
+    throw new Error("Failed to get project.");
+  }
+  return project;
 };
 
 export const getProjectIssues = async (
@@ -110,11 +117,15 @@ export const getProjectIssues = async (
     method: "GET",
     headers: getHeaders(),
   });
-  return res.json();
+  const issues = await res.json();
+  if (!u.isArrayOf(isIssue)(issues)) {
+    throw new Error("Failed to get issues.");
+  }
+  return issues;
 };
 
-export const getProjectId = async () => {
-  const singleProject = await getSingleProject();
+export const getProjectId = async (cwd?: string) => {
+  const singleProject = await getSingleProject(cwd);
   const id = singleProject.id;
   return await Promise.resolve(id);
 };
