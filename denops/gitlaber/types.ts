@@ -210,6 +210,8 @@ export type WikiNode = u.PredicateType<typeof isWikiNode>;
 const isGitlaberInstance = u.isObjectOf({
   index: u.isNumber,
   cwd: u.isString,
+  url: u.isString,
+  token: u.isString,
   project: isProject,
   issues: u.isOptionalOf(u.isArrayOf(isIssue)),
   wikis: u.isOptionalOf(u.isArrayOf(isWiki)),

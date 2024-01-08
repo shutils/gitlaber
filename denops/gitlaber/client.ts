@@ -58,48 +58,51 @@ const getRemoteUrl = (cwd?: string) => {
   return exec("git", ["remote", "get-url", "origin"], cwd);
 };
 
-const getGitlabUrl = (cwd?: string) => {
+export const getGitlabUrl = (cwd?: string) => {
   try {
     return exec("git", ["config", "--get", "gitlab.url"], cwd);
   } catch {
-    const gitlabUrl = Deno.env.get("GITLAB_URL");
-    if (gitlabUrl) {
-      return gitlabUrl;
+    const url = Deno.env.get("GITLAB_URL");
+    if (url) {
+      return url;
     } else {
       return GITLAB_DEFAULT_URL;
     }
   }
 };
 
-const getGitlabToken = (cwd?: string) => {
+export const getGitlabToken = (cwd?: string) => {
   try {
     return exec("git", ["config", "--get", "gitlab.token"], cwd);
   } catch {
-    const gitlabToken = Deno.env.get("GITLAB_TOKEN");
-    if (gitlabToken) {
-      return gitlabToken;
+    const token = Deno.env.get("GITLAB_TOKEN");
+    if (token) {
+      return token;
     } else {
       throw new Error("Unable to get GitLab token");
     }
   }
 };
 
-const getHeaders = () => {
+const createHeaders = (token: string) => {
   return {
     "Content-Type": "application/json",
-    "PRIVATE-TOKEN": getGitlabToken(),
+    "PRIVATE-TOKEN": token,
   };
 };
 
-export const getSingleProject = async (cwd?: string): Promise<
+export const getSingleProject = async (
+  url: string,
+  token: string,
+  cwd?: string,
+): Promise<
   Project
 > => {
-  const gitlabUrl = getGitlabUrl(cwd);
   const projectPath = getUrlEncodedPath(getRemoteUrl(cwd));
-  const gitlabApiPath = gitlabUrl + "/api/v4/projects/" + projectPath;
+  const gitlabApiPath = url + "/api/v4/projects/" + projectPath;
   const res = await fetch(gitlabApiPath, {
     method: "GET",
-    headers: getHeaders(),
+    headers: createHeaders(token),
   });
   const project = await res.json();
   if (!isProject(project)) {
@@ -109,13 +112,14 @@ export const getSingleProject = async (cwd?: string): Promise<
 };
 
 export const getProjectIssues = async (
+  url: string,
+  token: string,
   projectId: number,
 ): Promise<Issue[]> => {
-  const gitlabUrl = getGitlabUrl();
-  const gitlabApiPath = gitlabUrl + "/api/v4/projects/" + projectId + "/issues";
+  const gitlabApiPath = url + "/api/v4/projects/" + projectId + "/issues";
   const res = await fetch(gitlabApiPath, {
     method: "GET",
-    headers: getHeaders(),
+    headers: createHeaders(token),
   });
   const issues = await res.json();
   if (!u.isArrayOf(isIssue)(issues)) {
@@ -124,21 +128,16 @@ export const getProjectIssues = async (
   return issues;
 };
 
-export const getProjectId = async (cwd?: string) => {
-  const singleProject = await getSingleProject(cwd);
-  const id = singleProject.id;
-  return await Promise.resolve(id);
-};
-
 export const requestCreateNewProjectIssue = async (
+  url: string,
+  token: string,
   projectId: number,
   attributes: IssueCreateNewAttributes,
 ): Promise<void> => {
-  const gitlabUrl = getGitlabUrl();
-  const gitlabApiPath = gitlabUrl + "/api/v4/projects/" + projectId + "/issues";
+  const gitlabApiPath = url + "/api/v4/projects/" + projectId + "/issues";
   const res = await fetch(gitlabApiPath, {
     method: "POST",
-    headers: getHeaders(),
+    headers: createHeaders(token),
     body: JSON.stringify(attributes),
   });
   if (res.status != 201) {
@@ -147,15 +146,16 @@ export const requestCreateNewProjectIssue = async (
 };
 
 export const requestDeleteIssue = async (
+  url: string,
+  token: string,
   projectId: number,
   issue_iid: number,
 ): Promise<void> => {
-  const gitlabUrl = getGitlabUrl();
   const gitlabApiPath =
-    `${gitlabUrl}/api/v4/projects/${projectId}/issues/${issue_iid}`;
+    `${url}/api/v4/projects/${projectId}/issues/${issue_iid}`;
   const res = await fetch(gitlabApiPath, {
     method: "DELETE",
-    headers: getHeaders(),
+    headers: createHeaders(token),
   });
   if (res.status != 204) {
     throw new Error("Failed to delete issue.");
@@ -163,17 +163,16 @@ export const requestDeleteIssue = async (
 };
 
 export const requestEditIssue = async (
-  attributes: IssueEditAttributes,
+  url: string,
+  token: string,
+  attrs: IssueEditAttributes,
 ): Promise<void> => {
-  const gitlabUrl = getGitlabUrl();
-  const projectId = attributes.id;
-  const issue_iid = attributes.issue_iid;
   const gitlabApiPath =
-    `${gitlabUrl}/api/v4/projects/${projectId}/issues/${issue_iid}`;
+    `${url}/api/v4/projects/${attrs.id}/issues/${attrs.issue_iid}`;
   const res = await fetch(gitlabApiPath, {
     method: "PUT",
-    headers: getHeaders(),
-    body: JSON.stringify(attributes),
+    headers: createHeaders(token),
+    body: JSON.stringify(attrs),
   });
   if (!(res.status == 200 || res.status == 201)) {
     throw new Error("Failed to edit issue.");
@@ -181,15 +180,15 @@ export const requestEditIssue = async (
 };
 
 export const requestCreateNewProjectWiki = async (
-  attributes: WikiCreateAttributes,
+  url: string,
+  token: string,
+  attrs: WikiCreateAttributes,
 ): Promise<void> => {
-  const gitlabUrl = getGitlabUrl();
-  const projectId = attributes.id;
-  const gitlabApiPath = `${gitlabUrl}/api/v4/projects/${projectId}/wikis`;
+  const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/wikis`;
   const res = await fetch(gitlabApiPath, {
     method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify(attributes),
+    headers: createHeaders(token),
+    body: JSON.stringify(attrs),
   });
   if (!(res.status == 201)) {
     throw new Error("Failed to create a new wiki.");
@@ -197,31 +196,30 @@ export const requestCreateNewProjectWiki = async (
 };
 
 export const getProjectWikis = async (
-  attributes: WikisGetAttributes,
+  url: string,
+  token: string,
+  attrs: WikisGetAttributes,
 ): Promise<Wiki[]> => {
-  const gitlabUrl = getGitlabUrl();
-  const projectId = attributes.id;
   const gitlabApiPath =
-    `${gitlabUrl}/api/v4/projects/${projectId}/wikis?with_content=1`;
+    `${url}/api/v4/projects/${attrs.id}/wikis?with_content=1`;
   const res = await fetch(gitlabApiPath, {
     method: "GET",
-    headers: getHeaders(),
+    headers: createHeaders(token),
   });
   return res.json();
 };
 
 export const requestEditWiki = async (
-  attributes: WikiEditAttributes,
+  url: string,
+  token: string,
+  attrs: WikiEditAttributes,
 ): Promise<void> => {
-  const gitlabUrl = getGitlabUrl();
-  const projectId = attributes.id;
-  const slug = attributes.slug;
   const gitlabApiPath =
-    `${gitlabUrl}/api/v4/projects/${projectId}/wikis/${slug}`;
+    `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
   const res = await fetch(gitlabApiPath, {
     method: "PUT",
-    headers: getHeaders(),
-    body: JSON.stringify(attributes),
+    headers: createHeaders(token),
+    body: JSON.stringify(attrs),
   });
   if (!(res.status == 200 || res.status == 201)) {
     throw new Error("Failed to edit wiki.");
@@ -229,16 +227,15 @@ export const requestEditWiki = async (
 };
 
 export const requestDeleteWiki = async (
-  attributes: WikiDeleteAttributes,
+  url: string,
+  token: string,
+  attrs: WikiDeleteAttributes,
 ): Promise<void> => {
-  const gitlabUrl = getGitlabUrl();
-  const projectId = attributes.id;
-  const slug = attributes.slug;
   const gitlabApiPath =
-    `${gitlabUrl}/api/v4/projects/${projectId}/wikis/${slug}`;
+    `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
   const res = await fetch(gitlabApiPath, {
     method: "DELETE",
-    headers: getHeaders(),
+    headers: createHeaders(token),
   });
   if (res.status != 204) {
     throw new Error("Failed to delete a wiki.");
