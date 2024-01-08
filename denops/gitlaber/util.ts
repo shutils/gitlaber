@@ -58,7 +58,7 @@ export const getCurrentNode = async (
 ): Promise<BaseNode | IssueNode | WikiNode> => {
   const nodes: Array<BaseNode | IssueNode | WikiNode> = await vars.b.get(
     denops,
-    "nodes",
+    "gitlaber_nodes",
   );
   const index = await fn.line(denops, ".") - 1;
   return nodes[index];
