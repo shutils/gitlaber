@@ -118,6 +118,7 @@ export function main(denops: Denops) {
       await setMainPanelMapping(denops);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
       await setNoModifiable(denops);
+      await denops.cmd("redraw");
     },
 
     async openProjectIssuePanel(): Promise<void> {
@@ -128,6 +129,7 @@ export function main(denops: Denops) {
       await setProjectIssuePanelMapping(denops);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
       await setNoModifiable(denops);
+      await denops.cmd("redraw");
     },
 
     async openProjectIssuesPanel(): Promise<void> {
@@ -137,6 +139,7 @@ export function main(denops: Denops) {
       await loadProjectIssues(denops, projectId);
       await setNofile(denops);
       await setProjectIssuesPanelMapping(denops);
+      await denops.cmd("redraw");
     },
 
     async createNewProjectIssue(): Promise<void> {
@@ -203,6 +206,7 @@ export function main(denops: Denops) {
       await setNoModifiable(denops);
       await setBaseMapping(denops);
       await setFileType(denops);
+      await denops.cmd("redraw");
     },
 
     async openProjectIssueEditBuf(): Promise<void> {
@@ -232,6 +236,7 @@ export function main(denops: Denops) {
       });
       await setBaseMapping(denops);
       await setFileType(denops);
+      await denops.cmd("redraw");
     },
 
     async editProjectIssue(): Promise<void> {
@@ -275,6 +280,7 @@ export function main(denops: Denops) {
       await setProjectWikiPanelMapping(denops);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
       await setNoModifiable(denops);
+      await denops.cmd("redraw");
     },
 
     async openProjectWikisPanel(): Promise<void> {
@@ -284,6 +290,7 @@ export function main(denops: Denops) {
       await loadProjectWikis(denops, projectId);
       await setNofile(denops);
       await setProjectWikisPanelMapping(denops);
+      await denops.cmd("redraw");
     },
 
     async openCreateNewProjectWikiBuf(): Promise<void> {
@@ -312,6 +319,7 @@ export function main(denops: Denops) {
       });
       await setBaseMapping(denops);
       await setFileType(denops);
+      await denops.cmd("redraw");
     },
 
     async createProjectNewWiki(): Promise<void> {
@@ -349,6 +357,7 @@ export function main(denops: Denops) {
       await setNoModifiable(denops);
       await setBaseMapping(denops);
       await setFileType(denops);
+      await denops.cmd("redraw");
     },
 
     async openEditProjectWikiBuf(): Promise<void> {
@@ -379,6 +388,7 @@ export function main(denops: Denops) {
       });
       await setBaseMapping(denops);
       await setFileType(denops);
+      await denops.cmd("redraw");
     },
 
     async editProjectWiki(): Promise<void> {
