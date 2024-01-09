@@ -24,6 +24,7 @@ import {
   setProjectWikisPanelMapping,
 } from "./keymap.ts";
 import {
+  flattenBuffer,
   getCurrentGitlaberInstance,
   getCurrentNode,
   getGitlaberVar,
@@ -236,13 +237,7 @@ export function main(denops: Denops) {
       const url = currentGitlaberInstance.url;
       const token = currentGitlaberInstance.token;
       const projectId = currentGitlaberInstance.project.id;
-      const lines = await fn.getbufline(
-        denops,
-        await fn.bufname(denops),
-        1,
-        "$",
-      );
-      const description = lines.join("\n");
+      const description = await flattenBuffer(denops, await fn.bufname(denops));
       const issue_iid = await vars.b.get(denops, "gitlaber_issue_iid");
       if (!unknownutil.isNumber(issue_iid)) {
         return;
@@ -322,13 +317,7 @@ export function main(denops: Denops) {
       const url = currentGitlaberInstance.url;
       const token = currentGitlaberInstance.token;
       const projectId = currentGitlaberInstance.project.id;
-      const lines = await fn.getbufline(
-        denops,
-        await fn.bufname(denops),
-        1,
-        "$",
-      );
-      const content = lines.join("\n");
+      const content = await flattenBuffer(denops, await fn.bufname(denops));
       const title = await vars.b.get(denops, "gitlaber_new_wiki_title");
       if (!unknownutil.isString(title)) {
         return;
@@ -395,13 +384,7 @@ export function main(denops: Denops) {
       const url = currentGitlaberInstance.url;
       const token = currentGitlaberInstance.token;
       const projectId = currentGitlaberInstance.project.id;
-      const lines = await fn.getbufline(
-        denops,
-        await fn.bufname(denops),
-        1,
-        "$",
-      );
-      const content = lines.join("\n");
+      const content = await flattenBuffer(denops, await fn.bufname(denops));
       const title = await vars.b.get(denops, "gitlaber_wiki_title");
       if (!unknownutil.isString(title)) {
         return;

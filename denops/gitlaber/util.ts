@@ -88,3 +88,13 @@ export const getCurrentGitlaberInstance = async (
   }
   return gitlaberVar[index];
 };
+
+export const flattenBuffer = async (denops: Denops, bufname: string) => {
+  const lines = await fn.getbufline(
+    denops,
+    bufname,
+    1,
+    "$",
+  );
+  return lines.join("\n");
+};
