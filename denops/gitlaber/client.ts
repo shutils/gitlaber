@@ -2,18 +2,24 @@ import { parse } from "https://deno.land/std@0.210.0/path/mod.ts";
 import { unknownutil as u } from "./deps.ts";
 
 import {
+  Branch,
+  BranchCreateAttributes,
+  BranchGetAttributes,
+  CommitGetAttributes,
+  isBranch,
+  isCommit,
   isIssue,
   isProject,
   Issue,
   IssueCreateNewAttributes,
   IssueEditAttributes,
+  MergeRequestCreateAttributes,
   Project,
   Wiki,
   WikiCreateAttributes,
   WikiDeleteAttributes,
   WikiEditAttributes,
   WikisGetAttributes,
-  BranchCreateAttributes,
 } from "./types.ts";
 import { GITLAB_DEFAULT_URL } from "./constant.ts";
 
@@ -117,7 +123,8 @@ export const getProjectIssues = async (
   token: string,
   projectId: number,
 ): Promise<Issue[]> => {
-  const gitlabApiPath = url + "/api/v4/projects/" + projectId + "/issues?state=opened";
+  const gitlabApiPath = url + "/api/v4/projects/" + projectId +
+    "/issues?state=opened";
   const res = await fetch(gitlabApiPath, {
     method: "GET",
     headers: createHeaders(token),
@@ -248,7 +255,8 @@ export const requestCreateIssueBranch = async (
   token: string,
   attrs: BranchCreateAttributes,
 ): Promise<void> => {
-  const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/repository/branches`;
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/repository/branches`;
   const res = await fetch(gitlabApiPath, {
     method: "POST",
     headers: createHeaders(token),
@@ -257,4 +265,59 @@ export const requestCreateIssueBranch = async (
   if (!(res.status == 201)) {
     throw new Error("Failed to create a new branch.");
   }
+};
+
+export const getProjectBranches = async (
+  url: string,
+  token: string,
+  attrs: BranchGetAttributes,
+): Promise<Branch[]> => {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/repository/branches`;
+  const res = await fetch(gitlabApiPath, {
+    method: "GET",
+    headers: createHeaders(token),
+  });
+  const branches = await res.json();
+  if (!u.isArrayOf(isBranch)(branches)) {
+    throw new Error("Failed to get branches.");
+  }
+  return branches;
+};
+
+export const requestCreateMergeRequest = async (
+  url: string,
+  token: string,
+  attrs: MergeRequestCreateAttributes,
+): Promise<void> => {
+  const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/merge_requests`;
+  const res = await fetch(gitlabApiPath, {
+    method: "POST",
+    headers: createHeaders(token),
+    body: JSON.stringify(attrs),
+  });
+  if (!(res.status == 201)) {
+    throw new Error("Failed to create a new merge request.");
+  }
+};
+
+export const requestGetCommit = async (
+  url: string,
+  token: string,
+  attrs: CommitGetAttributes,
+) => {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/repository/commits/${attrs.sha}`;
+  const res = await fetch(gitlabApiPath, {
+    method: "GET",
+    headers: createHeaders(token),
+  });
+  if (!(res.status == 200)) {
+    throw new Error("Failed to get a commit.");
+  }
+  const commit = await res.json();
+  if (!isCommit(commit)) {
+    throw new Error(`This is not a commit. ${commit}`);
+  }
+  return commit;
 };

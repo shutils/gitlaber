@@ -47,6 +47,12 @@ export const setMainPanelMapping = async (denops: Denops) => {
   );
   await mapping.map(
     denops,
+    "b",
+    "<Cmd>call denops#notify('gitlaber', 'openProjectBranchPanel', [])<CR>",
+    mapOption,
+  );
+  await mapping.map(
+    denops,
     "o",
     "<Cmd>call denops#notify('gitlaber', 'openBrowserProject', [])<CR>",
     mapOption,
@@ -105,6 +111,26 @@ export const setProjectIssuesPanelMapping = async (denops: Denops) => {
     denops,
     "o",
     "<Cmd>call denops#notify('gitlaber', 'openBrowserIssue', [])<CR>",
+    mapOption,
+  );
+  await setBaseMapping(denops);
+};
+
+export const setProjectBranchPanelMapping = async (denops: Denops) => {
+  await mapping.map(
+    denops,
+    "l",
+    "<Cmd>call denops#notify('gitlaber', 'openProjectBranchesPanel', [])<CR>",
+    mapOption,
+  );
+  await setBaseMapping(denops);
+};
+
+export const setProjectBranchesPanelMapping = async (denops: Denops) => {
+  await mapping.map(
+    denops,
+    "M",
+    "<Cmd>call denops#notify('gitlaber', 'createNewBranchMr', [])<CR>",
     mapOption,
   );
   await setBaseMapping(denops);

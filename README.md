@@ -83,15 +83,15 @@ Each panel has a default keymap.
 
 #### Issue list panel
 
-| Function                 | Key map | Implemented        |
-| ------------------------ | ------- | ------------------ |
-| Preview project issue    | p       | :white_check_mark: |
-| Edit project issue       | e       | :white_check_mark: |
-| Delete project issue     | d       | :white_check_mark: |
-| Reload project issue     | r       | :white_check_mark: |
-| Quit                     | q       | :white_check_mark: |
-| Create issue branch      | b       | :white_check_mark: |
-| Open in browser          | o       | :white_check_mark: |
+| Function              | Key map | Implemented        |
+| --------------------- | ------- | ------------------ |
+| Preview project issue | p       | :white_check_mark: |
+| Edit project issue    | e       | :white_check_mark: |
+| Delete project issue  | d       | :white_check_mark: |
+| Reload project issue  | r       | :white_check_mark: |
+| Quit                  | q       | :white_check_mark: |
+| Create issue branch   | b       | :white_check_mark: |
+| Open in browser       | o       | :white_check_mark: |
 
 #### Wiki panel
 
@@ -103,13 +103,27 @@ Each panel has a default keymap.
 
 #### Wiki list panel
 
-| Function                | Key map | Implemented        |
-| ----------------------- | ------- | ------------------ |
-| Preview project wiki    | p       | :white_check_mark: |
-| Edit project wiki       | e       | :white_check_mark: |
-| Delete project wiki     | d       | :white_check_mark: |
-| Quit                    | q       | :white_check_mark: |
-| Open in browser         | o       | :white_check_mark: |
+| Function             | Key map | Implemented        |
+| -------------------- | ------- | ------------------ |
+| Preview project wiki | p       | :white_check_mark: |
+| Edit project wiki    | e       | :white_check_mark: |
+| Delete project wiki  | d       | :white_check_mark: |
+| Quit                 | q       | :white_check_mark: |
+| Open in browser      | o       | :white_check_mark: |
+
+#### Branch panel
+
+| Function         | Key map | Implemented        |
+| ---------------- | ------- | ------------------ |
+| Open branch list | l       | :white_check_mark: |
+| Quit             | q       | :white_check_mark: |
+
+#### Branch list panel
+
+| Function  | Key map | Implemented        |
+| --------- | ------- | ------------------ |
+| Create mr | M       | :white_check_mark: |
+| Quit      | q       | :white_check_mark: |
 
 ## Roadmap
 
@@ -153,6 +167,12 @@ This plugin will implement the following functions.
   - [ ] Delete a mr
   - [ ] View change history
   - [ ] Search mr
+- [ ] Branch operation
+  - [ ] Create a new branch
+  - [x] Create a mr from branch
+  - [x] View branch list
+  - [ ] Delete a branch
+  - [ ] Search branch
 
 ### Other feature
 

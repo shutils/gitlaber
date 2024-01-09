@@ -27,7 +27,9 @@ const isIssueState = u.isLiteralOneOf(["opened", "closed"] as const);
 
 export type IssueState = u.PredicateType<typeof isIssueState>;
 
-const isNodeKind = u.isLiteralOneOf(["other", "issue", "wiki"] as const);
+const isNodeKind = u.isLiteralOneOf(
+  ["other", "issue", "wiki", "branch"] as const,
+);
 
 export type NodeKind = u.PredicateType<typeof isNodeKind>;
 
@@ -89,6 +91,53 @@ const isWiki = u.isObjectOf({
 });
 
 export type Wiki = u.PredicateType<typeof isWiki>;
+
+export const isCommit = u.isObjectOf({
+  id: u.isString,
+  short_id: u.isString,
+  title: u.isString,
+  author_name: u.isString,
+  author_email: u.isString,
+  committer_name: u.isString,
+  committer_email: u.isString,
+  created_at: u.isString,
+  message: u.isString,
+  committed_date: u.isString,
+  parent_ids: u.isArrayOf(u.isString),
+  ...u.isUnknown,
+});
+
+export type Commit = u.PredicateType<typeof isCommit>;
+
+export const isBranch = u.isObjectOf({
+  name: u.isString,
+  merged: u.isBoolean,
+  protected: u.isBoolean,
+  default: u.isBoolean,
+  developers_can_push: u.isBoolean,
+  developers_can_merge: u.isBoolean,
+  can_push: u.isBoolean,
+  web_url: u.isString,
+  commit: u.isObjectOf({
+    id: u.isString,
+    short_id: u.isString,
+    created_at: u.isString,
+    parent_ids: u.isArrayOf(u.isString),
+    title: u.isString,
+    message: u.isString,
+    author_name: u.isString,
+    author_email: u.isString,
+    authored_date: u.isString,
+    committer_name: u.isString,
+    committer_email: u.isString,
+    committed_date: u.isString,
+    web_url: u.isString,
+    ...u.isUnknown,
+  }),
+  ...u.isUnknown,
+});
+
+export type Branch = u.PredicateType<typeof isBranch>;
 
 const isWikiGetAttributes = u.isObjectOf({
   id: u.isNumber,
@@ -194,6 +243,43 @@ export type BranchCreateAttributes = u.PredicateType<
   typeof isBranchCreateAttributes
 >;
 
+const isBranchGetAttributes = u.isObjectOf({
+  id: u.isNumber,
+  search: u.isOptionalOf(u.isString),
+  regex: u.isOptionalOf(u.isString),
+});
+
+export type BranchGetAttributes = u.PredicateType<
+  typeof isBranchGetAttributes
+>;
+
+const isMergeRequestCreateAttributes = u.isObjectOf({
+  id: u.isNumber,
+  source_branch: u.isString,
+  target_branch: u.isString,
+  title: u.isString,
+  description: u.isOptionalOf(u.isString),
+  assignee_id: u.isOptionalOf(u.isNumber),
+  remove_source_branch: u.isOptionalOf(u.isBoolean),
+  squash: u.isOptionalOf(u.isBoolean),
+  ...u.isUnknown,
+});
+
+export type MergeRequestCreateAttributes = u.PredicateType<
+  typeof isMergeRequestCreateAttributes
+>;
+
+const isCommitGetAttributes = u.isObjectOf({
+  id: u.isNumber,
+  sha: u.isString,
+  stats: u.isOptionalOf(u.isBoolean),
+  ...u.isUnknown,
+});
+
+export type CommitGetAttributes = u.PredicateType<
+  typeof isCommitGetAttributes
+>;
+
 const baseNode = {
   display: u.isString,
   kind: isNodeKind,
@@ -217,6 +303,14 @@ const isIssueNode = u.isObjectOf({
 });
 
 export type IssueNode = u.PredicateType<typeof isIssueNode>;
+
+const isBranchNode = u.isObjectOf({
+  ...baseNode,
+  kind: u.isLiteralOf("branch"),
+  branch: isBranch,
+});
+
+export type BranchNode = u.PredicateType<typeof isBranchNode>;
 
 const isWikiNode = u.isObjectOf({
   ...baseNode,

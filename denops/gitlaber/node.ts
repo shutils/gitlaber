@@ -1,4 +1,6 @@
 import {
+  Branch,
+  BranchNode,
   GitlaberInstance,
   Issue,
   IssueNode,
@@ -78,6 +80,29 @@ export const createProjectIssuesNodes = (
       } ${issue.title}`,
       kind: "issue",
       issue: issue,
+    });
+  });
+  return nodes;
+};
+
+export const createProjectBranchPanelNodes = () => {
+  const nodes: Array<Node> = [];
+  nodes.push({
+    display: "Project branch Panel",
+    kind: "other",
+  });
+  return nodes;
+};
+
+export const createProjectBranchesNodes = (
+  branches: Branch[],
+) => {
+  const nodes: Array<Node | BranchNode> = [];
+  branches.map((branch) => {
+    nodes.push({
+      display: branch.name,
+      kind: "branch",
+      branch: branch,
     });
   });
   return nodes;

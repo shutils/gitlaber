@@ -3,22 +3,27 @@ import { autocmd, Denops, fn, helper, unknownutil, vars } from "./deps.ts";
 import {
   getGitlabToken,
   getGitlabUrl,
+  getProjectBranches,
   getProjectIssues,
   getProjectWikis,
   getSingleProject,
   requestCreateIssueBranch,
+  requestCreateMergeRequest,
   requestCreateNewProjectIssue,
   requestCreateNewProjectWiki,
   requestDeleteIssue,
   requestDeleteWiki,
   requestEditIssue,
   requestEditWiki,
+  requestGetCommit,
 } from "./client.ts";
 
 import {
   setBaseMapping,
   setGlobalMapping,
   setMainPanelMapping,
+  setProjectBranchesPanelMapping,
+  setProjectBranchPanelMapping,
   setProjectIssuePanelMapping,
   setProjectIssuesPanelMapping,
   setProjectWikiPanelMapping,
@@ -39,6 +44,8 @@ import {
 import { setNodesOnBuf } from "./render.ts";
 import {
   createMainPanelNodes,
+  createProjectBranchesNodes,
+  createProjectBranchPanelNodes,
   createProjectIssueDescriptionNodes,
   createProjectIssuePanelNodes,
   createProjectIssuesNodes,
@@ -68,6 +75,20 @@ const loadProjectWikis = async (denops: Denops, projectId: number) => {
   await setModifiable(denops);
   const projectWikis = await getProjectWikis(url, token, { id: projectId });
   const nodes = createProjectWikiNodes(projectWikis);
+  await setNodesOnBuf(denops, nodes);
+  await vars.b.set(denops, "gitlaber_nodes", nodes);
+  await setNoModifiable(denops);
+};
+
+const loadProjectBranches = async (denops: Denops, projectId: number) => {
+  const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
+  const url = currentGitlaberInstance.url;
+  const token = currentGitlaberInstance.token;
+  await setModifiable(denops);
+  const projectBranches = await getProjectBranches(url, token, {
+    id: projectId,
+  });
+  const nodes = createProjectBranchesNodes(projectBranches);
   await setNodesOnBuf(denops, nodes);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
   await setNoModifiable(denops);
@@ -270,6 +291,79 @@ export function main(denops: Denops) {
     async _getCurrentNode(): Promise<BaseNode | IssueNode> {
       const currentNode = await getCurrentNode(denops);
       return currentNode;
+    },
+
+    async openProjectBranchPanel(): Promise<void> {
+      const nodes = createProjectBranchPanelNodes();
+      await fn.execute(denops, "botright new");
+      await setNodesOnBuf(denops, nodes);
+      await setNofile(denops);
+      await setProjectBranchPanelMapping(denops);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
+      await setNoModifiable(denops);
+      await denops.cmd("redraw");
+    },
+
+    async openProjectBranchesPanel(): Promise<void> {
+      const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
+      const projectId = currentGitlaberInstance.project.id;
+      await fn.execute(denops, "vertical botright new");
+      await loadProjectBranches(denops, projectId);
+      await setNofile(denops);
+      await setProjectBranchesPanelMapping(denops);
+      await denops.cmd("redraw");
+    },
+
+    async createNewBranchMr(): Promise<void> {
+      const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
+      const currentNode = await getCurrentNode(denops);
+      if (!("branch" in currentNode)) {
+        helper.echoerr(denops, "This node is not branch.");
+        return;
+      }
+      const url = currentGitlaberInstance.url;
+      const token = currentGitlaberInstance.token;
+      const projectId = currentGitlaberInstance.project.id;
+      const currentBranch = currentNode.branch.name;
+      const commitId = currentNode.branch.commit.short_id;
+      const commit = await requestGetCommit(url, token, {
+        id: projectId,
+        sha: commitId,
+      });
+      const defaultTitle = commit.title;
+      const defaultBranch = currentGitlaberInstance.project.default_branch;
+      const terget = await helper.input(denops, {
+        prompt: "Terget branch: ",
+        text: defaultBranch,
+      });
+      if (!terget) {
+        return;
+      }
+      const title = await helper.input(denops, {
+        prompt: "Merge request title: ",
+        text: defaultTitle,
+      });
+      if (!title) {
+        return;
+      }
+      const confirm = await helper.input(denops, {
+        prompt:
+          `Are you sure you want to create a merge request? (${currentBranch} into ${terget}) y/N: `,
+      });
+      if (confirm !== "y") {
+        return;
+      }
+      try {
+        await requestCreateMergeRequest(url, token, {
+          id: projectId,
+          title: title,
+          source_branch: currentBranch,
+          target_branch: terget,
+        });
+        helper.echo(denops, "Successfully created a new merge request.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
     },
 
     async openProjectWikiPanel(): Promise<void> {

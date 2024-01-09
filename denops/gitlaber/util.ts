@@ -2,6 +2,7 @@ import { Denops, fn, helper, vars } from "./deps.ts";
 
 import {
   BaseNode,
+  BranchNode,
   GitlaberVar,
   isGitlaberVar,
   IssueNode,
@@ -46,8 +47,12 @@ export const setNoModifiable = async (denops: Denops) => {
 
 export const getCurrentNode = async (
   denops: Denops,
-): Promise<BaseNode | IssueNode | WikiNode> => {
-  const nodes: Array<BaseNode | IssueNode | WikiNode> = await vars.b.get(
+): Promise<
+  BaseNode | IssueNode | WikiNode | BranchNode
+> => {
+  const nodes: Array<
+    BaseNode | IssueNode | WikiNode | BranchNode
+  > = await vars.b.get(
     denops,
     "gitlaber_nodes",
   );
