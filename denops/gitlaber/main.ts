@@ -29,49 +29,30 @@ import {
   getGitlaberVar,
   setFileType,
   setModifiable,
-  setNodesOnBuf,
   setNofile,
   setNoModifiable,
 } from "./util.ts";
 
-import { BaseNode, GitlaberInstance, IssueNode, WikiNode } from "./types.ts";
+import { setNodesOnBuf } from "./render.ts";
+import {
+  createMainPanelNodes,
+  createProjectIssueDescriptionNodes,
+  createProjectIssuePanelNodes,
+  createProjectIssuesNodes,
+  createProjectWikiContentNodes,
+  createProjectWikiNodes,
+  createProjectWikiPanelNodes,
+} from "./node.ts";
+
+import { BaseNode, GitlaberInstance, IssueNode } from "./types.ts";
 
 const loadProjectIssues = async (denops: Denops, projectId: number) => {
   const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
   const url = currentGitlaberInstance.url;
   const token = currentGitlaberInstance.token;
   await setModifiable(denops);
-  const bufLines = await fn.getbufline(
-    denops,
-    await fn.bufname(denops),
-    1,
-    "$",
-  );
-  const nodes: Array<BaseNode | IssueNode> = [];
   const projectIssues = await getProjectIssues(url, token, projectId);
-  let maxIidWidth = 1;
-  projectIssues.map((issue) => {
-    if (maxIidWidth < issue.iid.toString().length) {
-      maxIidWidth = issue.iid.toString().length;
-    }
-  });
-  projectIssues.map((issue) => {
-    nodes.push({
-      display: `# ${issue.iid} ${
-        Array(maxIidWidth + 1 - issue.iid.toString().length).join(" ")
-      } ${issue.title}`,
-      kind: "issue",
-      issue: issue,
-    });
-  });
-  if (bufLines.length > nodes.length) {
-    await fn.deletebufline(
-      denops,
-      await fn.bufname(denops),
-      nodes.length + 1,
-      "$",
-    );
-  }
+  const nodes = createProjectIssuesNodes(projectIssues);
   await setNodesOnBuf(denops, nodes);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
   await setNoModifiable(denops);
@@ -82,29 +63,8 @@ const loadProjectWikis = async (denops: Denops, projectId: number) => {
   const url = currentGitlaberInstance.url;
   const token = currentGitlaberInstance.token;
   await setModifiable(denops);
-  const bufLines = await fn.getbufline(
-    denops,
-    await fn.bufname(denops),
-    1,
-    "$",
-  );
-  const nodes: Array<BaseNode | WikiNode> = [];
   const projectWikis = await getProjectWikis(url, token, { id: projectId });
-  projectWikis.map((wiki) => {
-    nodes.push({
-      display: `${wiki.title}`,
-      kind: "wiki",
-      wiki: wiki,
-    });
-  });
-  if (bufLines.length > nodes.length) {
-    await fn.deletebufline(
-      denops,
-      await fn.bufname(denops),
-      nodes.length + 1,
-      "$",
-    );
-  }
+  const nodes = createProjectWikiNodes(projectWikis);
   await setNodesOnBuf(denops, nodes);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
   await setNoModifiable(denops);
@@ -144,44 +104,12 @@ export function main(denops: Denops) {
           await vars.g.set(denops, "gitlaber_var", gitlaberVar);
         }
       }
-      const nodes: Array<BaseNode | IssueNode> = [];
+      const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
       await fn.execute(denops, "tabnew");
-      nodes.push({
-        display: "Main Panel",
-        kind: "other",
-      });
-      nodes.push({
-        display: "",
-        kind: "other",
-      });
-      nodes.push({
-        display: `cwd: ${cwd}`,
-        kind: "other",
-      });
-      nodes.push({
-        display: `id: ${singleProject.id}`,
-        kind: "other",
-      });
-      nodes.push({
-        display: `name: ${singleProject.name}`,
-        kind: "other",
-      });
-      nodes.push({
-        display: `description: ${singleProject.description}`,
-        kind: "other",
-      });
-      nodes.push({
-        display: `created_at: ${singleProject.created_at}`,
-        kind: "other",
-      });
-      nodes.push({
-        display: `updated_at: ${singleProject.updated_at}`,
-        kind: "other",
-      });
-      nodes.push({
-        display: `open_issues_count: ${singleProject.open_issues_count}`,
-        kind: "other",
-      });
+      const nodes = createMainPanelNodes(
+        currentGitlaberInstance,
+        singleProject,
+      );
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
       await setMainPanelMapping(denops);
@@ -190,12 +118,8 @@ export function main(denops: Denops) {
     },
 
     async openProjectIssuePanel(): Promise<void> {
-      const nodes: Array<BaseNode> = [];
-      nodes.push({
-        display: "Project issue Panel",
-        kind: "other",
-      });
       await fn.execute(denops, "botright new");
+      const nodes = createProjectIssuePanelNodes();
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
       await setProjectIssuePanelMapping(denops);
@@ -239,11 +163,11 @@ export function main(denops: Denops) {
       const url = currentGitlaberInstance.url;
       const token = currentGitlaberInstance.token;
       const projectId = currentGitlaberInstance.project.id;
-      const currentIssue = await getCurrentNode(denops);
-      if (!("issue" in currentIssue)) {
+      const currentNode = await getCurrentNode(denops);
+      if (!("issue" in currentNode)) {
         return;
       }
-      const issue_iid = currentIssue.issue.iid;
+      const issue_iid = currentNode.issue.iid;
       const confirm = await helper.input(denops, {
         prompt:
           `Are you sure you want to delete the issue(${issue_iid})? y/N: `,
@@ -260,23 +184,16 @@ export function main(denops: Denops) {
     },
 
     async openProjectIssuePreview(): Promise<void> {
-      const currentIssue = await getCurrentNode(denops);
-      if (!("issue" in currentIssue)) {
+      const currentNode = await getCurrentNode(denops);
+      if (!("issue" in currentNode)) {
         return;
       }
-      if (currentIssue.issue.description == null) {
+      if (currentNode.issue.description == null) {
         helper.echo(denops, "This issue does not have a description.");
         return;
       }
-      const lines = currentIssue.issue.description.split("\n");
-      const nodes: Array<BaseNode> = [];
-      lines.map((line) => {
-        nodes.push({
-          display: line,
-          kind: "other",
-        });
-      });
       await fn.execute(denops, "new");
+      const nodes = createProjectIssueDescriptionNodes(currentNode.issue);
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
@@ -292,18 +209,8 @@ export function main(denops: Denops) {
       if (!("issue" in currentIssue)) {
         return;
       }
-      let lines = [""];
-      if (currentIssue.issue.description != null) {
-        lines = currentIssue.issue.description.split("\n");
-      }
-      const nodes: Array<BaseNode> = [];
-      lines.map((line) => {
-        nodes.push({
-          display: line,
-          kind: "other",
-        });
-      });
       await fn.execute(denops, "new");
+      const nodes = createProjectIssueDescriptionNodes(currentIssue.issue);
       const bufname = await fn.tempname(denops);
       const bufnr = await fn.bufadd(denops, bufname);
       await fn.bufload(denops, bufnr);
@@ -364,11 +271,7 @@ export function main(denops: Denops) {
     },
 
     async openProjectWikiPanel(): Promise<void> {
-      const nodes: Array<BaseNode> = [];
-      nodes.push({
-        display: "Project wiki Panel",
-        kind: "other",
-      });
+      const nodes = createProjectWikiPanelNodes();
       await fn.execute(denops, "botright new");
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
@@ -443,18 +346,11 @@ export function main(denops: Denops) {
     },
 
     async openProjectWikiPreview(): Promise<void> {
-      const currentWiki = await getCurrentNode(denops);
-      if (!("wiki" in currentWiki)) {
+      const currentNode = await getCurrentNode(denops);
+      if (!("wiki" in currentNode)) {
         return;
       }
-      const lines = currentWiki.wiki.content.split("\n");
-      const nodes: Array<BaseNode> = [];
-      lines.map((line) => {
-        nodes.push({
-          display: line,
-          kind: "other",
-        });
-      });
+      const nodes = createProjectWikiContentNodes(currentNode.wiki);
       await fn.execute(denops, "new");
       await setNodesOnBuf(denops, nodes);
       await setNofile(denops);
@@ -467,18 +363,11 @@ export function main(denops: Denops) {
     async openEditProjectWikiBuf(): Promise<void> {
       const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
       const projectId = currentGitlaberInstance.project.id;
-      const currentWiki = await getCurrentNode(denops);
-      if (!("wiki" in currentWiki)) {
+      const currentNode = await getCurrentNode(denops);
+      if (!("wiki" in currentNode)) {
         return;
       }
-      const lines = currentWiki.wiki.content.split("\n");
-      const nodes: Array<BaseNode> = [];
-      lines.map((line) => {
-        nodes.push({
-          display: line,
-          kind: "other",
-        });
-      });
+      const nodes = createProjectWikiContentNodes(currentNode.wiki);
       await fn.execute(denops, "new");
       const bufname = await fn.tempname(denops);
       const bufnr = await fn.bufadd(denops, bufname);
@@ -487,8 +376,8 @@ export function main(denops: Denops) {
       await setNodesOnBuf(denops, nodes);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
       await vars.b.set(denops, "gitlaber_project_id", projectId);
-      await vars.b.set(denops, "gitlaber_wiki_title", currentWiki.wiki.title);
-      await vars.b.set(denops, "gitlaber_wiki_slug", currentWiki.wiki.slug);
+      await vars.b.set(denops, "gitlaber_wiki_title", currentNode.wiki.title);
+      await vars.b.set(denops, "gitlaber_wiki_slug", currentNode.wiki.slug);
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
         helper.remove("BufWritePost");
         helper.define(

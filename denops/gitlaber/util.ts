@@ -44,15 +44,6 @@ export const setNoModifiable = async (denops: Denops) => {
   );
 };
 
-export const setNodesOnBuf = async (
-  denops: Denops,
-  nodes: Array<BaseNode | IssueNode>,
-) => {
-  for (let i = 0; i < nodes.length; i++) {
-    await fn.setline(denops, i + 1, nodes[i].display);
-  }
-};
-
 export const getCurrentNode = async (
   denops: Denops,
 ): Promise<BaseNode | IssueNode | WikiNode> => {

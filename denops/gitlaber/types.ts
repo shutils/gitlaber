@@ -191,6 +191,13 @@ const isBaseNode = u.isObjectOf(baseNode);
 
 export type BaseNode = u.PredicateType<typeof isBaseNode>;
 
+const isNode = u.isObjectOf({
+  ...baseNode,
+  ...u.isUnknown,
+});
+
+export type Node = u.PredicateType<typeof isNode>;
+
 const isIssueNode = u.isObjectOf({
   ...baseNode,
   kind: u.isLiteralOf("issue"),
