@@ -117,7 +117,7 @@ export const getProjectIssues = async (
   token: string,
   projectId: number,
 ): Promise<Issue[]> => {
-  const gitlabApiPath = url + "/api/v4/projects/" + projectId + "/issues";
+  const gitlabApiPath = url + "/api/v4/projects/" + projectId + "/issues?state=opened";
   const res = await fetch(gitlabApiPath, {
     method: "GET",
     headers: createHeaders(token),
