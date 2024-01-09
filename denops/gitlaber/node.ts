@@ -1,14 +1,12 @@
 import {
-  Branch,
   BranchNode,
   GitlaberInstance,
-  Issue,
   IssueNode,
   Node,
-  Project,
-  Wiki,
   WikiNode,
 } from "./types.ts";
+
+import { Branch, Issue, Project, Wiki } from "./client/index.ts";
 
 export const createMainPanelNodes = (
   gitlaberInstance: GitlaberInstance,

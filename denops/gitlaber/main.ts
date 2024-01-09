@@ -16,7 +16,7 @@ import {
   requestEditIssue,
   requestEditWiki,
   requestGetCommit,
-} from "./client.ts";
+} from "./client/index.ts";
 
 import {
   setBaseMapping,
