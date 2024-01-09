@@ -6,6 +6,7 @@ import {
   getProjectIssues,
   getProjectWikis,
   getSingleProject,
+  requestCreateIssueBranch,
   requestCreateNewProjectIssue,
   requestCreateNewProjectWiki,
   requestDeleteIssue,
@@ -442,6 +443,45 @@ export function main(denops: Denops) {
       const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
       const url = currentGitlaberInstance.project.web_url;
       await openWithBrowser(denops, url);
+    },
+
+    async createIssueBranch(): Promise<void> {
+      const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
+      const currentNode = await getCurrentNode(denops);
+      if (!("issue" in currentNode)) {
+        helper.echoerr(denops, "This node is not issue.");
+        return;
+      }
+      const url = currentGitlaberInstance.url;
+      const token = currentGitlaberInstance.token;
+      const projectId = currentGitlaberInstance.project.id;
+      const defaultBranch = currentGitlaberInstance.project.default_branch;
+      const title = currentNode.issue.title;
+      const issue_iid = currentNode.issue.iid;
+      const branch = await helper.input(denops, {
+        prompt: "New branch name: ",
+        text: `${issue_iid}-${title}`,
+      });
+      if (!branch) {
+        return;
+      }
+      const ref = await helper.input(denops, {
+        prompt: "Ref branch name: ",
+        text: defaultBranch,
+      });
+      if (!ref) {
+        return;
+      }
+      try {
+        await requestCreateIssueBranch(url, token, {
+          id: projectId,
+          branch: branch,
+          ref: ref,
+        });
+        helper.echo(denops, "Successfully create a new branch.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
     },
 
     async openBrowserIssue(): Promise<void> {

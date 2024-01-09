@@ -39,6 +39,7 @@ export const isProject = u.isObjectOf({
   open_issues_count: u.isNumber,
   created_at: u.isString,
   updated_at: u.isOptionalOf(u.isString),
+  default_branch: u.isString,
   issue_branch_template: u.isOneOf([u.isString, u.isNull]),
   _links: u.isObjectOf({
     self: u.isString,
@@ -181,6 +182,16 @@ const isIssueCreateAttributes = u.isObjectOf({
 
 export type IssueEditAttributes = u.PredicateType<
   typeof isIssueCreateAttributes
+>;
+
+const isBranchCreateAttributes = u.isObjectOf({
+  id: u.isNumber,
+  branch: u.isString,
+  ref: u.isString,
+});
+
+export type BranchCreateAttributes = u.PredicateType<
+  typeof isBranchCreateAttributes
 >;
 
 const baseNode = {

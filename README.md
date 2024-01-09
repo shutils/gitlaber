@@ -80,6 +80,7 @@ Each panel has a default keymap.
 | Open issue list          | l       | :white_check_mark: |
 | Create new project issue | n       | :white_check_mark: |
 | Quit                     | q       | :white_check_mark: |
+| Create issue branch      | b       | :white_check_mark: |
 
 ## Roadmap
 
@@ -104,7 +105,7 @@ This plugin will implement the following functions.
   - [ ] Change issue state _NOTE:_ close or reopen
   - [ ] Change issue assignee
   - [ ] Change issue label
-  - [ ] Create related branches
+  - [x] Create related branches
   - [ ] Create related merge request
   - [x] Open in browser (required: tryu/open-browser.vim)
 - [ ] Wiki operation

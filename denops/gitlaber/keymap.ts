@@ -97,6 +97,12 @@ export const setProjectIssuesPanelMapping = async (denops: Denops) => {
   );
   await mapping.map(
     denops,
+    "b",
+    "<Cmd>call denops#notify('gitlaber', 'createIssueBranch', [])<CR>",
+    mapOption,
+  );
+  await mapping.map(
+    denops,
     "o",
     "<Cmd>call denops#notify('gitlaber', 'openBrowserIssue', [])<CR>",
     mapOption,

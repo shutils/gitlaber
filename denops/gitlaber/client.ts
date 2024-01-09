@@ -13,6 +13,7 @@ import {
   WikiDeleteAttributes,
   WikiEditAttributes,
   WikisGetAttributes,
+  BranchCreateAttributes,
 } from "./types.ts";
 import { GITLAB_DEFAULT_URL } from "./constant.ts";
 
@@ -239,5 +240,21 @@ export const requestDeleteWiki = async (
   });
   if (res.status != 204) {
     throw new Error("Failed to delete a wiki.");
+  }
+};
+
+export const requestCreateIssueBranch = async (
+  url: string,
+  token: string,
+  attrs: BranchCreateAttributes,
+): Promise<void> => {
+  const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/repository/branches`;
+  const res = await fetch(gitlabApiPath, {
+    method: "POST",
+    headers: createHeaders(token),
+    body: JSON.stringify(attrs),
+  });
+  if (!(res.status == 201)) {
+    throw new Error("Failed to create a new branch.");
   }
 };
