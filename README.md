@@ -13,6 +13,8 @@ This plugin is an integration of [Gitlab REST API](https://docs.gitlab.com/ee/ap
 
 [denops](https://github.com/vim-denops/denops.vim)
 
+[tryu/open-browser.vim](https://github.com/tyru/open-browser.vim) (optional)
+
 ## Installation
 
 Install it with your plugin manager. Below is an example of lazy.nvim.
@@ -87,7 +89,7 @@ This plugin will implement the following functions.
 
 - [ ] Project operation
   - [x] View summary
-  - [ ] Open in browser
+  - [x] Open in browser (required: tryu/open-browser.vim)
   - [ ] View members
   - [ ] List of milestones
 - [ ] Issue operation
@@ -104,13 +106,14 @@ This plugin will implement the following functions.
   - [ ] Change issue label
   - [ ] Create related branches
   - [ ] Create related merge request
-  - [ ] Open in browser
+  - [x] Open in browser (required: tryu/open-browser.vim)
 - [ ] Wiki operation
   - [x] Create a new wiki
   - [x] View wiki list
   - [x] View a wiki
   - [x] Edit a wiki
   - [x] Delete a wiki
+  - [x] Open in browser (required: tryu/open-browser.vim)
   - [ ] View change history
 - [ ] Merge request operation
   - [ ] Create a new mr

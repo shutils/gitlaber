@@ -45,6 +45,12 @@ export const setMainPanelMapping = async (denops: Denops) => {
     "<Cmd>call gitlaber#denops#open_wiki_panel()<CR>",
     mapOption,
   );
+  await mapping.map(
+    denops,
+    "o",
+    "<Cmd>call denops#notify('gitlaber', 'openBrowserProject', [])<CR>",
+    mapOption,
+  );
   await setBaseMapping(denops);
 };
 
@@ -87,6 +93,12 @@ export const setProjectIssuesPanelMapping = async (denops: Denops) => {
     denops,
     "e",
     "<Cmd>call gitlaber#denops#open_pro_issue_edit()<CR>",
+    mapOption,
+  );
+  await mapping.map(
+    denops,
+    "o",
+    "<Cmd>call denops#notify('gitlaber', 'openBrowserIssue', [])<CR>",
     mapOption,
   );
   await setBaseMapping(denops);
@@ -133,6 +145,11 @@ export const setProjectWikisPanelMapping = async (denops: Denops) => {
     "<Cmd>call gitlaber#denops#open_edit_pro_wiki_buf()<CR>",
     mapOption,
   );
+  await mapping.map(
+    denops,
+    "o",
+    "<Cmd>call denops#notify('gitlaber', 'openBrowserWiki', [])<CR>",
+    mapOption,
+  );
   await setBaseMapping(denops);
 };
-

@@ -34,6 +34,7 @@ export type NodeKind = u.PredicateType<typeof isNodeKind>;
 export const isProject = u.isObjectOf({
   id: u.isNumber,
   description: u.isOneOf([u.isString, u.isNull]),
+  web_url: u.isString,
   name: u.isString,
   open_issues_count: u.isNumber,
   created_at: u.isString,

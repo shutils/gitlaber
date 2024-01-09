@@ -28,6 +28,7 @@ import {
   getCurrentGitlaberInstance,
   getCurrentNode,
   getGitlaberVar,
+  openWithBrowser,
   setFileType,
   setModifiable,
   setNofile,
@@ -435,6 +436,35 @@ export function main(denops: Denops) {
       const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
       const projectId = currentGitlaberInstance.project.id;
       await loadProjectWikis(denops, projectId);
+    },
+
+    async openBrowserProject(): Promise<void> {
+      const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
+      const url = currentGitlaberInstance.project.web_url;
+      await openWithBrowser(denops, url);
+    },
+
+    async openBrowserIssue(): Promise<void> {
+      const currentNode = await getCurrentNode(denops);
+      if (!("issue" in currentNode)) {
+        helper.echoerr(denops, "This node is not issue.");
+        return;
+      }
+      const url = currentNode.issue.web_url;
+      await openWithBrowser(denops, url);
+    },
+
+    async openBrowserWiki(): Promise<void> {
+      const currentGitlaberInstance = await getCurrentGitlaberInstance(denops);
+      const currentNode = await getCurrentNode(denops);
+      if (!("wiki" in currentNode)) {
+        helper.echoerr(denops, "This node is not wiki.");
+        return;
+      }
+      const projectUrl = currentGitlaberInstance.project.web_url;
+      const slug = currentNode.wiki.slug;
+      const url = projectUrl + "/-/wikis/" + slug;
+      await openWithBrowser(denops, url);
     },
   };
 }
