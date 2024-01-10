@@ -161,6 +161,7 @@ This plugin will implement the following functions.
   - [ ] View change history
 - [ ] Merge request operation
   - [ ] Create a new mr
+  - [x] View mr list
   - [ ] View a mr description
   - [ ] View a mr with comment
   - [ ] Edit a mr description

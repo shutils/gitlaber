@@ -1,5 +1,5 @@
 import { unknownutil as u } from "./deps.ts";
-import { isBranch, isIssue, isProject, isWiki } from "./client/index.ts";
+import { isBranch, isIssue, isProject, isWiki, isMergeRequest } from "./client/index.ts";
 
 const isGitlaberState = u.isObjectOf({
   has_main_panel: u.isBoolean,
@@ -25,7 +25,7 @@ const isLinks = u.isObjectOf({
 export type Links = u.PredicateType<typeof isLinks>;
 
 const isNodeKind = u.isLiteralOneOf(
-  ["other", "issue", "wiki", "branch"] as const,
+  ["other", "issue", "wiki", "branch", "mr"] as const,
 );
 
 export type NodeKind = u.PredicateType<typeof isNodeKind>;
@@ -45,6 +45,7 @@ const isNode = u.isObjectOf({
 });
 
 export type Node = u.PredicateType<typeof isNode>;
+
 
 const isIssueNode = u.isObjectOf({
   ...baseNode,
@@ -69,6 +70,14 @@ const isWikiNode = u.isObjectOf({
 });
 
 export type WikiNode = u.PredicateType<typeof isWikiNode>;
+
+const isMergeRequestNode = u.isObjectOf({
+  ...baseNode,
+  kind: u.isLiteralOf("mr"),
+  mr: isMergeRequest,
+});
+
+export type MergeRequestNode = u.PredicateType<typeof isMergeRequestNode>;
 
 const isGitlaberInstance = u.isObjectOf({
   index: u.isNumber,

@@ -57,6 +57,12 @@ export const setMainPanelMapping = async (denops: Denops) => {
     "<Cmd>call denops#notify('gitlaber', 'openBrowserProject', [])<CR>",
     mapOption,
   );
+  await mapping.map(
+    denops,
+    "m",
+    "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestPanel', [])<CR>",
+    mapOption,
+  );
   await setBaseMapping(denops);
 };
 
@@ -183,5 +189,19 @@ export const setProjectWikisPanelMapping = async (denops: Denops) => {
     "<Cmd>call denops#notify('gitlaber', 'openBrowserWiki', [])<CR>",
     mapOption,
   );
+  await setBaseMapping(denops);
+};
+
+export const setProjectMergeRequestPanelMapping = async (denops: Denops) => {
+  await mapping.map(
+    denops,
+    "l",
+    "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestsPanel', [])<CR>",
+    mapOption,
+  );
+  await setBaseMapping(denops);
+};
+
+export const setProjectMergeRequestsPanelMapping = async (denops: Denops) => {
   await setBaseMapping(denops);
 };

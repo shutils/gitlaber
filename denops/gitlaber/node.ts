@@ -2,11 +2,12 @@ import {
   BranchNode,
   GitlaberInstance,
   IssueNode,
+  MergeRequestNode,
   Node,
   WikiNode,
 } from "./types.ts";
 
-import { Branch, Issue, Project, Wiki } from "./client/index.ts";
+import { Branch, Issue, MergeRequest, Project, Wiki } from "./client/index.ts";
 
 export const createMainPanelNodes = (
   gitlaberInstance: GitlaberInstance,
@@ -161,6 +162,37 @@ export const createProjectWikiContentNodes = (
     nodes.push({
       display: line,
       kind: "other",
+    });
+  });
+  return nodes;
+};
+
+export const createProjectMergeRequestPanelNodes = () => {
+  const nodes: Array<Node> = [];
+  nodes.push({
+    display: "Project merge request Panel",
+    kind: "other",
+  });
+  return nodes;
+};
+
+export const createProjectMergeRequestsNodes = (
+  mrs: MergeRequest[],
+) => {
+  const nodes: Array<Node | MergeRequestNode> = [];
+  let maxIdWidth = 1;
+  mrs.map((mr) => {
+    if (maxIdWidth < mr.id.toString().length) {
+      maxIdWidth = mr.id.toString().length;
+    }
+  });
+  mrs.map((mr) => {
+    nodes.push({
+      display: `# ${mr.id} ${
+        Array(maxIdWidth + 1 - mr.id.toString().length).join(" ")
+      } ${mr.title}`,
+      kind: "mr",
+      mr: mr,
     });
   });
   return nodes;

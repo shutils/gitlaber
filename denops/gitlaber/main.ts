@@ -49,6 +49,20 @@ const loadProjectBranches = async (denops: Denops, projectId: number) => {
   await util.setNoModifiable(denops);
 };
 
+const loadProjectMergeRequests = async (denops: Denops, projectId: number) => {
+  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
+  const url = currentGitlaberInstance.url;
+  const token = currentGitlaberInstance.token;
+  await util.setModifiable(denops);
+  const projectMergeRequests = await client.getProjectMergeRequests(url, token, {
+    id: projectId,
+  });
+  const nodes = node.createProjectMergeRequestsNodes(projectMergeRequests);
+  await render.setNodesOnBuf(denops, nodes);
+  await vars.b.set(denops, "gitlaber_nodes", nodes);
+  await util.setNoModifiable(denops);
+};
+
 export function main(denops: Denops) {
   keymap.setGlobalMapping(denops);
   denops.dispatcher = {
@@ -540,6 +554,29 @@ export function main(denops: Denops) {
       );
       const projectId = currentGitlaberInstance.project.id;
       await loadProjectWikis(denops, projectId);
+    },
+
+    async openProjectMergeRequestPanel(): Promise<void> {
+      const nodes = node.createProjectMergeRequestPanelNodes();
+      await fn.execute(denops, "botright new");
+      await render.setNodesOnBuf(denops, nodes);
+      await util.setNofile(denops);
+      await keymap.setProjectMergeRequestPanelMapping(denops);
+      await vars.b.set(denops, "gitlaber_nodes", nodes);
+      await util.setNoModifiable(denops);
+      await denops.cmd("redraw");
+    },
+
+    async openProjectMergeRequestsPanel(): Promise<void> {
+      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+        denops,
+      );
+      const projectId = currentGitlaberInstance.project.id;
+      await fn.execute(denops, "vertical botright new");
+      await loadProjectMergeRequests(denops, projectId);
+      await util.setNofile(denops);
+      await keymap.setProjectMergeRequestsPanelMapping(denops);
+      await denops.cmd("redraw");
     },
 
     async openBrowserProject(): Promise<void> {
