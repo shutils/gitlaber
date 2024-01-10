@@ -38,7 +38,7 @@ export type IssueCreateNewAttributes = u.PredicateType<
   typeof isIssueCreateNewAttributes
 >;
 
-const isIssueCreateAttributes = u.isObjectOf({
+const isIssueEditAttributes = u.isObjectOf({
   id: u.isNumber,
   issue_iid: u.isNumber,
   add_labels: u.isOptionalOf(u.isString),
@@ -61,7 +61,7 @@ const isIssueCreateAttributes = u.isObjectOf({
 });
 
 export type IssueEditAttributes = u.PredicateType<
-  typeof isIssueCreateAttributes
+  typeof isIssueEditAttributes
 >;
 
 export async function getProjectIssues(

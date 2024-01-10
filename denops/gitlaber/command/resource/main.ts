@@ -75,6 +75,31 @@ export function main(denops: Denops): void {
       }
     },
 
+    async toggleProjectIssueState(): Promise<void> {
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
+        denops,
+      );
+      const currentNode = await util.getCurrentNode(denops);
+      if (!("issue" in currentNode)) {
+        return;
+      }
+      const { iid, state } = currentNode.issue;
+      let stateEvent: "close" | "reopen" = "close";
+      if (state === "closed") {
+        stateEvent = "reopen";
+      }
+      try {
+        await client.requestEditIssue(url, token, {
+          id: project.id,
+          issue_iid: iid,
+          state_event: stateEvent,
+        });
+        helper.echo(denops, "Successfully toggle a issue state.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
+    },
+
     async createNewBranchMr(): Promise<void> {
       const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,

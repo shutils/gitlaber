@@ -145,7 +145,7 @@ This plugin will implement the following functions.
   - [x] Delete a issue
   - [ ] View change history
   - [ ] Search issue
-  - [ ] Change issue state _NOTE:_ close or reopen
+  - [x] Change issue state _NOTE:_ close or reopen
   - [ ] Change issue assignee
   - [ ] Change issue label
   - [x] Create related branches

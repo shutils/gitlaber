@@ -129,6 +129,11 @@ export const mappings: BufMapping[] = [
         option: mapOption,
       },
       {
+        lhs: "t",
+        rhs: "<Cmd>call denops#notify('gitlaber', 'toggleProjectIssueState', [])<CR>",
+        option: mapOption,
+      },
+      {
         lhs: "o",
         rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserIssue', [])<CR>",
         option: mapOption,
