@@ -1,5 +1,5 @@
 import { unknownutil as u } from "../deps.ts";
-import { createHeaders, getRemoteUrl, getUrlEncodedPath } from "./util.ts";
+import { getRemoteUrl, getUrlEncodedPath, request } from "./util.ts";
 
 export const isProject = u.isObjectOf({
   id: u.isNumber,
@@ -36,10 +36,7 @@ export async function getSingleProject(
 > {
   const projectPath = getUrlEncodedPath(getRemoteUrl(cwd));
   const gitlabApiPath = url + "/api/v4/projects/" + projectPath;
-  const res = await fetch(gitlabApiPath, {
-    method: "GET",
-    headers: createHeaders(token),
-  });
+  const res = await request(gitlabApiPath, token, "GET");
   const project = await res.json();
   if (!isProject(project)) {
     throw new Error("Failed to get project.");

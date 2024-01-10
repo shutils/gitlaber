@@ -1,5 +1,5 @@
 import { unknownutil as u } from "../deps.ts";
-import { createHeaders } from "./util.ts";
+import { request } from "./util.ts";
 
 export const isCommit = u.isObjectOf({
   id: u.isString,
@@ -36,10 +36,7 @@ export async function requestGetCommit(
 ) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/repository/commits/${attrs.sha}`;
-  const res = await fetch(gitlabApiPath, {
-    method: "GET",
-    headers: createHeaders(token),
-  });
+  const res = await request(gitlabApiPath, token, "GET");
   if (!(res.status == 200)) {
     throw new Error("Failed to get a commit.");
   }

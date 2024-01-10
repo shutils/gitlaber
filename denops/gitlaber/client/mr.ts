@@ -1,5 +1,5 @@
 import { unknownutil as u } from "../deps.ts";
-import { createHeaders } from "./util.ts";
+import { request } from "./util.ts";
 
 const isMergeRequestCreateAttributes = u.isObjectOf({
   id: u.isNumber,
@@ -23,11 +23,12 @@ export async function requestCreateMergeRequest(
   attrs: MergeRequestCreateAttributes,
 ): Promise<void> {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/merge_requests`;
-  const res = await fetch(gitlabApiPath, {
-    method: "POST",
-    headers: createHeaders(token),
-    body: JSON.stringify(attrs),
-  });
+  const res = await request(
+    gitlabApiPath,
+    token,
+    "POST",
+    JSON.stringify(attrs),
+  );
   if (!(res.status == 201)) {
     throw new Error("Failed to create a new merge request.");
   }

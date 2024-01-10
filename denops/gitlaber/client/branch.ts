@@ -1,5 +1,5 @@
 import { unknownutil as u } from "../deps.ts";
-import { createHeaders } from "./util.ts";
+import { request } from "./util.ts";
 
 export const isBranch = u.isObjectOf({
   name: u.isString,
@@ -58,10 +58,7 @@ export async function getProjectBranches(
 ): Promise<Branch[]> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/repository/branches`;
-  const res = await fetch(gitlabApiPath, {
-    method: "GET",
-    headers: createHeaders(token),
-  });
+  const res = await request(gitlabApiPath, token, "GET");
   const branches = await res.json();
   if (!u.isArrayOf(isBranch)(branches)) {
     throw new Error("Failed to get branches.");
@@ -76,11 +73,12 @@ export async function requestCreateIssueBranch(
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/repository/branches`;
-  const res = await fetch(gitlabApiPath, {
-    method: "POST",
-    headers: createHeaders(token),
-    body: JSON.stringify(attrs),
-  });
+  const res = await request(
+    gitlabApiPath,
+    token,
+    "POST",
+    JSON.stringify(attrs),
+  );
   if (!(res.status == 201)) {
     throw new Error("Failed to create a new branch.");
   }

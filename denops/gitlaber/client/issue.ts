@@ -1,5 +1,5 @@
 import { unknownutil as u } from "../deps.ts";
-import { createHeaders } from "./util.ts";
+import { request } from "./util.ts";
 
 const isIssueState = u.isLiteralOneOf(["opened", "closed"] as const);
 
@@ -71,10 +71,7 @@ export async function getProjectIssues(
 ): Promise<Issue[]> {
   const gitlabApiPath = url + "/api/v4/projects/" + projectId +
     "/issues?state=opened";
-  const res = await fetch(gitlabApiPath, {
-    method: "GET",
-    headers: createHeaders(token),
-  });
+  const res = await request(gitlabApiPath, token, "GET");
   const issues = await res.json();
   if (!u.isArrayOf(isIssue)(issues)) {
     throw new Error("Failed to get issues.");
@@ -89,11 +86,12 @@ export async function requestCreateNewProjectIssue(
   attributes: IssueCreateNewAttributes,
 ): Promise<void> {
   const gitlabApiPath = url + "/api/v4/projects/" + projectId + "/issues";
-  const res = await fetch(gitlabApiPath, {
-    method: "POST",
-    headers: createHeaders(token),
-    body: JSON.stringify(attributes),
-  });
+  const res = await request(
+    gitlabApiPath,
+    token,
+    "POST",
+    JSON.stringify(attributes),
+  );
   if (res.status != 201) {
     throw new Error("Failed to create new issue.");
   }
@@ -107,10 +105,7 @@ export async function requestDeleteIssue(
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${projectId}/issues/${issue_iid}`;
-  const res = await fetch(gitlabApiPath, {
-    method: "DELETE",
-    headers: createHeaders(token),
-  });
+  const res = await request(gitlabApiPath, token, "DELETE");
   if (res.status != 204) {
     throw new Error("Failed to delete issue.");
   }
@@ -123,11 +118,7 @@ export async function requestEditIssue(
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/issues/${attrs.issue_iid}`;
-  const res = await fetch(gitlabApiPath, {
-    method: "PUT",
-    headers: createHeaders(token),
-    body: JSON.stringify(attrs),
-  });
+  const res = await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
   if (!(res.status == 200 || res.status == 201)) {
     throw new Error("Failed to edit issue.");
   }

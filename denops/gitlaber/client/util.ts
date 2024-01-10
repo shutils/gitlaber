@@ -1,15 +1,17 @@
 import { parse } from "https://deno.land/std@0.210.0/path/mod.ts";
 import { GITLAB_DEFAULT_URL } from "../constant.ts";
 
-const isHttpPath = (path: string) => {
+type Method = "GET" | "POST" | "PUT" | "DELETE";
+
+function isHttpPath(path: string) {
   return path.startsWith("http");
-};
+}
 
-const isSshPath = (path: string) => {
+function isSshPath(path: string) {
   return path.startsWith("ssh");
-};
+}
 
-const exec = (cmd: string, args: string[], cwd?: string) => {
+function exec(cmd: string, args: string[], cwd?: string) {
   const result = new Deno.Command(cmd, {
     args: args,
     cwd: cwd,
@@ -25,9 +27,9 @@ const exec = (cmd: string, args: string[], cwd?: string) => {
       }`,
     );
   }
-};
+}
 
-export const getUrlEncodedPath = (path: string) => {
+export function getUrlEncodedPath(path: string) {
   if (isHttpPath(path) || isSshPath(path)) {
     const splitedPath = path.split("/");
     const namespace = splitedPath[splitedPath.length - 2];
@@ -37,13 +39,13 @@ export const getUrlEncodedPath = (path: string) => {
   } else {
     throw new Error("Failed to encode repository URL.");
   }
-};
+}
 
-export const getRemoteUrl = (cwd?: string) => {
+export function getRemoteUrl(cwd?: string) {
   return exec("git", ["remote", "get-url", "origin"], cwd);
-};
+}
 
-export const getGitlabUrl = (cwd?: string) => {
+export function getGitlabUrl(cwd?: string) {
   try {
     return exec("git", ["config", "--get", "gitlab.url"], cwd);
   } catch {
@@ -54,9 +56,9 @@ export const getGitlabUrl = (cwd?: string) => {
       return GITLAB_DEFAULT_URL;
     }
   }
-};
+}
 
-export const getGitlabToken = (cwd?: string) => {
+export function getGitlabToken(cwd?: string) {
   try {
     return exec("git", ["config", "--get", "gitlab.token"], cwd);
   } catch {
@@ -67,11 +69,24 @@ export const getGitlabToken = (cwd?: string) => {
       throw new Error("Unable to get GitLab token");
     }
   }
-};
+}
 
-export const createHeaders = (token: string) => {
+export function createHeaders(token: string) {
   return {
     "Content-Type": "application/json",
     "PRIVATE-TOKEN": token,
   };
-};
+}
+
+export async function request(
+  url: string,
+  token: string,
+  method?: Method,
+  body?: string,
+) {
+  return await fetch(url, {
+    method: method,
+    headers: createHeaders(token),
+    body: body,
+  });
+}

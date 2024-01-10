@@ -1,5 +1,5 @@
 import { unknownutil as u } from "../deps.ts";
-import { createHeaders } from "./util.ts";
+import { request } from "./util.ts";
 
 export const isWiki = u.isObjectOf({
   content: u.isString,
@@ -75,11 +75,12 @@ export async function requestCreateNewProjectWiki(
   attrs: WikiCreateAttributes,
 ): Promise<void> {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/wikis`;
-  const res = await fetch(gitlabApiPath, {
-    method: "POST",
-    headers: createHeaders(token),
-    body: JSON.stringify(attrs),
-  });
+  const res = await request(
+    gitlabApiPath,
+    token,
+    "POST",
+    JSON.stringify(attrs),
+  );
   if (!(res.status == 201)) {
     throw new Error("Failed to create a new wiki.");
   }
@@ -92,10 +93,7 @@ export async function getProjectWikis(
 ): Promise<Wiki[]> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis?with_content=1`;
-  const res = await fetch(gitlabApiPath, {
-    method: "GET",
-    headers: createHeaders(token),
-  });
+  const res = await request(gitlabApiPath, token, "GET");
   return res.json();
 }
 
@@ -106,11 +104,7 @@ export async function requestEditWiki(
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
-  const res = await fetch(gitlabApiPath, {
-    method: "PUT",
-    headers: createHeaders(token),
-    body: JSON.stringify(attrs),
-  });
+  const res = await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
   if (!(res.status == 200 || res.status == 201)) {
     throw new Error("Failed to edit wiki.");
   }
@@ -123,10 +117,7 @@ export async function requestDeleteWiki(
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
-  const res = await fetch(gitlabApiPath, {
-    method: "DELETE",
-    headers: createHeaders(token),
-  });
+  const res = await request(gitlabApiPath, token, "DELETE");
   if (res.status != 204) {
     throw new Error("Failed to delete a wiki.");
   }
