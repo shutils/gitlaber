@@ -9,62 +9,6 @@ import * as node from "./node.ts";
 
 import * as types from "./types.ts";
 
-const loadProjectIssues = async (denops: Denops, projectId: number) => {
-  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
-  const url = currentGitlaberInstance.url;
-  const token = currentGitlaberInstance.token;
-  await util.setModifiable(denops);
-  const projectIssues = await client.getProjectIssues(url, token, projectId);
-  const nodes = node.createProjectIssuesNodes(projectIssues);
-  await render.setNodesOnBuf(denops, nodes);
-  await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await util.setNoModifiable(denops);
-};
-
-const loadProjectWikis = async (denops: Denops, projectId: number) => {
-  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
-  const url = currentGitlaberInstance.url;
-  const token = currentGitlaberInstance.token;
-  await util.setModifiable(denops);
-  const projectWikis = await client.getProjectWikis(url, token, {
-    id: projectId,
-  });
-  const nodes = node.createProjectWikiNodes(projectWikis);
-  await render.setNodesOnBuf(denops, nodes);
-  await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await util.setNoModifiable(denops);
-};
-
-const loadProjectBranches = async (denops: Denops, projectId: number) => {
-  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
-  const url = currentGitlaberInstance.url;
-  const token = currentGitlaberInstance.token;
-  await util.setModifiable(denops);
-  const projectBranches = await client.getProjectBranches(url, token, {
-    id: projectId,
-  });
-  const nodes = node.createProjectBranchesNodes(projectBranches);
-  await render.setNodesOnBuf(denops, nodes);
-  await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await util.setNoModifiable(denops);
-};
-
-const loadProjectMergeRequests = async (denops: Denops, projectId: number) => {
-  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
-  const url = currentGitlaberInstance.url;
-  const token = currentGitlaberInstance.token;
-  await util.setModifiable(denops);
-  const projectMergeRequests = await client.getProjectMergeRequests(
-    url,
-    token,
-    { id: projectId },
-  );
-  const nodes = node.createProjectMergeRequestsNodes(projectMergeRequests);
-  await render.setNodesOnBuf(denops, nodes);
-  await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await util.setNoModifiable(denops);
-};
-
 export function main(denops: Denops) {
   keymap.setGlobalMapping(denops);
   denops.dispatcher = {
@@ -132,7 +76,7 @@ export function main(denops: Denops) {
       );
       const projectId = currentGitlaberInstance.project.id;
       await fn.execute(denops, "vertical botright new");
-      await loadProjectIssues(denops, projectId);
+      await render.loadProjectIssues(denops, projectId);
       await util.setNofile(denops);
       await keymap.setProjectIssuesPanelMapping(denops);
       await denops.cmd("redraw");
@@ -273,7 +217,7 @@ export function main(denops: Denops) {
         denops,
       );
       const projectId = currentGitlaberInstance.project.id;
-      await loadProjectIssues(denops, projectId);
+      await render.loadProjectIssues(denops, projectId);
     },
 
     async _getCurrentNode(): Promise<types.BaseNode | types.IssueNode> {
@@ -298,7 +242,7 @@ export function main(denops: Denops) {
       );
       const projectId = currentGitlaberInstance.project.id;
       await fn.execute(denops, "vertical botright new");
-      await loadProjectBranches(denops, projectId);
+      await render.loadProjectBranches(denops, projectId);
       await util.setNofile(denops);
       await keymap.setProjectBranchesPanelMapping(denops);
       await denops.cmd("redraw");
@@ -375,7 +319,7 @@ export function main(denops: Denops) {
       );
       const projectId = currentGitlaberInstance.project.id;
       await fn.execute(denops, "vertical botright new");
-      await loadProjectWikis(denops, projectId);
+      await render.loadProjectWikis(denops, projectId);
       await util.setNofile(denops);
       await keymap.setProjectWikisPanelMapping(denops);
       await denops.cmd("redraw");
@@ -563,7 +507,7 @@ export function main(denops: Denops) {
         denops,
       );
       const projectId = currentGitlaberInstance.project.id;
-      await loadProjectWikis(denops, projectId);
+      await render.loadProjectWikis(denops, projectId);
     },
 
     async openProjectMergeRequestPanel(): Promise<void> {
@@ -583,7 +527,7 @@ export function main(denops: Denops) {
       );
       const projectId = currentGitlaberInstance.project.id;
       await fn.execute(denops, "vertical botright new");
-      await loadProjectMergeRequests(denops, projectId);
+      await render.loadProjectMergeRequests(denops, projectId);
       await util.setNofile(denops);
       await keymap.setProjectMergeRequestsPanelMapping(denops);
       await denops.cmd("redraw");
