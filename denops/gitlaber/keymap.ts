@@ -138,6 +138,16 @@ export const mappings: BufMapping[] = [
         rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserIssue', [])<CR>",
         option: mapOption,
       },
+      {
+        lhs: "la",
+        rhs: "<Cmd>call denops#notify('gitlaber', 'addProjectIssueLabel', [])<CR>",
+        option: mapOption,
+      },
+      {
+        lhs: "lr",
+        rhs: "<Cmd>call denops#notify('gitlaber', 'removeProjectIssueLabel', [])<CR>",
+        option: mapOption,
+      },
     ],
   },
   {

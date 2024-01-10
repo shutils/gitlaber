@@ -147,7 +147,7 @@ This plugin will implement the following functions.
   - [ ] Search issue
   - [x] Change issue state _NOTE:_ close or reopen
   - [ ] Change issue assignee
-  - [ ] Change issue label
+  - [x] Change issue label
   - [x] Create related branches
   - [ ] Create related merge request
   - [x] Open in browser (required: tryu/open-browser.vim)

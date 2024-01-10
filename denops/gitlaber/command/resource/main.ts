@@ -100,6 +100,78 @@ export function main(denops: Denops): void {
       }
     },
 
+    async addProjectIssueLabel(): Promise<void> {
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
+        denops,
+      );
+      const currentNode = await util.getCurrentNode(denops);
+      if (!("issue" in currentNode)) {
+        return;
+      }
+      const labels = await client.requestGetProjectLabels(url, token, {
+        id: project.id,
+      });
+      if (labels.length === 0) {
+        helper.echo(denops, "Project has not labels.");
+        return;
+      }
+      const description = "Select the label number you want to add.";
+      const textlist: string[] = [description];
+      for (let i = 0; i < labels.length; i++) {
+        textlist.unshift(`${i + 1}. ${labels[i].name}`);
+      }
+      const { iid } = currentNode.issue;
+      const labelIndex = await fn.inputlist(denops, textlist.reverse());
+      if (!labelIndex) {
+        return;
+      }
+      try {
+        await client.requestEditIssue(url, token, {
+          id: project.id,
+          issue_iid: iid,
+          add_labels: labels[labelIndex - 1]?.name ?? undefined,
+        });
+        helper.echo(denops, "Successfully add a issue label.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
+    },
+
+    async removeProjectIssueLabel(): Promise<void> {
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
+        denops,
+      );
+      const currentNode = await util.getCurrentNode(denops);
+      if (!("issue" in currentNode)) {
+        return;
+      }
+      const labels = currentNode.issue.labels;
+      if (labels.length === 0) {
+        helper.echo(denops, "This issue has not labels.");
+        return;
+      }
+      const description = "Select the label number you want to remove.";
+      const textlist: string[] = [description];
+      for (let i = 0; i < labels.length; i++) {
+        textlist.unshift(`${i + 1}. ${labels[i]}`);
+      }
+      const { iid } = currentNode.issue;
+      const labelIndex = await fn.inputlist(denops, textlist.reverse());
+      if (!labelIndex) {
+        return;
+      }
+      try {
+        await client.requestEditIssue(url, token, {
+          id: project.id,
+          issue_iid: iid,
+          remove_labels: labels[labelIndex - 1] ?? undefined,
+        });
+        helper.echo(denops, "Successfully remove a issue label.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
+    },
+
     async createNewBranchMr(): Promise<void> {
       const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
