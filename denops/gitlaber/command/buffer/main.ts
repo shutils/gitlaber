@@ -209,7 +209,7 @@ export function main(denops: Denops): void {
         { id: projectId },
       );
       const nodes = node.createProjectMergeRequestsNodes(projectMergeRequests);
-      await fn.execute(denops, "new");
+      await fn.execute(denops, "vertical botright new");
       const bufnr = await fn.bufnr(denops);
       await drawBuffer(
         denops,
