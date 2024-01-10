@@ -109,7 +109,8 @@ export const mappings: BufMapping[] = [
       },
       {
         lhs: "r",
-        rhs: "<Cmd>call gitlaber#denops#reload_pro_issue()<CR>",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'reloadProjectIssues', [bufnr()])<CR>",
         option: mapOption,
       },
       {
@@ -184,7 +185,8 @@ export const mappings: BufMapping[] = [
       },
       {
         lhs: "r",
-        rhs: "<Cmd>call gitlaber#denops#reload_pro_wikis()<CR>",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'reloadProjectWikis', [bufnr()])<CR>",
         option: mapOption,
       },
       {
@@ -239,4 +241,3 @@ export const setMapping = async (denops: Denops, name: BufName) => {
     );
   }
 };
-

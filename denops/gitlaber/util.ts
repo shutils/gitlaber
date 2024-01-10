@@ -9,42 +9,6 @@ import {
   WikiNode,
 } from "./types.ts";
 
-export const setNofile = async (denops: Denops) => {
-  await fn.setbufvar(
-    denops,
-    await fn.bufname(denops),
-    "&buftype",
-    "nofile",
-  );
-};
-
-export const setFileType = async (denops: Denops) => {
-  await fn.setbufvar(
-    denops,
-    await fn.bufname(denops),
-    "&filetype",
-    "markdown",
-  );
-};
-
-export const setModifiable = async (denops: Denops) => {
-  await fn.setbufvar(
-    denops,
-    await fn.bufname(denops),
-    "&modifiable",
-    true,
-  );
-};
-
-export const setNoModifiable = async (denops: Denops) => {
-  await fn.setbufvar(
-    denops,
-    await fn.bufname(denops),
-    "&modifiable",
-    false,
-  );
-};
-
 export const getCurrentNode = async (
   denops: Denops,
 ): Promise<
