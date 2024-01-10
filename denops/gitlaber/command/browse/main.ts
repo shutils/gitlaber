@@ -1,5 +1,6 @@
 import { Denops, helper } from "../../deps.ts";
 import * as util from "../../util.ts";
+import * as types from "../../types.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -12,28 +13,28 @@ export function main(denops: Denops): void {
       await util.openWithBrowser(denops, url);
     },
 
-    async openBrowserIssue(): Promise<void> {
+    async openBrowserNode(): Promise<void> {
       const currentNode = await util.getCurrentNode(denops);
-      if (!("issue" in currentNode)) {
-        helper.echoerr(denops, "This node is not issue.");
-        return;
-      }
-      const url = currentNode.issue.web_url;
-      await util.openWithBrowser(denops, url);
-    },
+      let url: string;
 
-    async openBrowserWiki(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("wiki" in currentNode)) {
-        helper.echoerr(denops, "This node is not wiki.");
+      if (types.isIssueNode(currentNode)) {
+        url = currentNode.issue.web_url;
+      } else if (types.isWikiNode(currentNode)) {
+        const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+          denops,
+        );
+        const projectUrl = currentGitlaberInstance.project.web_url;
+        const slug = currentNode.wiki.slug;
+        url = projectUrl + "/-/wikis/" + slug;
+      } else if (types.isBranchNode(currentNode)) {
+        url = currentNode.branch.web_url;
+      } else if (types.isMergeRequestNode(currentNode)) {
+        url = currentNode.mr.web_url;
+      } else {
+        helper.echo(denops, "This node cannot be opened in a browser.");
         return;
       }
-      const projectUrl = currentGitlaberInstance.project.web_url;
-      const slug = currentNode.wiki.slug;
-      const url = projectUrl + "/-/wikis/" + slug;
+
       await util.openWithBrowser(denops, url);
     },
   };

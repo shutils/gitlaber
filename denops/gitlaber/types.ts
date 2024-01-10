@@ -47,7 +47,7 @@ const isNode = u.isObjectOf({
 export type Node = u.PredicateType<typeof isNode>;
 
 
-const isIssueNode = u.isObjectOf({
+export const isIssueNode = u.isObjectOf({
   ...baseNode,
   kind: u.isLiteralOf("issue"),
   issue: isIssue,
@@ -55,7 +55,7 @@ const isIssueNode = u.isObjectOf({
 
 export type IssueNode = u.PredicateType<typeof isIssueNode>;
 
-const isBranchNode = u.isObjectOf({
+export const isBranchNode = u.isObjectOf({
   ...baseNode,
   kind: u.isLiteralOf("branch"),
   branch: isBranch,
@@ -63,7 +63,7 @@ const isBranchNode = u.isObjectOf({
 
 export type BranchNode = u.PredicateType<typeof isBranchNode>;
 
-const isWikiNode = u.isObjectOf({
+export const isWikiNode = u.isObjectOf({
   ...baseNode,
   kind: u.isLiteralOf("wiki"),
   wiki: isWiki,
@@ -71,7 +71,7 @@ const isWikiNode = u.isObjectOf({
 
 export type WikiNode = u.PredicateType<typeof isWikiNode>;
 
-const isMergeRequestNode = u.isObjectOf({
+export const isMergeRequestNode = u.isObjectOf({
   ...baseNode,
   kind: u.isLiteralOf("mr"),
   mr: isMergeRequest,

@@ -130,22 +130,25 @@ export const mappings: BufMapping[] = [
       },
       {
         lhs: "t",
-        rhs: "<Cmd>call denops#notify('gitlaber', 'toggleProjectIssueState', [])<CR>",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'toggleProjectIssueState', [])<CR>",
         option: mapOption,
       },
       {
         lhs: "o",
-        rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserIssue', [])<CR>",
+        rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
         option: mapOption,
       },
       {
         lhs: "la",
-        rhs: "<Cmd>call denops#notify('gitlaber', 'addProjectIssueLabel', [])<CR>",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'addProjectIssueLabel', [])<CR>",
         option: mapOption,
       },
       {
         lhs: "lr",
-        rhs: "<Cmd>call denops#notify('gitlaber', 'removeProjectIssueLabel', [])<CR>",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'removeProjectIssueLabel', [])<CR>",
         option: mapOption,
       },
     ],
@@ -169,6 +172,11 @@ export const mappings: BufMapping[] = [
       {
         lhs: "M",
         rhs: "<Cmd>call denops#notify('gitlaber', 'createNewBranchMr', [])<CR>",
+        option: mapOption,
+      },
+      {
+        lhs: "o",
+        rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
         option: mapOption,
       },
     ],
@@ -216,7 +224,7 @@ export const mappings: BufMapping[] = [
       },
       {
         lhs: "o",
-        rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserWiki', [])<CR>",
+        rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
         option: mapOption,
       },
     ],
@@ -237,6 +245,11 @@ export const mappings: BufMapping[] = [
     name: "projectMergeRequests",
     mappings: [
       ...baseMappings.mappings,
+      {
+        lhs: "o",
+        rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+        option: mapOption,
+      },
     ],
   },
 ];
