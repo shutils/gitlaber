@@ -7,12 +7,9 @@ export function main(denops: Denops): void {
     ...denops.dispatcher,
 
     async createNewProjectIssue(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
       );
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
-      const projectId = currentGitlaberInstance.project.id;
       const title = await helper.input(denops, {
         prompt: "New issue title: ",
       });
@@ -20,8 +17,8 @@ export function main(denops: Denops): void {
         return;
       }
       try {
-        await client.requestCreateNewProjectIssue(url, token, projectId, {
-          id: projectId,
+        await client.requestCreateNewProjectIssue(url, token, project.id, {
+          id: project.id,
           title: title,
         });
         helper.echo(denops, "Successfully created a new issue.");
@@ -31,12 +28,9 @@ export function main(denops: Denops): void {
     },
 
     async deleteProjectIssue(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
       );
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
-      const projectId = currentGitlaberInstance.project.id;
       const currentNode = await util.getCurrentNode(denops);
       if (!("issue" in currentNode)) {
         return;
@@ -50,7 +44,7 @@ export function main(denops: Denops): void {
         return;
       }
       try {
-        await client.requestDeleteIssue(url, token, projectId, issue_iid);
+        await client.requestDeleteIssue(url, token, project.id, issue_iid);
         helper.echo(denops, "Successfully delete a issue.");
       } catch (e) {
         helper.echoerr(denops, e.message);
@@ -58,12 +52,9 @@ export function main(denops: Denops): void {
     },
 
     async editProjectIssue(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
       );
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
-      const projectId = currentGitlaberInstance.project.id;
       const description = await util.flattenBuffer(
         denops,
         await fn.bufname(denops),
@@ -74,7 +65,7 @@ export function main(denops: Denops): void {
       }
       try {
         await client.requestEditIssue(url, token, {
-          id: projectId,
+          id: project.id,
           issue_iid: issue_iid,
           description: description,
         });
@@ -85,7 +76,7 @@ export function main(denops: Denops): void {
     },
 
     async createNewBranchMr(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
       );
       const currentNode = await util.getCurrentNode(denops);
@@ -93,17 +84,14 @@ export function main(denops: Denops): void {
         helper.echoerr(denops, "This node is not branch.");
         return;
       }
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
-      const projectId = currentGitlaberInstance.project.id;
       const currentBranch = currentNode.branch.name;
       const commitId = currentNode.branch.commit.short_id;
       const commit = await client.requestGetCommit(url, token, {
-        id: projectId,
+        id: project.id,
         sha: commitId,
       });
       const defaultTitle = commit.title;
-      const defaultBranch = currentGitlaberInstance.project.default_branch;
+      const defaultBranch = project.default_branch;
       const terget = await helper.input(denops, {
         prompt: "Terget branch: ",
         text: defaultBranch,
@@ -127,7 +115,7 @@ export function main(denops: Denops): void {
       }
       try {
         await client.requestCreateMergeRequest(url, token, {
-          id: projectId,
+          id: project.id,
           title: title,
           source_branch: currentBranch,
           target_branch: terget,
@@ -139,12 +127,9 @@ export function main(denops: Denops): void {
     },
 
     async createProjectNewWiki(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
       );
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
-      const projectId = currentGitlaberInstance.project.id;
       const content = await util.flattenBuffer(
         denops,
         await fn.bufname(denops),
@@ -155,7 +140,7 @@ export function main(denops: Denops): void {
       }
       try {
         await client.requestCreateNewProjectWiki(url, token, {
-          id: projectId,
+          id: project.id,
           title: title,
           content: content,
         });
@@ -166,12 +151,9 @@ export function main(denops: Denops): void {
     },
 
     async editProjectWiki(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
       );
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
-      const projectId = currentGitlaberInstance.project.id;
       const content = await util.flattenBuffer(
         denops,
         await fn.bufname(denops),
@@ -193,7 +175,7 @@ export function main(denops: Denops): void {
       }
       try {
         await client.requestEditWiki(url, token, {
-          id: projectId,
+          id: project.id,
           title: title,
           content: content,
           slug: slug,
@@ -206,12 +188,9 @@ export function main(denops: Denops): void {
     },
 
     async deleteProjectWiki(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
       );
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
-      const projectId = currentGitlaberInstance.project.id;
       const currentWiki = await util.getCurrentNode(denops);
       if (!("wiki" in currentWiki)) {
         return;
@@ -226,7 +205,7 @@ export function main(denops: Denops): void {
       }
       try {
         await client.requestDeleteWiki(url, token, {
-          id: projectId,
+          id: project.id,
           slug: slug,
         });
         helper.echo(denops, "Successfully delete a wiki.");
@@ -236,7 +215,7 @@ export function main(denops: Denops): void {
     },
 
     async createIssueBranch(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,
       );
       const currentNode = await util.getCurrentNode(denops);
@@ -244,10 +223,7 @@ export function main(denops: Denops): void {
         helper.echoerr(denops, "This node is not issue.");
         return;
       }
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
-      const projectId = currentGitlaberInstance.project.id;
-      const defaultBranch = currentGitlaberInstance.project.default_branch;
+      const defaultBranch = project.default_branch;
       const title = currentNode.issue.title;
       const issue_iid = currentNode.issue.iid;
       const branch = await helper.input(denops, {
@@ -266,7 +242,7 @@ export function main(denops: Denops): void {
       }
       try {
         await client.requestCreateIssueBranch(url, token, {
-          id: projectId,
+          id: project.id,
           branch: branch,
           ref: ref,
         });
