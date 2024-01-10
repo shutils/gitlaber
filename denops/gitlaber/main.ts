@@ -54,9 +54,11 @@ const loadProjectMergeRequests = async (denops: Denops, projectId: number) => {
   const url = currentGitlaberInstance.url;
   const token = currentGitlaberInstance.token;
   await util.setModifiable(denops);
-  const projectMergeRequests = await client.getProjectMergeRequests(url, token, {
-    id: projectId,
-  });
+  const projectMergeRequests = await client.getProjectMergeRequests(
+    url,
+    token,
+    { id: projectId },
+  );
   const nodes = node.createProjectMergeRequestsNodes(projectMergeRequests);
   await render.setNodesOnBuf(denops, nodes);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
@@ -505,12 +507,20 @@ export function main(denops: Denops) {
       if (!unknownutil.isString(slug)) {
         return;
       }
+      let commitMessage = await helper.input(denops, {
+        prompt: `Please enter your commit message: `,
+        text: `Update ${title}`,
+      });
+      if (!unknownutil.isString(commitMessage)) {
+        commitMessage = "";
+      }
       try {
         await client.requestEditWiki(url, token, {
           id: projectId,
           title: title,
           content: content,
           slug: slug,
+          message: commitMessage,
         });
         helper.echo(denops, "Successfully edit a wiki.");
       } catch (e) {

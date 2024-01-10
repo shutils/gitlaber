@@ -54,6 +54,7 @@ const isWikiEditAttributes = u.isObjectOf({
     u.isLiteralOneOf(["markdown", "rdoc", "asciidoc", "org"] as const),
   ),
   slug: u.isString,
+  message: u.isOptionalOf(u.isString),
   ...u.isUnknown,
 });
 
