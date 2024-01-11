@@ -21,6 +21,7 @@ async function drawBuffer(
   option?: {
     nofile?: boolean;
     nomodifiable?: boolean;
+    filetype?: string;
   },
 ) {
   await setModifiable(denops, bufnr);
@@ -32,6 +33,9 @@ async function drawBuffer(
   }
   if (option?.nomodifiable) {
     await setNoModifiable(denops, bufnr);
+  }
+  if (option?.filetype) {
+    await setFileType(denops, bufnr);
   }
   await denops.cmd("redraw");
 }
@@ -262,6 +266,7 @@ export function main(denops: Denops): void {
       await drawBuffer(denops, nodes, "projectWiki", bufnr, {
         nofile: true,
         nomodifiable: true,
+        filetype: "markdown",
       });
     },
 
@@ -313,6 +318,7 @@ export function main(denops: Denops): void {
       await drawBuffer(denops, nodes, "projectIssue", bufnr, {
         nofile: true,
         nomodifiable: true,
+        filetype: "markdown",
       });
     },
 
