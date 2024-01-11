@@ -68,6 +68,34 @@ export const isMergeRequest = u.isObjectOf({
 
 export type MergeRequest = u.PredicateType<typeof isMergeRequest>;
 
+const isMergeRequestApproveAttributes = u.isObjectOf({
+  id: u.isNumber,
+  merge_request_iid: u.isNumber,
+  approval_password: u.isOptionalOf(u.isString),
+  sha: u.isOptionalOf(u.isString),
+  ...u.isUnknown,
+});
+
+export type MergeRequestApproveAttributes = u.PredicateType<
+  typeof isMergeRequestApproveAttributes
+>;
+
+const isMergeRequestMergeAttributes = u.isObjectOf({
+  id: u.isNumber,
+  merge_request_iid: u.isNumber,
+  merge_commit_message: u.isOptionalOf(u.isString),
+  merge_when_pipeline_succeeds: u.isOptionalOf(u.isBoolean),
+  sha: u.isOptionalOf(u.isString),
+  should_remove_source_branch: u.isOptionalOf(u.isBoolean),
+  squash_commit_message: u.isOptionalOf(u.isString),
+  squash: u.isOptionalOf(u.isBoolean),
+  ...u.isUnknown,
+});
+
+export type MergeRequestMergeAttributes = u.PredicateType<
+  typeof isMergeRequestMergeAttributes
+>;
+
 export async function requestCreateMergeRequest(
   url: string,
   token: string,
@@ -114,5 +142,36 @@ export async function requestEditMergeRequest(
   );
   if (!(res.status == 200 || res.status == 201)) {
     throw new Error("Failed to edit a merge request.");
+  }
+}
+
+export async function requestApproveMergeRequest(
+  url: string,
+  token: string,
+  attrs: MergeRequestApproveAttributes,
+): Promise<void> {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/approve`;
+  const res = await request(
+    gitlabApiPath,
+    token,
+    "POST",
+    JSON.stringify(attrs),
+  );
+  if (![200, 201].includes(res.status)) {
+    throw new Error("Failed to approve a merge request.");
+  }
+}
+
+export async function requestMergeMergeRequest(
+  url: string,
+  token: string,
+  attrs: MergeRequestMergeAttributes,
+): Promise<void> {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/merge`;
+  const res = await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
+  if (![200, 201].includes(res.status)) {
+    throw new Error("Failed to merge a merge request.");
   }
 }

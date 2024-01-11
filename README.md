@@ -141,8 +141,8 @@ Each panel has a default keymap.
 | ---------------------------- | ------- | ------------------ |
 | Assign member to mr assignee | a       | :white_check_mark: |
 | Assign member to mr reviewer | r       | :white_check_mark: |
-| Approval a merge request     | A       |                    |
-| Merge a merge request        | M       |                    |
+| Approval a merge request     | A       | :white_check_mark: |
+| Merge a merge request        | M       | :white_check_mark: |
 | Quit                         | q       | :white_check_mark: |
 
 ## Roadmap
@@ -185,8 +185,8 @@ This plugin will implement the following functions.
   - [ ] View a mr description
   - [ ] View a mr with comment
   - [ ] Edit a mr description
-  - [ ] Merge a mr
-  - [ ] Approval a mr
+  - [x] Merge a mr
+  - [x] Approval a mr
   - [x] Assign assignee to mr
   - [x] Assign reviewer to mr
   - [ ] Delete a mr

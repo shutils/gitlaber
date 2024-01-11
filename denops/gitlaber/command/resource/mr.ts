@@ -12,6 +12,72 @@ export function main(denops: Denops): void {
     async assignMergeRequestReviewer(): Promise<void> {
       await assignMergeRequestMember(denops, "reviewer");
     },
+
+    async approveMergeRequest(): Promise<void> {
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
+        denops,
+      );
+      const currentNode = await util.getCurrentNode(denops);
+      if (!("mr" in currentNode)) {
+        return;
+      }
+      const confirm = await helper.input(denops, {
+        prompt: `Are you sure you want to approve a merge request? y/N: `,
+      });
+      if (confirm !== "y") {
+        return;
+      }
+      await client.requestApproveMergeRequest(url, token, {
+        id: project.id,
+        merge_request_iid: currentNode.mr.iid,
+      });
+    },
+
+    async mergeMergeRequest(): Promise<void> {
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
+        denops,
+      );
+      const currentNode = await util.getCurrentNode(denops);
+      if (!("mr" in currentNode)) {
+        return;
+      }
+      const confirm = await helper.input(denops, {
+        prompt: `Are you sure you want to merge a merge request? y/N: `,
+      });
+      if (confirm !== "y") {
+        return;
+      }
+      const remove_source_branch = await helper.input(denops, {
+        prompt: `Do you want to remove the source branch? y/N: `,
+      });
+      const squash = await helper.input(denops, {
+        prompt: `Do you want to squash? y/N: `,
+      });
+      let squash_commit_message: string | undefined;
+      if (squash === "y") {
+        const branch = await client.getProjectBranch(url, token, {
+          id: project.id,
+          branch: currentNode.mr.source_branch,
+        });
+        const input = await helper.input(denops, {
+          prompt: `Squash commit message: `,
+          text: branch.commit.title,
+        });
+        squash_commit_message = input ?? undefined;
+      }
+      try {
+        await client.requestMergeMergeRequest(url, token, {
+          id: project.id,
+          merge_request_iid: currentNode.mr.iid,
+          should_remove_source_branch: remove_source_branch === "y",
+          squash: squash === "y",
+          squash_commit_message: squash_commit_message,
+        });
+        helper.echo(denops, "Successfully merge a merge request.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
+    },
   };
 }
 

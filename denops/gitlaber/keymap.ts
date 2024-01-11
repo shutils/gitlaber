@@ -308,6 +308,20 @@ export const mappings: BufMapping[] = [
         option: mapOption,
         description: "Assign merge request reviewer",
       },
+      {
+        lhs: "A",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'approveMergeRequest', [])<CR>",
+        option: mapOption,
+        description: "Approve a merge request",
+      },
+      {
+        lhs: "M",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'mergeMergeRequest', [])<CR>",
+        option: mapOption,
+        description: "Merge a merge request",
+      },
     ],
   },
 ];
