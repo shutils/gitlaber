@@ -99,6 +99,43 @@ export function main(denops: Denops): void {
       }
     },
 
+    async assignIssueAssignee(): Promise<void> {
+      const { url, token, project } = await util.getCurrentGitlaberInstance(
+        denops,
+      );
+      const currentNode = await util.getCurrentNode(denops);
+      if (!("issue" in currentNode)) {
+        return;
+      }
+      const members = await client.requestGetProjectMembers(url, token, {
+        id: project.id,
+      });
+      if (members.length === 0) {
+        helper.echo(denops, "Project has not members.");
+        return;
+      }
+      const description = "Select the member number you want to assign.";
+      const contents: string[] = [];
+      for (let i = 0; i < members.length; i++) {
+        contents.unshift(`${i + 1}. ${members[i].name}`);
+      }
+      const labelIndex = await util.select(denops, contents, description);
+      if (!labelIndex) {
+        return;
+      }
+      const { iid } = currentNode.issue;
+      try {
+        await client.requestEditIssue(url, token, {
+          id: project.id,
+          issue_iid: iid,
+          assignee_ids: [members[labelIndex - 1].id],
+        });
+        helper.echo(denops, "Successfully assine a member.");
+      } catch (e) {
+        helper.echoerr(denops, e.message);
+      }
+    },
+
     async addProjectIssueLabel(): Promise<void> {
       const { url, token, project } = await util.getCurrentGitlaberInstance(
         denops,

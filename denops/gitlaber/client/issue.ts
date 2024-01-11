@@ -42,6 +42,7 @@ const isIssueEditAttributes = u.isObjectOf({
   id: u.isNumber,
   issue_iid: u.isNumber,
   add_labels: u.isOptionalOf(u.isString),
+  assignee_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
   confidential: u.isOptionalOf(u.isBoolean),
   description: u.isOptionalOf(u.isString),
   discussion_locked: u.isOptionalOf(u.isBoolean),

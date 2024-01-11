@@ -31,6 +31,28 @@ export type MergeRequestGetAttributes = u.PredicateType<
   typeof isMergeRequestGetAttributes
 >;
 
+const isMergeRequestEditAttributes = u.isObjectOf({
+  id: u.isNumber,
+  merge_request_iid: u.isNumber,
+  add_labels: u.isOptionalOf(u.isString),
+  assignee_id: u.isOptionalOf(u.isNumber),
+  assignee_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
+  description: u.isOptionalOf(u.isString),
+  labels: u.isOptionalOf(u.isString),
+  remove_labels: u.isOptionalOf(u.isString),
+  remove_source_branch: u.isOptionalOf(u.isBoolean),
+  reviewer_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
+  squash: u.isOptionalOf(u.isBoolean),
+  state_event: u.isOptionalOf(u.isLiteralOneOf(["close", "reopen"] as const)),
+  target_branch: u.isOptionalOf(u.isString),
+  title: u.isOptionalOf(u.isString),
+  ...u.isUnknown,
+});
+
+export type MergeRequestEditAttributes = u.PredicateType<
+  typeof isMergeRequestEditAttributes
+>;
+
 export const isMergeRequest = u.isObjectOf({
   id: u.isNumber,
   iid: u.isNumber,
@@ -75,4 +97,22 @@ export async function getProjectMergeRequests(
     throw new Error(`Failed to get merge requests. reason: ${mrs}`);
   }
   return mrs;
+}
+
+export async function requestEditMergeRequest(
+  url: string,
+  token: string,
+  attrs: MergeRequestEditAttributes,
+): Promise<void> {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}`;
+  const res = await request(
+    gitlabApiPath,
+    token,
+    "PUT",
+    JSON.stringify(attrs),
+  );
+  if (!(res.status == 200 || res.status == 201)) {
+    throw new Error("Failed to edit a merge request.");
+  }
 }

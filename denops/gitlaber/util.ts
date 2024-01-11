@@ -6,16 +6,15 @@ import {
   GitlaberVar,
   isGitlaberVar,
   IssueNode,
+  MergeRequestNode,
   WikiNode,
 } from "./types.ts";
 
 export const getCurrentNode = async (
   denops: Denops,
-): Promise<
-  BaseNode | IssueNode | WikiNode | BranchNode
-> => {
+) => {
   const nodes: Array<
-    BaseNode | IssueNode | WikiNode | BranchNode
+    BaseNode | IssueNode | WikiNode | BranchNode | MergeRequestNode
   > = await vars.b.get(
     denops,
     "gitlaber_nodes",
@@ -84,3 +83,12 @@ export const openWithBrowser = async (denops: Denops, url: string) => {
   }
   await denops.call("OpenBrowser", url);
 };
+
+export function select(
+  denops: Denops,
+  contents: string[],
+  description: string,
+) {
+  const texts = [description, ...contents.reverse()];
+  return fn.inputlist(denops, texts);
+}

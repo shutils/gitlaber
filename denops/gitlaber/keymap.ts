@@ -151,6 +151,12 @@ export const mappings: BufMapping[] = [
           "<Cmd>call denops#notify('gitlaber', 'removeProjectIssueLabel', [])<CR>",
         option: mapOption,
       },
+      {
+        lhs: "a",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'assignIssueAssignee', [])<CR>",
+        option: mapOption,
+      },
     ],
   },
   {
@@ -248,6 +254,18 @@ export const mappings: BufMapping[] = [
       {
         lhs: "o",
         rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+        option: mapOption,
+      },
+      {
+        lhs: "a",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'assignMergeRequestAssignee', [])<CR>",
+        option: mapOption,
+      },
+      {
+        lhs: "r",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'assignMergeRequestReviewer', [])<CR>",
         option: mapOption,
       },
     ],
