@@ -90,7 +90,7 @@ Each panel has a default keymap.
 | Preview project issue | p       | :white_check_mark: |
 | Edit project issue    | e       | :white_check_mark: |
 | Delete project issue  | d       | :white_check_mark: |
-| Reload project issue  | r       | :white_check_mark: |
+| Reload project issue  | R       | :white_check_mark: |
 | Quit                  | q       | :white_check_mark: |
 | Create issue branch   | b       | :white_check_mark: |
 | Open in browser       | o       | :white_check_mark: |
@@ -110,6 +110,7 @@ Each panel has a default keymap.
 | Preview project wiki | p       | :white_check_mark: |
 | Edit project wiki    | e       | :white_check_mark: |
 | Delete project wiki  | d       | :white_check_mark: |
+| Reload project wiki  | R       | :white_check_mark: |
 | Quit                 | q       | :white_check_mark: |
 | Open in browser      | o       | :white_check_mark: |
 
@@ -140,6 +141,8 @@ Each panel has a default keymap.
 | ---------------------------- | ------- | ------------------ |
 | Assign member to mr assignee | a       | :white_check_mark: |
 | Assign member to mr reviewer | r       | :white_check_mark: |
+| Approval a merge request     | A       |                    |
+| Merge a merge request        | M       |                    |
 | Quit                         | q       | :white_check_mark: |
 
 ## Roadmap
@@ -163,7 +166,7 @@ This plugin will implement the following functions.
   - [ ] View change history
   - [ ] Search issue
   - [x] Change issue state _NOTE:_ close or reopen
-  - [ ] Change issue assignee
+  - [x] Change issue assignee
   - [x] Change issue label
   - [x] Create related branches
   - [ ] Create related merge request
@@ -182,6 +185,8 @@ This plugin will implement the following functions.
   - [ ] View a mr description
   - [ ] View a mr with comment
   - [ ] Edit a mr description
+  - [ ] Merge a mr
+  - [ ] Approval a mr
   - [x] Assign assignee to mr
   - [x] Assign reviewer to mr
   - [ ] Delete a mr
