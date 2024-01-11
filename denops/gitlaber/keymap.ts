@@ -125,7 +125,7 @@ export const mappings: BufMapping[] = [
         description: "Delete issue",
       },
       {
-        lhs: "r",
+        lhs: "R",
         rhs:
           "<Cmd>call denops#notify('gitlaber', 'reloadProjectIssues', [bufnr()])<CR>",
         option: mapOption,
@@ -245,7 +245,7 @@ export const mappings: BufMapping[] = [
         description: "Delete wiki",
       },
       {
-        lhs: "r",
+        lhs: "R",
         rhs:
           "<Cmd>call denops#notify('gitlaber', 'reloadProjectWikis', [bufnr()])<CR>",
         option: mapOption,
