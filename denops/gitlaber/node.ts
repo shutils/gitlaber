@@ -15,6 +15,14 @@ export const createMainPanelNodes = (
 ) => {
   const nodes: Array<Node> = [];
   nodes.push({
+    display: "Hint: Type g? to display the keymap for each panel.",
+    kind: "other",
+  });
+  nodes.push({
+    display: "",
+    kind: "other",
+  });
+  nodes.push({
     display: "Main Panel",
     kind: "other",
   });
