@@ -66,12 +66,14 @@ Each panel has a default keymap.
 
 #### Main panel
 
-| Function         | Key map | Implemented        |
-| ---------------- | ------- | ------------------ |
-| Open issue panel | i       | :white_check_mark: |
-| Open wiki panel  | w       |                    |
-| Open in browser  | o       | :white_check_mark: |
-| Quit             | q       | :white_check_mark: |
+| Function          | Key map | Implemented        |
+| ----------------- | ------- | ------------------ |
+| Open issue panel  | i       | :white_check_mark: |
+| Open wiki panel   | w       | :white_check_mark: |
+| Open branch panel | b       | :white_check_mark: |
+| Open mr panel     | m       | :white_check_mark: |
+| Open in browser   | o       | :white_check_mark: |
+| Quit              | q       | :white_check_mark: |
 
 #### Issue panel
 
@@ -125,6 +127,21 @@ Each panel has a default keymap.
 | Create mr | M       | :white_check_mark: |
 | Quit      | q       | :white_check_mark: |
 
+#### Merge request panel
+
+| Function     | Key map | Implemented        |
+| ------------ | ------- | ------------------ |
+| Open mr list | l       | :white_check_mark: |
+| Quit         | q       | :white_check_mark: |
+
+#### Merge request list panel
+
+| Function                     | Key map | Implemented        |
+| ---------------------------- | ------- | ------------------ |
+| Assign member to mr assignee | a       | :white_check_mark: |
+| Assign member to mr reviewer | r       | :white_check_mark: |
+| Quit                         | q       | :white_check_mark: |
+
 ## Roadmap
 
 This plugin will implement the following functions.
@@ -165,6 +182,8 @@ This plugin will implement the following functions.
   - [ ] View a mr description
   - [ ] View a mr with comment
   - [ ] Edit a mr description
+  - [x] Assign assignee to mr
+  - [x] Assign reviewer to mr
   - [ ] Delete a mr
   - [ ] View change history
   - [ ] Search mr
