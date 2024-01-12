@@ -1,8 +1,5 @@
-import {
-  GitlaberInstance,
-  IssueNode,
-  Node,
-} from "./types.ts";
+import { unknownutil as u } from "./deps.ts";
+import { GitlaberInstance, Node, NodeKind } from "./types.ts";
 
 import { Branch, Issue, MergeRequest, Project, Wiki } from "./client/index.ts";
 
@@ -70,23 +67,7 @@ export const createProjectIssuePanelNodes = () => {
 export const createProjectIssuesNodes = (
   issues: Issue[],
 ) => {
-  const nodes: Array<Node | IssueNode> = [];
-  let maxIidWidth = 1;
-  issues.map((issue) => {
-    if (maxIidWidth < issue.iid.toString().length) {
-      maxIidWidth = issue.iid.toString().length;
-    }
-  });
-  issues.map((issue) => {
-    nodes.push({
-      display: `# ${issue.iid} ${
-        Array(maxIidWidth + 1 - issue.iid.toString().length).join(" ")
-      } ${issue.title}`,
-      kind: "issue",
-      issue: issue,
-    });
-  });
-  return nodes;
+  return createNodes(issues, ["iid", "title", "labels", "state"], "issue");
 };
 
 export const createProjectBranchPanelNodes = () => {
@@ -115,21 +96,7 @@ export const createProjectBranchesNodes = (
 export const createProjectWikiNodes = (
   wikis: Wiki[],
 ) => {
-  const nodes: Array<Node> = [];
-  let maxIidWidth = 1;
-  wikis.map((wiki) => {
-    if (maxIidWidth < wiki.title.toString().length) {
-      maxIidWidth = wiki.title.toString().length;
-    }
-  });
-  wikis.map((wiki) => {
-    nodes.push({
-      display: wiki.title,
-      kind: "wiki",
-      wiki: wiki,
-    });
-  });
-  return nodes;
+  return createNodes(wikis, ["title", "format"], "wiki");
 };
 
 export const createProjectIssueDescriptionNodes = (
@@ -201,4 +168,87 @@ export const createProjectMergeRequestsNodes = (
     });
   });
   return nodes;
+};
+
+export const createNodes = (
+  records: Record<string, unknown>[],
+  columns: string[],
+  kind: NodeKind,
+) => {
+  const nodes: Array<Node> = [];
+
+  const maxColumnWidths: Record<string, number> = {};
+  columns.forEach((column) => {
+    maxColumnWidths[column] = Math.max(column.length, 1);
+    records.forEach((record) => {
+      if (
+        !u.isString(record[column]) &&
+        !u.isNumber(record[column]) &&
+        !u.isArray(record[column])
+      ) {
+        throw new Error(`record[${column}] is not string or number.`);
+      }
+      const value = (record[column] as string).toString();
+      const width = calculateStringWidth(value);
+      if (maxColumnWidths[column] < width) {
+        maxColumnWidths[column] = width;
+      }
+    });
+  });
+
+  let header = "";
+  let separator = "";
+  columns.forEach((column, index) => {
+    const width = maxColumnWidths[column];
+    const paddedValue = column.padEnd(width);
+    const separatorLine = "-".repeat(width);
+    header += index === 0 ? paddedValue : ` | ${paddedValue}`;
+    separator += index === 0 ? separatorLine : ` | ${separatorLine}`;
+  });
+  nodes.push({
+    display: `${header}`,
+    kind: kind,
+  });
+  nodes.push({
+    display: `${separator}`,
+    kind: kind,
+  });
+
+  records.forEach((record) => {
+    let display = "";
+    columns.forEach((column, index) => {
+      if (
+        !u.isString(record[column]) &&
+        !u.isNumber(record[column]) &&
+        !u.isArray(record[column])
+      ) {
+        throw new Error(`record[${column}] is not string or number.`);
+      }
+      const value = (record[column] as string).toString();
+      const width = calculateStringWidth(value);
+      const paddedValue = value.padEnd(maxColumnWidths[column] - (width - value.length));
+      display += index === 0 ? paddedValue : ` | ${paddedValue}`;
+    });
+
+    nodes.push({
+      display,
+      kind: kind,
+      [kind]: record,
+    });
+  });
+
+  return nodes;
+};
+
+const calculateStringWidth = (str: string): number => {
+  let width = 0;
+  for (let i = 0; i < str.length; i++) {
+    const charCode = str.charCodeAt(i);
+    if (charCode >= 0x1100 && (charCode <= 0x11FF || (charCode >= 0x2E80 && charCode <= 0xD7A3))) {
+      width += 2;
+    } else {
+      width += 1;
+    }
+  }
+  return width;
 };
