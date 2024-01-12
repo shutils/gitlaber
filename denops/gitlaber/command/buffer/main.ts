@@ -12,6 +12,7 @@ import * as node from "../../node.ts";
 import * as types from "../../types.ts";
 import * as keymap from "../../keymap.ts";
 import * as client from "../../client/index.ts";
+import { getCtx, setCtx } from "../../core.ts";
 
 async function drawBuffer(
   denops: Denops,
@@ -87,9 +88,16 @@ export function main(denops: Denops): void {
         nofile: true,
         nomodifiable: true,
       });
+      await setCtx(denops, {
+        instance: currentGitlaberInstance,
+        nodes: nodes,
+        parent_nodes: [],
+        current_node: nodes[0],
+      }, bufnr);
     },
 
     async openProjectIssuePanel(): Promise<void> {
+      const ctx = await getCtx(denops);
       const nodes = node.createProjectIssuePanelNodes();
       await fn.execute(denops, "botright new");
       const bufnr = await fn.bufnr(denops);
@@ -97,19 +105,19 @@ export function main(denops: Denops): void {
         nofile: true,
         nomodifiable: true,
       });
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectIssuesPanel(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
+      const ctx = await getCtx(denops);
+      const { project, url, token } = ctx.instance;
       const projectIssues = await client.getProjectIssues(
         url,
         token,
-        projectId,
+        project.id,
       );
       const nodes = node.createProjectIssuesNodes(projectIssues);
       await fn.execute(denops, "vertical botright new");
@@ -124,9 +132,14 @@ export function main(denops: Denops): void {
           nomodifiable: true,
         },
       );
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectBranchPanel(): Promise<void> {
+      const ctx = await getCtx(denops);
       const nodes = node.createProjectBranchPanelNodes();
       await fn.execute(denops, "botright new");
       const bufnr = await fn.bufnr(denops);
@@ -134,17 +147,17 @@ export function main(denops: Denops): void {
         nofile: true,
         nomodifiable: true,
       });
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectBranchesPanel(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
+      const ctx = await getCtx(denops);
+      const { project, url, token } = ctx.instance;
       const projectBranches = await client.getProjectBranches(url, token, {
-        id: projectId,
+        id: project.id,
       });
       const nodes = node.createProjectBranchesNodes(projectBranches);
       await fn.execute(denops, "vertical botright new");
@@ -159,9 +172,14 @@ export function main(denops: Denops): void {
           nomodifiable: true,
         },
       );
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectWikiPanel(): Promise<void> {
+      const ctx = await getCtx(denops);
       const nodes = node.createProjectWikiPanelNodes();
       await fn.execute(denops, "botright new");
       const bufnr = await fn.bufnr(denops);
@@ -169,17 +187,17 @@ export function main(denops: Denops): void {
         nofile: true,
         nomodifiable: true,
       });
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectWikisPanel(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
+      const ctx = await getCtx(denops);
+      const { project, url, token } = ctx.instance;
       const projectWikis = await client.getProjectWikis(url, token, {
-        id: projectId,
+        id: project.id,
       });
       const nodes = node.createProjectWikiNodes(projectWikis);
       await fn.execute(denops, "vertical botright new");
@@ -188,9 +206,14 @@ export function main(denops: Denops): void {
         nofile: true,
         nomodifiable: true,
       });
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectMergeRequestPanel(): Promise<void> {
+      const ctx = await getCtx(denops);
       const nodes = node.createProjectMergeRequestPanelNodes();
       await fn.execute(denops, "botright new");
       const bufnr = await fn.bufnr(denops);
@@ -198,19 +221,19 @@ export function main(denops: Denops): void {
         nofile: true,
         nomodifiable: true,
       });
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectMergeRequestsPanel(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
-      const url = currentGitlaberInstance.url;
-      const token = currentGitlaberInstance.token;
+      const ctx = await getCtx(denops);
+      const { project, url, token } = ctx.instance;
       const projectMergeRequests = await client.getProjectMergeRequests(
         url,
         token,
-        { id: projectId },
+        { id: project.id },
       );
       const nodes = node.createProjectMergeRequestsNodes(projectMergeRequests);
       await fn.execute(denops, "vertical botright new");
@@ -222,13 +245,15 @@ export function main(denops: Denops): void {
         bufnr,
         { nofile: true, nomodifiable: true },
       );
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openCreateNewProjectWikiBuf(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
+      const ctx = await getCtx(denops);
+      const { project } = ctx.instance;
       const title = await helper.input(denops, {
         prompt: "New wiki title: ",
       });
@@ -241,7 +266,7 @@ export function main(denops: Denops): void {
       await fn.bufload(denops, bufnr);
       await fn.execute(denops, `buffer ${bufnr}`);
       await vars.b.set(denops, "gitlaber_new_wiki_title", title);
-      await vars.b.set(denops, "gitlaber_project_id", projectId);
+      await vars.b.set(denops, "gitlaber_project_id", project.id);
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
         helper.remove("BufWritePost");
         helper.define(
@@ -253,14 +278,18 @@ export function main(denops: Denops): void {
       await keymap.setMapping(denops, "base");
       await setFileType(denops, bufnr);
       await denops.cmd("redraw");
+      await setCtx(denops, {
+        ...ctx,
+      }, bufnr);
     },
 
     async openProjectWikiPreview(): Promise<void> {
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("wiki" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node } = ctx;
+      if (!("wiki" in current_node)) {
         return;
       }
-      const nodes = node.createProjectWikiContentNodes(currentNode.wiki);
+      const nodes = node.createProjectWikiContentNodes(current_node.wiki);
       await fn.execute(denops, "new");
       const bufnr = await fn.bufnr(denops);
       await drawBuffer(denops, nodes, "projectWiki", bufnr, {
@@ -268,18 +297,19 @@ export function main(denops: Denops): void {
         nomodifiable: true,
         filetype: "markdown",
       });
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openEditProjectWikiBuf(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("wiki" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { instance, current_node } = ctx;
+      if (!("wiki" in current_node)) {
         return;
       }
-      const nodes = node.createProjectWikiContentNodes(currentNode.wiki);
+      const nodes = node.createProjectWikiContentNodes(current_node.wiki);
       await fn.execute(denops, "new");
       const bufname = await fn.tempname(denops);
       const bufnr = await fn.bufadd(denops, bufname);
@@ -287,9 +317,9 @@ export function main(denops: Denops): void {
       await fn.execute(denops, `buffer ${bufnr}`);
       await setNodesOnBuf(denops, nodes, bufnr);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
-      await vars.b.set(denops, "gitlaber_project_id", projectId);
-      await vars.b.set(denops, "gitlaber_wiki_title", currentNode.wiki.title);
-      await vars.b.set(denops, "gitlaber_wiki_slug", currentNode.wiki.slug);
+      await vars.b.set(denops, "gitlaber_project_id", instance.project.id);
+      await vars.b.set(denops, "gitlaber_wiki_title", current_node.wiki.title);
+      await vars.b.set(denops, "gitlaber_wiki_slug", current_node.wiki.slug);
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
         helper.remove("BufWritePost");
         helper.define(
@@ -301,18 +331,24 @@ export function main(denops: Denops): void {
       await keymap.setMapping(denops, "base");
       await setFileType(denops, bufnr);
       await denops.cmd("redraw");
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectIssuePreview(): Promise<void> {
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("issue" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node } = ctx;
+      if (!("issue" in current_node)) {
+        helper.echo(denops, "This node is not an issue.");
         return;
       }
-      if (currentNode.issue.description == null) {
+      if (current_node.issue.description == null) {
         helper.echo(denops, "This issue does not have a description.");
         return;
       }
-      const nodes = node.createProjectIssueDescriptionNodes(currentNode.issue);
+      const nodes = node.createProjectIssueDescriptionNodes(current_node.issue);
       await fn.execute(denops, "new");
       const bufnr = await fn.bufnr(denops);
       await drawBuffer(denops, nodes, "projectIssue", bufnr, {
@@ -320,27 +356,28 @@ export function main(denops: Denops): void {
         nomodifiable: true,
         filetype: "markdown",
       });
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async openProjectIssueEditBuf(): Promise<void> {
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
-      const currentIssue = await util.getCurrentNode(denops);
-      if (!("issue" in currentIssue)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("issue" in current_node)) {
         return;
       }
       await fn.execute(denops, "new");
-      const nodes = node.createProjectIssueDescriptionNodes(currentIssue.issue);
+      const nodes = node.createProjectIssueDescriptionNodes(current_node.issue);
       const bufname = await fn.tempname(denops);
       const bufnr = await fn.bufadd(denops, bufname);
       await fn.bufload(denops, bufnr);
       await fn.execute(denops, `buffer ${bufnr}`);
       await setNodesOnBuf(denops, nodes, bufnr);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
-      await vars.b.set(denops, "gitlaber_project_id", projectId);
-      await vars.b.set(denops, "gitlaber_issue_iid", currentIssue.issue.iid);
+      await vars.b.set(denops, "gitlaber_project_id", instance.project.id);
+      await vars.b.set(denops, "gitlaber_issue_iid", current_node.issue.iid);
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
         helper.remove("BufWritePost");
         helper.define(
@@ -352,97 +389,97 @@ export function main(denops: Denops): void {
       await keymap.setMapping(denops, "base");
       await setFileType(denops, bufnr);
       await denops.cmd("redraw");
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
     },
 
     async reloadProjectIssues(bufnr: unknown): Promise<void> {
       if (!u.isNumber(bufnr)) {
         return;
       }
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
-      await loadProjectIssues(denops, projectId, bufnr);
+      await loadProjectIssues(denops, await getCtx(denops, bufnr), bufnr);
     },
 
     async reloadProjectWikis(bufnr: unknown): Promise<void> {
       if (!u.isNumber(bufnr)) {
         return;
       }
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const projectId = currentGitlaberInstance.project.id;
-      await loadProjectWikis(denops, projectId, bufnr);
+      await loadProjectWikis(denops, await getCtx(denops, bufnr), bufnr);
     },
   };
 }
 
 export const loadProjectIssues = async (
   denops: Denops,
-  projectId: number,
+  ctx: types.Ctx,
   bufnr: number,
 ) => {
-  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
-  const url = currentGitlaberInstance.url;
-  const token = currentGitlaberInstance.token;
+  const { project, url, token } = ctx.instance;
   await setModifiable(denops, bufnr);
-  const projectIssues = await client.getProjectIssues(url, token, projectId);
+  const projectIssues = await client.getProjectIssues(url, token, project.id);
   const nodes = node.createProjectIssuesNodes(projectIssues);
   await setNodesOnBuf(denops, nodes, bufnr);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
   await setNoModifiable(denops, bufnr);
+  await setCtx(denops, {
+    ...ctx,
+    nodes: nodes,
+  }, bufnr);
 };
 
 export const loadProjectWikis = async (
   denops: Denops,
-  projectId: number,
+  ctx: types.Ctx,
   bufnr: number,
 ) => {
-  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
-  const url = currentGitlaberInstance.url;
-  const token = currentGitlaberInstance.token;
+  const { project, url, token } = ctx.instance;
   await setModifiable(denops, bufnr);
   const projectWikis = await client.getProjectWikis(url, token, {
-    id: projectId,
+    id: project.id,
   });
   const nodes = node.createProjectWikiNodes(projectWikis);
   await setNodesOnBuf(denops, nodes, bufnr);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
   await setNoModifiable(denops, bufnr);
+  await setCtx(denops, {
+    ...ctx,
+    nodes: nodes,
+  }, bufnr);
 };
 
 export const loadProjectBranches = async (
   denops: Denops,
-  projectId: number,
+  ctx: types.Ctx,
   bufnr: number,
 ) => {
-  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
-  const url = currentGitlaberInstance.url;
-  const token = currentGitlaberInstance.token;
+  const { project, url, token } = ctx.instance;
   await setModifiable(denops, bufnr);
   const projectBranches = await client.getProjectBranches(url, token, {
-    id: projectId,
+    id: project.id,
   });
   const nodes = node.createProjectBranchesNodes(projectBranches);
   await setNodesOnBuf(denops, nodes, bufnr);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
   await setNoModifiable(denops, bufnr);
+  await setCtx(denops, {
+    ...ctx,
+    nodes: nodes,
+  }, bufnr);
 };
 
 export const loadProjectMergeRequests = async (
   denops: Denops,
-  projectId: number,
+  ctx: types.Ctx,
   bufnr: number,
 ) => {
-  const currentGitlaberInstance = await util.getCurrentGitlaberInstance(denops);
-  const url = currentGitlaberInstance.url;
-  const token = currentGitlaberInstance.token;
+  const { project, url, token } = ctx.instance;
   await setModifiable(denops, bufnr);
   const projectMergeRequests = await client.getProjectMergeRequests(
     url,
     token,
-    { id: projectId },
+    { id: project.id },
   );
   const nodes = node.createProjectMergeRequestsNodes(projectMergeRequests);
   await setNodesOnBuf(denops, nodes, bufnr);

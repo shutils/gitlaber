@@ -1,6 +1,7 @@
 import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
+import { getCtx } from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -67,15 +68,13 @@ export function main(denops: Denops): void {
     },
 
     async deleteProjectWiki(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentWiki = await util.getCurrentNode(denops);
-      if (!("wiki" in currentWiki)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("wiki" in current_node)) {
         return;
       }
-      const slug = currentWiki.wiki.slug;
-      const title = currentWiki.wiki.title;
+      const slug = current_node.wiki.slug;
+      const title = current_node.wiki.title;
       const confirm = await helper.input(denops, {
         prompt: `Are you sure you want to delete the wiki(${title})? y/N: `,
       });
@@ -83,8 +82,8 @@ export function main(denops: Denops): void {
         return;
       }
       try {
-        await client.requestDeleteWiki(url, token, {
-          id: project.id,
+        await client.requestDeleteWiki(instance.url, instance.token, {
+          id: instance.project.id,
           slug: slug,
         });
         helper.echo(denops, "Successfully delete a wiki.");

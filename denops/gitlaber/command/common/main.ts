@@ -1,15 +1,15 @@
 import { Denops, helper } from "../../deps.ts";
 
-import * as util from "../../util.ts";
 import * as types from "../../types.ts";
 import * as keymap from "../../keymap.ts";
+import { getCtx } from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     async _getCurrentNode(): Promise<types.BaseNode | types.IssueNode> {
-      const currentNode = await util.getCurrentNode(denops);
-      return currentNode;
+      const ctx = await getCtx(denops);
+      return ctx.current_node;
     },
 
     async echoKeymaps(): Promise<void> {

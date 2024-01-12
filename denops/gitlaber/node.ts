@@ -1,10 +1,7 @@
 import {
-  BranchNode,
   GitlaberInstance,
   IssueNode,
-  MergeRequestNode,
   Node,
-  WikiNode,
 } from "./types.ts";
 
 import { Branch, Issue, MergeRequest, Project, Wiki } from "./client/index.ts";
@@ -104,7 +101,7 @@ export const createProjectBranchPanelNodes = () => {
 export const createProjectBranchesNodes = (
   branches: Branch[],
 ) => {
-  const nodes: Array<Node | BranchNode> = [];
+  const nodes: Array<Node> = [];
   branches.map((branch) => {
     nodes.push({
       display: branch.name,
@@ -118,7 +115,7 @@ export const createProjectBranchesNodes = (
 export const createProjectWikiNodes = (
   wikis: Wiki[],
 ) => {
-  const nodes: Array<Node | WikiNode> = [];
+  const nodes: Array<Node> = [];
   let maxIidWidth = 1;
   wikis.map((wiki) => {
     if (maxIidWidth < wiki.title.toString().length) {
@@ -187,7 +184,7 @@ export const createProjectMergeRequestPanelNodes = () => {
 export const createProjectMergeRequestsNodes = (
   mrs: MergeRequest[],
 ) => {
-  const nodes: Array<Node | MergeRequestNode> = [];
+  const nodes: Array<Node> = [];
   let maxIdWidth = 1;
   mrs.map((mr) => {
     if (maxIdWidth < mr.id.toString().length) {

@@ -1,27 +1,29 @@
 import { Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import * as util from "../../util.ts";
+import { getCtx } from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     async createNewBranchMr(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("branch" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("branch" in current_node)) {
         helper.echoerr(denops, "This node is not branch.");
         return;
       }
-      const currentBranch = currentNode.branch.name;
-      const commitId = currentNode.branch.commit.short_id;
-      const commit = await client.requestGetCommit(url, token, {
-        id: project.id,
-        sha: commitId,
-      });
+      const currentBranch = current_node.branch.name;
+      const commitId = current_node.branch.commit.short_id;
+      const commit = await client.requestGetCommit(
+        instance.url,
+        instance.token,
+        {
+          id: instance.project.id,
+          sha: commitId,
+        },
+      );
       const defaultTitle = commit.title;
-      const defaultBranch = project.default_branch;
+      const defaultBranch = instance.project.default_branch;
       const terget = await helper.input(denops, {
         prompt: "Terget branch: ",
         text: defaultBranch,
@@ -44,8 +46,8 @@ export function main(denops: Denops): void {
         return;
       }
       try {
-        await client.requestCreateMergeRequest(url, token, {
-          id: project.id,
+        await client.requestCreateMergeRequest(instance.url, instance.token, {
+          id: instance.project.id,
           title: title,
           source_branch: currentBranch,
           target_branch: terget,

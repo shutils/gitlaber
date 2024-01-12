@@ -1,5 +1,11 @@
 import { unknownutil as u } from "./deps.ts";
-import { isBranch, isIssue, isProject, isWiki, isMergeRequest } from "./client/index.ts";
+import {
+  isBranch,
+  isIssue,
+  isMergeRequest,
+  isProject,
+  isWiki,
+} from "./client/index.ts";
 
 const isGitlaberState = u.isObjectOf({
   has_main_panel: u.isBoolean,
@@ -39,14 +45,6 @@ const isBaseNode = u.isObjectOf(baseNode);
 
 export type BaseNode = u.PredicateType<typeof isBaseNode>;
 
-const isNode = u.isObjectOf({
-  ...baseNode,
-  ...u.isUnknown,
-});
-
-export type Node = u.PredicateType<typeof isNode>;
-
-
 export const isIssueNode = u.isObjectOf({
   ...baseNode,
   kind: u.isLiteralOf("issue"),
@@ -79,7 +77,22 @@ export const isMergeRequestNode = u.isObjectOf({
 
 export type MergeRequestNode = u.PredicateType<typeof isMergeRequestNode>;
 
-const isGitlaberInstance = u.isObjectOf({
+export const isNode = u.isOneOf([
+  isBaseNode,
+  isIssueNode,
+  isBranchNode,
+  isWikiNode,
+  isMergeRequestNode,
+]);
+
+export type Node =
+  | BaseNode
+  | IssueNode
+  | BranchNode
+  | WikiNode
+  | MergeRequestNode;
+
+export const isGitlaberInstance = u.isObjectOf({
   index: u.isNumber,
   cwd: u.isString,
   url: u.isString,
@@ -94,3 +107,10 @@ export type GitlaberInstance = u.PredicateType<typeof isGitlaberInstance>;
 export const isGitlaberVar = u.isArrayOf(isGitlaberInstance);
 
 export type GitlaberVar = u.PredicateType<typeof isGitlaberVar>;
+
+export type Ctx = {
+  instance: GitlaberInstance;
+  parent_nodes: Node[];
+  nodes: Node[];
+  current_node: Node;
+};

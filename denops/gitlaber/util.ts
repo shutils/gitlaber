@@ -1,27 +1,6 @@
 import { Denops, fn, helper, vars } from "./deps.ts";
 
-import {
-  BaseNode,
-  BranchNode,
-  GitlaberVar,
-  isGitlaberVar,
-  IssueNode,
-  MergeRequestNode,
-  WikiNode,
-} from "./types.ts";
-
-export const getCurrentNode = async (
-  denops: Denops,
-) => {
-  const nodes: Array<
-    BaseNode | IssueNode | WikiNode | BranchNode | MergeRequestNode
-  > = await vars.b.get(
-    denops,
-    "gitlaber_nodes",
-  );
-  const index = await fn.line(denops, ".") - 1;
-  return nodes[index];
-};
+import { GitlaberVar, isGitlaberVar } from "./types.ts";
 
 export const getGitlaberVar = async (denops: Denops): Promise<GitlaberVar> => {
   try {

@@ -1,6 +1,7 @@
 import { Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
+import { getCtx } from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -14,11 +15,9 @@ export function main(denops: Denops): void {
     },
 
     async approveMergeRequest(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("mr" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("mr" in current_node)) {
         return;
       }
       const confirm = await helper.input(denops, {
@@ -27,18 +26,16 @@ export function main(denops: Denops): void {
       if (confirm !== "y") {
         return;
       }
-      await client.requestApproveMergeRequest(url, token, {
-        id: project.id,
-        merge_request_iid: currentNode.mr.iid,
+      await client.requestApproveMergeRequest(instance.url, instance.token, {
+        id: instance.project.id,
+        merge_request_iid: current_node.mr.iid,
       });
     },
 
     async mergeMergeRequest(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("mr" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("mr" in current_node)) {
         return;
       }
       const confirm = await helper.input(denops, {
@@ -55,10 +52,14 @@ export function main(denops: Denops): void {
       });
       let squash_commit_message: string | undefined;
       if (squash === "y") {
-        const branch = await client.getProjectBranch(url, token, {
-          id: project.id,
-          branch: currentNode.mr.source_branch,
-        });
+        const branch = await client.getProjectBranch(
+          instance.url,
+          instance.token,
+          {
+            id: instance.project.id,
+            branch: current_node.mr.source_branch,
+          },
+        );
         const input = await helper.input(denops, {
           prompt: `Squash commit message: `,
           text: branch.commit.title,
@@ -66,9 +67,9 @@ export function main(denops: Denops): void {
         squash_commit_message = input ?? undefined;
       }
       try {
-        await client.requestMergeMergeRequest(url, token, {
-          id: project.id,
-          merge_request_iid: currentNode.mr.iid,
+        await client.requestMergeMergeRequest(instance.url, instance.token, {
+          id: instance.project.id,
+          merge_request_iid: current_node.mr.iid,
           should_remove_source_branch: remove_source_branch === "y",
           squash: squash === "y",
           squash_commit_message: squash_commit_message,
@@ -85,15 +86,13 @@ async function assignMergeRequestMember(
   denops: Denops,
   role: "assignee" | "reviewer",
 ) {
-  const { url, token, project } = await util.getCurrentGitlaberInstance(
-    denops,
-  );
-  const currentNode = await util.getCurrentNode(denops);
-  if (!("mr" in currentNode)) {
+  const ctx = await getCtx(denops);
+  const { current_node, instance } = ctx;
+  if (!("mr" in current_node)) {
     return;
   }
-  const members = await client.requestGetProjectMembers(url, token, {
-    id: project.id,
+  const members = await client.requestGetProjectMembers(instance.url, instance.token, {
+    id: instance.project.id,
   });
   if (members.length === 0) {
     helper.echo(denops, "Project has not members.");
@@ -108,7 +107,7 @@ async function assignMergeRequestMember(
   if (!labelIndex) {
     return;
   }
-  const { iid } = currentNode.mr;
+  const { iid } = current_node.mr;
   let extraAttrs: object;
   if (role === "assignee") {
     extraAttrs = {
@@ -120,8 +119,8 @@ async function assignMergeRequestMember(
     };
   }
   try {
-    await client.requestEditMergeRequest(url, token, {
-      id: project.id,
+    await client.requestEditMergeRequest(instance.url, instance.token, {
+      id: instance.project.id,
       merge_request_iid: iid,
       ...extraAttrs,
     });

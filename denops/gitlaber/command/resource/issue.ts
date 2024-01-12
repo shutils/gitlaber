@@ -1,14 +1,14 @@
 import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
+import { getCtx } from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     async createNewProjectIssue(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
+      const ctx = await getCtx(denops);
+      const { project, url, token } = ctx.instance;
       const title = await helper.input(denops, {
         prompt: "New issue title: ",
       });
@@ -27,14 +27,12 @@ export function main(denops: Denops): void {
     },
 
     async deleteProjectIssue(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("issue" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("issue" in current_node)) {
         return;
       }
-      const issue_iid = currentNode.issue.iid;
+      const issue_iid = current_node.issue.iid;
       const confirm = await helper.input(denops, {
         prompt:
           `Are you sure you want to delete the issue(${issue_iid})? y/N: `,
@@ -43,7 +41,12 @@ export function main(denops: Denops): void {
         return;
       }
       try {
-        await client.requestDeleteIssue(url, token, project.id, issue_iid);
+        await client.requestDeleteIssue(
+          instance.url,
+          instance.token,
+          instance.project.id,
+          issue_iid,
+        );
         helper.echo(denops, "Successfully delete a issue.");
       } catch (e) {
         helper.echoerr(denops, e.message);
@@ -51,9 +54,8 @@ export function main(denops: Denops): void {
     },
 
     async editProjectIssue(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
+      const ctx = await getCtx(denops);
+      const { project, url, token } = ctx.instance;
       const description = await util.flattenBuffer(
         denops,
         await fn.bufname(denops),
@@ -75,21 +77,19 @@ export function main(denops: Denops): void {
     },
 
     async toggleProjectIssueState(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("issue" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("issue" in current_node)) {
         return;
       }
-      const { iid, state } = currentNode.issue;
+      const { iid, state } = current_node.issue;
       let stateEvent: "close" | "reopen" = "close";
       if (state === "closed") {
         stateEvent = "reopen";
       }
       try {
-        await client.requestEditIssue(url, token, {
-          id: project.id,
+        await client.requestEditIssue(instance.url, instance.token, {
+          id: instance.project.id,
           issue_iid: iid,
           state_event: stateEvent,
         });
@@ -100,16 +100,18 @@ export function main(denops: Denops): void {
     },
 
     async assignIssueAssignee(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("issue" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("issue" in current_node)) {
         return;
       }
-      const members = await client.requestGetProjectMembers(url, token, {
-        id: project.id,
-      });
+      const members = await client.requestGetProjectMembers(
+        instance.url,
+        instance.token,
+        {
+          id: instance.project.id,
+        },
+      );
       if (members.length === 0) {
         helper.echo(denops, "Project has not members.");
         return;
@@ -123,10 +125,10 @@ export function main(denops: Denops): void {
       if (!labelIndex) {
         return;
       }
-      const { iid } = currentNode.issue;
+      const { iid } = current_node.issue;
       try {
-        await client.requestEditIssue(url, token, {
-          id: project.id,
+        await client.requestEditIssue(instance.url, instance.token, {
+          id: instance.project.id,
           issue_iid: iid,
           assignee_ids: [members[labelIndex - 1].id],
         });
@@ -137,16 +139,18 @@ export function main(denops: Denops): void {
     },
 
     async addProjectIssueLabel(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("issue" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("issue" in current_node)) {
         return;
       }
-      const labels = await client.requestGetProjectLabels(url, token, {
-        id: project.id,
-      });
+      const labels = await client.requestGetProjectLabels(
+        instance.url,
+        instance.token,
+        {
+          id: instance.project.id,
+        },
+      );
       if (labels.length === 0) {
         helper.echo(denops, "Project has not labels.");
         return;
@@ -156,14 +160,14 @@ export function main(denops: Denops): void {
       for (let i = 0; i < labels.length; i++) {
         textlist.unshift(`${i + 1}. ${labels[i].name}`);
       }
-      const { iid } = currentNode.issue;
+      const { iid } = current_node.issue;
       const labelIndex = await fn.inputlist(denops, textlist.reverse());
       if (!labelIndex) {
         return;
       }
       try {
-        await client.requestEditIssue(url, token, {
-          id: project.id,
+        await client.requestEditIssue(instance.url, instance.token, {
+          id: instance.project.id,
           issue_iid: iid,
           add_labels: labels[labelIndex - 1]?.name ?? undefined,
         });
@@ -174,14 +178,12 @@ export function main(denops: Denops): void {
     },
 
     async removeProjectIssueLabel(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("issue" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("issue" in current_node)) {
         return;
       }
-      const labels = currentNode.issue.labels;
+      const labels = current_node.issue.labels;
       if (labels.length === 0) {
         helper.echo(denops, "This issue has not labels.");
         return;
@@ -191,14 +193,14 @@ export function main(denops: Denops): void {
       for (let i = 0; i < labels.length; i++) {
         textlist.unshift(`${i + 1}. ${labels[i]}`);
       }
-      const { iid } = currentNode.issue;
+      const { iid } = current_node.issue;
       const labelIndex = await fn.inputlist(denops, textlist.reverse());
       if (!labelIndex) {
         return;
       }
       try {
-        await client.requestEditIssue(url, token, {
-          id: project.id,
+        await client.requestEditIssue(instance.url, instance.token, {
+          id: instance.project.id,
           issue_iid: iid,
           remove_labels: labels[labelIndex - 1] ?? undefined,
         });
@@ -209,17 +211,15 @@ export function main(denops: Denops): void {
     },
 
     async createIssueBranch(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
-        denops,
-      );
-      const currentNode = await util.getCurrentNode(denops);
-      if (!("issue" in currentNode)) {
+      const ctx = await getCtx(denops);
+      const { current_node, instance } = ctx;
+      if (!("issue" in current_node)) {
         helper.echoerr(denops, "This node is not issue.");
         return;
       }
-      const defaultBranch = project.default_branch;
-      const title = currentNode.issue.title;
-      const issue_iid = currentNode.issue.iid;
+      const defaultBranch = instance.project.default_branch;
+      const title = current_node.issue.title;
+      const issue_iid = current_node.issue.iid;
       const branch = await helper.input(denops, {
         prompt: "New branch name: ",
         text: `${issue_iid}-${title}`,
@@ -235,8 +235,8 @@ export function main(denops: Denops): void {
         return;
       }
       try {
-        await client.requestCreateIssueBranch(url, token, {
-          id: project.id,
+        await client.requestCreateIssueBranch(instance.url, instance.token, {
+          id: instance.project.id,
           branch: branch,
           ref: ref,
         });
