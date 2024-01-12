@@ -1,7 +1,14 @@
 import { unknownutil as u } from "./deps.ts";
 import { GitlaberInstance, Node, NodeKind } from "./types.ts";
 
-import { Branch, Issue, MergeRequest, Project, Wiki } from "./client/index.ts";
+import {
+  Branch,
+  Issue,
+  Member,
+  MergeRequest,
+  Project,
+  Wiki,
+} from "./client/index.ts";
 
 export const createMainPanelNodes = (
   gitlaberInstance: GitlaberInstance,
@@ -67,7 +74,11 @@ export const createProjectIssuePanelNodes = () => {
 export const createProjectIssuesNodes = (
   issues: Issue[],
 ) => {
-  return createNodes(issues, ["iid", "title", "labels", "state"], "issue");
+  return createNodes(
+    issues,
+    ["iid", "title", "labels", "state", "assignees"],
+    "issue",
+  );
 };
 
 export const createProjectBranchPanelNodes = () => {
@@ -82,15 +93,7 @@ export const createProjectBranchPanelNodes = () => {
 export const createProjectBranchesNodes = (
   branches: Branch[],
 ) => {
-  const nodes: Array<Node> = [];
-  branches.map((branch) => {
-    nodes.push({
-      display: branch.name,
-      kind: "branch",
-      branch: branch,
-    });
-  });
-  return nodes;
+  return createNodes(branches, ["name", "merged"], "branch");
 };
 
 export const createProjectWikiNodes = (
@@ -150,31 +153,19 @@ export const createProjectMergeRequestPanelNodes = () => {
 
 export const createProjectMergeRequestsNodes = (
   mrs: MergeRequest[],
-) => {
-  const nodes: Array<Node> = [];
-  let maxIdWidth = 1;
-  mrs.map((mr) => {
-    if (maxIdWidth < mr.id.toString().length) {
-      maxIdWidth = mr.id.toString().length;
-    }
-  });
-  mrs.map((mr) => {
-    nodes.push({
-      display: `# ${mr.id} ${
-        Array(maxIdWidth + 1 - mr.id.toString().length).join(" ")
-      } ${mr.title}`,
-      kind: "mr",
-      mr: mr,
-    });
-  });
-  return nodes;
+): Node[] => {
+  return createNodes(
+    mrs,
+    ["iid", "title", "state", "assignees", "reviewers"],
+    "mr",
+  );
 };
 
 export const createNodes = (
   records: Record<string, unknown>[],
   columns: string[],
   kind: NodeKind,
-) => {
+): Node[] => {
   const nodes: Array<Node> = [];
 
   const maxColumnWidths: Record<string, number> = {};
@@ -182,11 +173,11 @@ export const createNodes = (
     maxColumnWidths[column] = Math.max(column.length, 1);
     records.forEach((record) => {
       if (
-        !u.isString(record[column]) &&
-        !u.isNumber(record[column]) &&
-        !u.isArray(record[column])
+        u.isObjectOf({ ...u.isUnknown })(record[column])
       ) {
-        throw new Error(`record[${column}] is not string or number.`);
+        throw new Error(
+          `A column has been specified that cannot be displayed: ${column}`,
+        );
       }
       const value = (record[column] as string).toString();
       const width = calculateStringWidth(value);
@@ -218,15 +209,24 @@ export const createNodes = (
     let display = "";
     columns.forEach((column, index) => {
       if (
-        !u.isString(record[column]) &&
-        !u.isNumber(record[column]) &&
-        !u.isArray(record[column])
+        u.isObjectOf({ ...u.isUnknown })(record[column])
       ) {
-        throw new Error(`record[${column}] is not string or number.`);
+        throw new Error(
+          `A column has been specified that cannot be displayed: ${column}`,
+        );
       }
-      const value = (record[column] as string).toString();
+      let value: string;
+      if (column === "assignees" || column === "reviewers") {
+        value = (record[column] as Member[]).flatMap((member) => {
+          return member.name;
+        }).join(", ");
+      } else {
+        value = (record[column] as string).toString();
+      }
       const width = calculateStringWidth(value);
-      const paddedValue = value.padEnd(maxColumnWidths[column] - (width - value.length));
+      const paddedValue = value.padEnd(
+        maxColumnWidths[column] - (width - value.length),
+      );
       display += index === 0 ? paddedValue : ` | ${paddedValue}`;
     });
 
@@ -244,7 +244,10 @@ const calculateStringWidth = (str: string): number => {
   let width = 0;
   for (let i = 0; i < str.length; i++) {
     const charCode = str.charCodeAt(i);
-    if (charCode >= 0x1100 && (charCode <= 0x11FF || (charCode >= 0x2E80 && charCode <= 0xD7A3))) {
+    if (
+      charCode >= 0x1100 &&
+      (charCode <= 0x11FF || (charCode >= 0x2E80 && charCode <= 0xD7A3))
+    ) {
       width += 2;
     } else {
       width += 1;
