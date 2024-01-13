@@ -1,14 +1,8 @@
-import { unknownutil as u } from "./deps.ts";
-import { GitlaberInstance, Node, NodeKind } from "./types.ts";
+import { Denops, unknownutil as u } from "./deps.ts";
+import { Ctx, GitlaberInstance, Node, NodeKind } from "./types.ts";
+import * as client from "./client/index.ts";
 
-import {
-  Branch,
-  Issue,
-  Member,
-  MergeRequest,
-  Project,
-  Wiki,
-} from "./client/index.ts";
+import { Issue, Member, Project, Wiki } from "./client/index.ts";
 
 export const createMainPanelNodes = (
   gitlaberInstance: GitlaberInstance,
@@ -62,44 +56,71 @@ export const createMainPanelNodes = (
   return nodes;
 };
 
-export const createProjectIssuePanelNodes = () => {
+export const createProjectIssuePanelNodes = async (
+  _denops: Denops,
+  _ctx: Ctx,
+) => {
   const nodes: Array<Node> = [];
   nodes.push({
     display: "Project issue Panel",
     kind: "other",
   });
-  return nodes;
+  return await Promise.resolve(nodes);
 };
 
-export const createProjectIssuesNodes = (
-  issues: Issue[],
+export const createProjectIssuesNodes = async (
+  _denops: Denops,
+  ctx: Ctx,
 ) => {
-  return createNodes(
-    issues,
+  const { project, url, token } = ctx.instance;
+  const projectIssues = await client.getProjectIssues(
+    url,
+    token,
+    project.id,
+  );
+  return Promise.resolve(createNodes(
+    projectIssues,
     ["iid", "title", "labels", "state", "assignees"],
     "issue",
-  );
+  ));
 };
 
-export const createProjectBranchPanelNodes = () => {
+export const createProjectBranchPanelNodes = async (
+  _denops: Denops,
+  _ctx: Ctx,
+) => {
   const nodes: Array<Node> = [];
   nodes.push({
     display: "Project branch Panel",
     kind: "other",
   });
-  return nodes;
+  return await Promise.resolve(nodes);
 };
 
-export const createProjectBranchesNodes = (
-  branches: Branch[],
+export const createProjectBranchesNodes = async (
+  _denops: Denops,
+  ctx: Ctx,
 ) => {
-  return createNodes(branches, ["name", "merged"], "branch");
+  const { project, url, token } = ctx.instance;
+  const projectBranches = await client.getProjectBranches(url, token, {
+    id: project.id,
+  });
+  return await Promise.resolve(
+    createNodes(projectBranches, ["name", "merged"], "branch"),
+  );
 };
 
-export const createProjectWikiNodes = (
-  wikis: Wiki[],
+export const createProjectWikiNodes = async (
+  _denops: Denops,
+  ctx: Ctx,
 ) => {
-  return createNodes(wikis, ["title", "format"], "wiki");
+  const { project, url, token } = ctx.instance;
+  const projectWikis = await client.getProjectWikis(url, token, {
+    id: project.id,
+  });
+  return await Promise.resolve(
+    createNodes(projectWikis, ["title", "format"], "wiki"),
+  );
 };
 
 export const createProjectIssueDescriptionNodes = (
@@ -119,13 +140,13 @@ export const createProjectIssueDescriptionNodes = (
   return nodes;
 };
 
-export const createProjectWikiPanelNodes = () => {
+export const createProjectWikiPanelNodes = async () => {
   const nodes: Array<Node> = [];
   nodes.push({
     display: "Project wiki Panel",
     kind: "other",
   });
-  return nodes;
+  return await Promise.resolve(nodes);
 };
 
 export const createProjectWikiContentNodes = (
@@ -142,23 +163,33 @@ export const createProjectWikiContentNodes = (
   return nodes;
 };
 
-export const createProjectMergeRequestPanelNodes = () => {
+export const createProjectMergeRequestPanelNodes = async (
+  _denops: Denops,
+  _ctx: Ctx,
+) => {
   const nodes: Array<Node> = [];
   nodes.push({
     display: "Project merge request Panel",
     kind: "other",
   });
-  return nodes;
+  return await Promise.resolve(nodes);
 };
 
-export const createProjectMergeRequestsNodes = (
-  mrs: MergeRequest[],
-): Node[] => {
-  return createNodes(
-    mrs,
+export const createProjectMergeRequestsNodes = async (
+  _denops: Denops,
+  ctx: Ctx,
+) => {
+  const { project, url, token } = ctx.instance;
+  const projectMergeRequests = await client.getProjectMergeRequests(
+    url,
+    token,
+    { id: project.id },
+  );
+  return await Promise.resolve(createNodes(
+    projectMergeRequests,
     ["iid", "title", "state", "assignees", "reviewers"],
     "mr",
-  );
+  ));
 };
 
 export const createNodes = (

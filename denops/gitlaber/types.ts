@@ -1,4 +1,4 @@
-import { unknownutil as u } from "./deps.ts";
+import { Denops, unknownutil as u } from "./deps.ts";
 import {
   isBranch,
   isIssue,
@@ -113,4 +113,40 @@ export type Ctx = {
   parent_nodes: Node[];
   nodes: Node[];
   current_node: Node;
+};
+
+const isBufferKind = u.isLiteralOneOf(
+  [
+    "base",
+    "main",
+    "project_issue",
+    "project_issues",
+    "project_branch",
+    "project_branches",
+    "project_wiki",
+    "project_wikis",
+    "project_merge_request",
+    "project_merge_requests",
+  ] as const,
+);
+
+export type BufferKind = u.PredicateType<typeof isBufferKind>;
+
+export const isBufferOptions = u.isObjectOf({
+  nofile: u.isOptionalOf(u.isBoolean),
+  nomodifiable: u.isOptionalOf(u.isBoolean),
+  filetype: u.isOptionalOf(u.isString),
+});
+
+export type BufferOptions = u.PredicateType<typeof isBufferOptions>;
+
+export type BufferConfig = {
+  direction: string;
+  options: BufferOptions;
+  node_creater: (denops: Denops, ctx: Ctx) => Promise<Node[]>;
+};
+
+export type BufferInfo = {
+  kind: BufferKind;
+  config: BufferConfig;
 };

@@ -1,23 +1,13 @@
 import { Denops, mapping, vars } from "./deps.ts";
 
+import { BufferKind } from "./types.ts";
+
 const mapOption: mapping.MapOptions = {
   mode: "n",
   noremap: true,
   silent: true,
   buffer: true,
 };
-
-export type BufName =
-  | "base"
-  | "main"
-  | "projectIssue"
-  | "projectIssues"
-  | "projectBranch"
-  | "projectBranches"
-  | "projectWiki"
-  | "projectWikis"
-  | "projectMergeRequest"
-  | "projectMergeRequests";
 
 type Mapping = {
   lhs: string;
@@ -27,12 +17,12 @@ type Mapping = {
 };
 
 type BufMapping = {
-  name: BufName;
+  kind: BufferKind;
   mappings: Mapping[];
 };
 
 const baseMappings: BufMapping = {
-  name: "base",
+  kind: "base",
   mappings: [
     {
       lhs: "q",
@@ -58,7 +48,7 @@ const baseMappings: BufMapping = {
 export const mappings: BufMapping[] = [
   baseMappings,
   {
-    name: "main",
+    kind: "main",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -97,7 +87,7 @@ export const mappings: BufMapping[] = [
     ],
   },
   {
-    name: "projectIssue",
+    kind: "project_issue",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -115,7 +105,7 @@ export const mappings: BufMapping[] = [
     ],
   },
   {
-    name: "projectIssues",
+    kind: "project_issues",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -127,7 +117,7 @@ export const mappings: BufMapping[] = [
       {
         lhs: "R",
         rhs:
-          "<Cmd>call denops#notify('gitlaber', 'reloadProjectIssues', [bufnr()])<CR>",
+          "<Cmd>call denops#notify('gitlaber', 'reloadBuffer', [bufnr()])<CR>",
         option: mapOption,
         description: "Reload issues",
       },
@@ -186,7 +176,7 @@ export const mappings: BufMapping[] = [
     ],
   },
   {
-    name: "projectBranch",
+    kind: "project_branch",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -199,7 +189,7 @@ export const mappings: BufMapping[] = [
     ],
   },
   {
-    name: "projectBranches",
+    kind: "project_branches",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -217,7 +207,7 @@ export const mappings: BufMapping[] = [
     ],
   },
   {
-    name: "projectWiki",
+    kind: "project_wiki",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -235,7 +225,7 @@ export const mappings: BufMapping[] = [
     ],
   },
   {
-    name: "projectWikis",
+    kind: "project_wikis",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -247,7 +237,7 @@ export const mappings: BufMapping[] = [
       {
         lhs: "R",
         rhs:
-          "<Cmd>call denops#notify('gitlaber', 'reloadProjectWikis', [bufnr()])<CR>",
+          "<Cmd>call denops#notify('gitlaber', 'reloadBuffer', [bufnr()])<CR>",
         option: mapOption,
         description: "Reload wikis",
       },
@@ -272,7 +262,7 @@ export const mappings: BufMapping[] = [
     ],
   },
   {
-    name: "projectMergeRequest",
+    kind: "project_merge_request",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -285,7 +275,7 @@ export const mappings: BufMapping[] = [
     ],
   },
   {
-    name: "projectMergeRequests",
+    kind: "project_merge_requests",
     mappings: [
       ...baseMappings.mappings,
       {
@@ -317,8 +307,7 @@ export const mappings: BufMapping[] = [
       },
       {
         lhs: "M",
-        rhs:
-          "<Cmd>call denops#notify('gitlaber', 'mergeMergeRequest', [])<CR>",
+        rhs: "<Cmd>call denops#notify('gitlaber', '', [])<CR>",
         option: mapOption,
         description: "Merge a merge request",
       },
@@ -326,8 +315,8 @@ export const mappings: BufMapping[] = [
   },
 ];
 
-export const setMapping = async (denops: Denops, name: BufName) => {
-  let bufMappings = mappings.find((m) => m.name === name);
+export const setMapping = async (denops: Denops, kind: BufferKind) => {
+  let bufMappings = mappings.find((m) => m.kind === kind);
   if (!bufMappings) {
     bufMappings = baseMappings;
     return;

@@ -14,21 +14,180 @@ import * as keymap from "../../keymap.ts";
 import * as client from "../../client/index.ts";
 import { getCtx, setCtx } from "../../core.ts";
 
+async function setBufferInfo(
+  denops: Denops,
+  bufferInfo: types.BufferInfo,
+  bufnr?: number,
+) {
+  if (!bufnr) {
+    bufnr = await fn.bufnr(denops);
+  }
+  await fn.setbufvar(denops, bufnr, "gitlaber_buffer_info", bufferInfo);
+}
+
+export async function getBufferInfo(
+  denops: Denops,
+  bufnr?: number,
+): Promise<types.BufferInfo> {
+  if (!bufnr) {
+    bufnr = await fn.bufnr(denops);
+  }
+  const bufferInfo = await fn.getbufvar(denops, bufnr, "gitlaber_buffer_info");
+  if (
+    u.isObjectOf({
+      kind: u.isString,
+      ...u.isUnknown,
+    })
+  ) {
+    return (bufferInfo as types.BufferInfo);
+  } else {
+    throw new Error("buffer info is not set");
+  }
+}
+
+function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
+  const bufferInfos: types.BufferInfo[] = [
+    {
+      kind: "project_issue",
+      config: {
+        direction: "botright new",
+        node_creater: node.createProjectIssuePanelNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+    {
+      kind: "project_issues",
+      config: {
+        direction: "vertical botright new",
+        node_creater: node.createProjectIssuesNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+    {
+      kind: "project_branch",
+      config: {
+        direction: "botright new",
+        node_creater: node.createProjectBranchPanelNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+    {
+      kind: "project_branches",
+      config: {
+        direction: "botright new",
+        node_creater: node.createProjectBranchesNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+    {
+      kind: "project_wiki",
+      config: {
+        direction: "botright new",
+        node_creater: node.createProjectWikiPanelNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+    {
+      kind: "project_wikis",
+      config: {
+        direction: "vertical botright new",
+        node_creater: node.createProjectWikiNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+    {
+      kind: "project_merge_request",
+      config: {
+        direction: "botright new",
+        node_creater: node.createProjectMergeRequestPanelNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+    {
+      kind: "project_merge_requests",
+      config: {
+        direction: "vertical botright new",
+        node_creater: node.createProjectMergeRequestsNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+  ];
+  const bufferInfo = bufferInfos.find((buffer) => buffer.kind === kind);
+  if (!bufferInfo) {
+    throw new Error("Cannot find buffer info for specified kind");
+  }
+  return bufferInfo;
+}
+
+async function renderBuffer(denops: Denops, bufferInfo: types.BufferInfo) {
+  const ctx = await getCtx(denops);
+  const config = bufferInfo.config;
+
+  const nodes = await config.node_creater(denops, ctx);
+  await fn.execute(denops, config.direction);
+  const bufnr = await fn.bufnr(denops);
+  await drawBuffer(denops, nodes, bufferInfo.kind, bufnr, config.options);
+  await setCtx(denops, {
+    ...ctx,
+    nodes: nodes,
+  }, bufnr);
+  await setBufferInfo(denops, bufferInfo);
+}
+
+async function reRenderBuffer(
+  denops: Denops,
+  bufnr?: number,
+) {
+  if (!bufnr) {
+    bufnr = await fn.bufnr(denops);
+  }
+  const bufferInfo = await getBufferInfo(denops);
+  const ctx = await getCtx(denops);
+  const config = selectBufferInfo(bufferInfo.kind).config;
+
+  const nodes = await config.node_creater(denops, ctx);
+  await drawBuffer(denops, nodes, bufferInfo.kind, bufnr, config.options);
+  await setCtx(denops, {
+    ...ctx,
+    nodes: nodes,
+  }, bufnr);
+}
+
 async function drawBuffer(
   denops: Denops,
   nodes: types.Node[],
-  name: keymap.BufName,
+  kind: types.BufferKind,
   bufnr: number,
-  option?: {
-    nofile?: boolean;
-    nomodifiable?: boolean;
-    filetype?: string;
-  },
+  option?: types.BufferOptions,
 ) {
   await setModifiable(denops, bufnr);
   await setNodesOnBuf(denops, nodes, bufnr);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await keymap.setMapping(denops, name);
+  await keymap.setMapping(denops, kind);
   if (option?.nofile) {
     await setNofile(denops, bufnr);
   }
@@ -97,158 +256,35 @@ export function main(denops: Denops): void {
     },
 
     async openProjectIssuePanel(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const nodes = node.createProjectIssuePanelNodes();
-      await fn.execute(denops, "botright new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "projectIssue", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-      });
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("project_issue"));
     },
 
     async openProjectIssuesPanel(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const { project, url, token } = ctx.instance;
-      const projectIssues = await client.getProjectIssues(
-        url,
-        token,
-        project.id,
-      );
-      const nodes = node.createProjectIssuesNodes(projectIssues);
-      await fn.execute(denops, "vertical botright new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(
-        denops,
-        nodes,
-        "projectIssues",
-        bufnr,
-        {
-          nofile: true,
-          nomodifiable: true,
-        },
-      );
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("project_issues"));
     },
 
     async openProjectBranchPanel(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const nodes = node.createProjectBranchPanelNodes();
-      await fn.execute(denops, "botright new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "projectBranch", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-      });
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("project_branch"));
     },
 
     async openProjectBranchesPanel(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const { project, url, token } = ctx.instance;
-      const projectBranches = await client.getProjectBranches(url, token, {
-        id: project.id,
-      });
-      const nodes = node.createProjectBranchesNodes(projectBranches);
-      await fn.execute(denops, "vertical botright new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(
-        denops,
-        nodes,
-        "projectBranches",
-        bufnr,
-        {
-          nofile: true,
-          nomodifiable: true,
-        },
-      );
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("project_branches"));
     },
 
     async openProjectWikiPanel(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const nodes = node.createProjectWikiPanelNodes();
-      await fn.execute(denops, "botright new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "projectWiki", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-      });
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("project_wiki"));
     },
 
     async openProjectWikisPanel(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const { project, url, token } = ctx.instance;
-      const projectWikis = await client.getProjectWikis(url, token, {
-        id: project.id,
-      });
-      const nodes = node.createProjectWikiNodes(projectWikis);
-      await fn.execute(denops, "vertical botright new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "projectWikis", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-      });
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("project_wikis"));
     },
 
     async openProjectMergeRequestPanel(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const nodes = node.createProjectMergeRequestPanelNodes();
-      await fn.execute(denops, "botright new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "projectMergeRequest", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-      });
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("project_merge_request"));
     },
 
     async openProjectMergeRequestsPanel(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const { project, url, token } = ctx.instance;
-      const projectMergeRequests = await client.getProjectMergeRequests(
-        url,
-        token,
-        { id: project.id },
-      );
-      const nodes = node.createProjectMergeRequestsNodes(projectMergeRequests);
-      await fn.execute(denops, "vertical botright new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(
-        denops,
-        nodes,
-        "projectMergeRequests",
-        bufnr,
-        { nofile: true, nomodifiable: true },
-      );
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("project_merge_requests"));
     },
 
     async openCreateNewProjectWikiBuf(): Promise<void> {
@@ -292,7 +328,7 @@ export function main(denops: Denops): void {
       const nodes = node.createProjectWikiContentNodes(current_node.wiki);
       await fn.execute(denops, "new");
       const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "projectWiki", bufnr, {
+      await drawBuffer(denops, nodes, "project_wiki", bufnr, {
         nofile: true,
         nomodifiable: true,
         filetype: "markdown",
@@ -351,7 +387,7 @@ export function main(denops: Denops): void {
       const nodes = node.createProjectIssueDescriptionNodes(current_node.issue);
       await fn.execute(denops, "new");
       const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "projectIssue", bufnr, {
+      await drawBuffer(denops, nodes, "project_issue", bufnr, {
         nofile: true,
         nomodifiable: true,
         filetype: "markdown",
@@ -394,98 +430,14 @@ export function main(denops: Denops): void {
         nodes: nodes,
       }, bufnr);
     },
-
-    async reloadProjectIssues(bufnr: unknown): Promise<void> {
+    async reloadBuffer(bufnr: unknown): Promise<void> {
       if (!u.isNumber(bufnr)) {
         return;
       }
-      await loadProjectIssues(denops, await getCtx(denops, bufnr), bufnr);
-    },
-
-    async reloadProjectWikis(bufnr: unknown): Promise<void> {
-      if (!u.isNumber(bufnr)) {
-        return;
-      }
-      await loadProjectWikis(denops, await getCtx(denops, bufnr), bufnr);
+      await reRenderBuffer(denops, bufnr);
     },
   };
 }
-
-export const loadProjectIssues = async (
-  denops: Denops,
-  ctx: types.Ctx,
-  bufnr: number,
-) => {
-  const { project, url, token } = ctx.instance;
-  await setModifiable(denops, bufnr);
-  const projectIssues = await client.getProjectIssues(url, token, project.id);
-  const nodes = node.createProjectIssuesNodes(projectIssues);
-  await setNodesOnBuf(denops, nodes, bufnr);
-  await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await setNoModifiable(denops, bufnr);
-  await setCtx(denops, {
-    ...ctx,
-    nodes: nodes,
-  }, bufnr);
-};
-
-export const loadProjectWikis = async (
-  denops: Denops,
-  ctx: types.Ctx,
-  bufnr: number,
-) => {
-  const { project, url, token } = ctx.instance;
-  await setModifiable(denops, bufnr);
-  const projectWikis = await client.getProjectWikis(url, token, {
-    id: project.id,
-  });
-  const nodes = node.createProjectWikiNodes(projectWikis);
-  await setNodesOnBuf(denops, nodes, bufnr);
-  await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await setNoModifiable(denops, bufnr);
-  await setCtx(denops, {
-    ...ctx,
-    nodes: nodes,
-  }, bufnr);
-};
-
-export const loadProjectBranches = async (
-  denops: Denops,
-  ctx: types.Ctx,
-  bufnr: number,
-) => {
-  const { project, url, token } = ctx.instance;
-  await setModifiable(denops, bufnr);
-  const projectBranches = await client.getProjectBranches(url, token, {
-    id: project.id,
-  });
-  const nodes = node.createProjectBranchesNodes(projectBranches);
-  await setNodesOnBuf(denops, nodes, bufnr);
-  await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await setNoModifiable(denops, bufnr);
-  await setCtx(denops, {
-    ...ctx,
-    nodes: nodes,
-  }, bufnr);
-};
-
-export const loadProjectMergeRequests = async (
-  denops: Denops,
-  ctx: types.Ctx,
-  bufnr: number,
-) => {
-  const { project, url, token } = ctx.instance;
-  await setModifiable(denops, bufnr);
-  const projectMergeRequests = await client.getProjectMergeRequests(
-    url,
-    token,
-    { id: project.id },
-  );
-  const nodes = node.createProjectMergeRequestsNodes(projectMergeRequests);
-  await setNodesOnBuf(denops, nodes, bufnr);
-  await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await setNoModifiable(denops, bufnr);
-};
 
 export const setNodesOnBuf = async (
   denops: Denops,

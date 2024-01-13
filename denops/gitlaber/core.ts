@@ -2,7 +2,11 @@ import { Denops, fn, unknownutil as u } from "./deps.ts";
 
 import { Ctx, isGitlaberInstance, isNode } from "./types.ts";
 
-export async function setCtx(denops: Denops, ctx: Ctx, bufnr: number) {
+export async function setCtx(
+  denops: Denops,
+  ctx: Ctx,
+  bufnr: number,
+) {
   await fn.setbufvar(denops, bufnr, "gitlaber_ctx", {
     ...ctx,
     parent_nodes: [...ctx.parent_nodes, ctx.current_node],
