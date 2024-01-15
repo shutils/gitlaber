@@ -27,44 +27,6 @@ export const isIssue = u.isObjectOf({
 
 export type Issue = u.PredicateType<typeof isIssue>;
 
-const isIssueCreateNewAttributes = u.isObjectOf({
-  id: u.isNumber,
-  title: u.isOptionalOf(u.isString),
-  description: u.isOptionalOf(u.isString),
-  iid: u.isOptionalOf(u.isNumber),
-});
-
-export type IssueCreateNewAttributes = u.PredicateType<
-  typeof isIssueCreateNewAttributes
->;
-
-const isIssueEditAttributes = u.isObjectOf({
-  id: u.isNumber,
-  issue_iid: u.isNumber,
-  add_labels: u.isOptionalOf(u.isString),
-  assignee_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
-  confidential: u.isOptionalOf(u.isBoolean),
-  description: u.isOptionalOf(u.isString),
-  discussion_locked: u.isOptionalOf(u.isBoolean),
-  due_date: u.isOptionalOf(u.isString),
-  epic_id: u.isOptionalOf(u.isNumber),
-  epic_iid: u.isOptionalOf(u.isNumber),
-  issue_type: u.isOptionalOf(
-    u.isLiteralOneOf(["issue", "incident", "test_case", "task"] as const),
-  ),
-  labels: u.isOptionalOf(u.isString),
-  milestone_id: u.isOptionalOf(u.isNumber),
-  remove_labels: u.isOptionalOf(u.isString),
-  state_event: u.isOptionalOf(u.isLiteralOneOf(["close", "reopen"] as const)),
-  title: u.isOptionalOf(u.isString),
-  updated_at: u.isOptionalOf(u.isString),
-  weight: u.isOptionalOf(u.isNumber),
-});
-
-export type IssueEditAttributes = u.PredicateType<
-  typeof isIssueEditAttributes
->;
-
 export async function getProjectIssues(
   url: string,
   token: string,
@@ -83,10 +45,14 @@ export async function getProjectIssues(
 export async function requestCreateNewProjectIssue(
   url: string,
   token: string,
-  projectId: number,
-  attributes: IssueCreateNewAttributes,
+  attributes: {
+    id: number;
+    iid?: number;
+    title: string;
+    description?: string;
+  },
 ): Promise<void> {
-  const gitlabApiPath = url + "/api/v4/projects/" + projectId + "/issues";
+  const gitlabApiPath = url + "/api/v4/projects/" + attributes.id + "/issues";
   const res = await request(
     gitlabApiPath,
     token,
@@ -101,11 +67,13 @@ export async function requestCreateNewProjectIssue(
 export async function requestDeleteIssue(
   url: string,
   token: string,
-  projectId: number,
-  issue_iid: number,
+  attrs: {
+    id: number;
+    issue_iid: number;
+  },
 ): Promise<void> {
   const gitlabApiPath =
-    `${url}/api/v4/projects/${projectId}/issues/${issue_iid}`;
+    `${url}/api/v4/projects/${attrs.id}/issues/${attrs.issue_iid}`;
   const res = await request(gitlabApiPath, token, "DELETE");
   if (res.status != 204) {
     throw new Error("Failed to delete issue.");
@@ -115,7 +83,26 @@ export async function requestDeleteIssue(
 export async function requestEditIssue(
   url: string,
   token: string,
-  attrs: IssueEditAttributes,
+  attrs: {
+    id: number;
+    issue_iid: number;
+    add_labels?: string;
+    assignee_ids?: number[];
+    confidential?: boolean;
+    description?: string;
+    discussion_locked?: boolean;
+    due_date?: string;
+    epic_id?: number;
+    epic_iid?: number;
+    issue_type?: "issue" | "incident" | "test_case" | "task";
+    labels?: string;
+    milestone_id?: number;
+    remove_labels?: string;
+    state_event?: "close" | "reopen";
+    title?: string;
+    updated_at?: string;
+    weight?: number;
+  },
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/issues/${attrs.issue_iid}`;

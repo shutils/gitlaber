@@ -2,6 +2,7 @@ import { autocmd, Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
 import { getCtx, updateGitlaberInstanceRecentResource } from "../../core.ts";
+import { executeRequest } from "./main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -26,10 +27,18 @@ export function main(denops: Denops): void {
       if (confirm !== "y") {
         return;
       }
-      await client.requestApproveMergeRequest(instance.url, instance.token, {
-        id: instance.project.id,
-        merge_request_iid: current_node.mr.iid,
-      });
+      await executeRequest(
+        denops,
+        client.requestApproveMergeRequest,
+        instance.url,
+        instance.token,
+        {
+          id: instance.project.id,
+          merge_request_iid: current_node.mr.iid,
+        },
+        "Successfully approve a merge request.",
+        "merge_request",
+      );
       await updateGitlaberInstanceRecentResource(denops, "merge_request");
       autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
     },
@@ -68,20 +77,21 @@ export function main(denops: Denops): void {
         });
         squash_commit_message = input ?? undefined;
       }
-      try {
-        await client.requestMergeMergeRequest(instance.url, instance.token, {
+      await executeRequest(
+        denops,
+        client.requestMergeMergeRequest,
+        instance.url,
+        instance.token,
+        {
           id: instance.project.id,
           merge_request_iid: current_node.mr.iid,
           should_remove_source_branch: remove_source_branch === "y",
           squash: squash === "y",
           squash_commit_message: squash_commit_message,
-        });
-        helper.echo(denops, "Successfully merge a merge request.");
-        await updateGitlaberInstanceRecentResource(denops, "merge_request");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully merge a merge request.",
+        "merge_request",
+      );
     },
   };
 }
@@ -126,16 +136,17 @@ async function assignMergeRequestMember(
       reviewer_ids: [members[labelIndex - 1].id],
     };
   }
-  try {
-    await client.requestEditMergeRequest(instance.url, instance.token, {
+  await executeRequest(
+    denops,
+    client.requestEditMergeRequest,
+    instance.url,
+    instance.token,
+    {
       id: instance.project.id,
       merge_request_iid: iid,
       ...extraAttrs,
-    });
-    helper.echo(denops, "Successfully assine a member.");
-    await updateGitlaberInstanceRecentResource(denops, "merge_request");
-    autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-  } catch (e) {
-    helper.echoerr(denops, e.message);
-  }
+    },
+    "Successfully assine a member.",
+    "merge_request",
+  );
 }

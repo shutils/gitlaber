@@ -1,11 +1,8 @@
-import { autocmd, Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
+import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
-import {
-  getCtx,
-  getCurrentGitlaberInstance,
-  updateGitlaberInstanceRecentResource,
-} from "../../core.ts";
+import { getCtx, getCurrentGitlaberInstance } from "../../core.ts";
+import { executeRequest } from "./main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -22,18 +19,19 @@ export function main(denops: Denops): void {
       if (!unknownutil.isString(title)) {
         return;
       }
-      try {
-        await client.requestCreateNewProjectWiki(url, token, {
+      await executeRequest(
+        denops,
+        client.requestCreateNewProjectWiki,
+        url,
+        token,
+        {
           id: project.id,
           title: title,
           content: content,
-        });
-        helper.echo(denops, "Successfully create a new wiki.");
-        await updateGitlaberInstanceRecentResource(denops, "wiki");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully created a new wiki.",
+        "wiki",
+      );
     },
 
     async editProjectWiki(): Promise<void> {
@@ -59,20 +57,21 @@ export function main(denops: Denops): void {
       if (!unknownutil.isString(commitMessage)) {
         commitMessage = "";
       }
-      try {
-        await client.requestEditWiki(url, token, {
+      await executeRequest(
+        denops,
+        client.requestEditWiki,
+        url,
+        token,
+        {
           id: project.id,
           title: title,
           content: content,
           slug: slug,
           message: commitMessage,
-        });
-        helper.echo(denops, "Successfully edit a wiki.");
-        await updateGitlaberInstanceRecentResource(denops, "wiki");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully edit a wiki.",
+        "wiki",
+      );
     },
 
     async deleteProjectWiki(): Promise<void> {
@@ -89,17 +88,18 @@ export function main(denops: Denops): void {
       if (confirm !== "y") {
         return;
       }
-      try {
-        await client.requestDeleteWiki(instance.url, instance.token, {
+      await executeRequest(
+        denops,
+        client.requestDeleteWiki,
+        instance.url,
+        instance.token,
+        {
           id: instance.project.id,
           slug: slug,
-        });
-        helper.echo(denops, "Successfully delete a wiki.");
-        await updateGitlaberInstanceRecentResource(denops, "wiki");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully delete a wiki.",
+        "wiki",
+      );
     },
   };
 }

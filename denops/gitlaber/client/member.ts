@@ -10,22 +10,16 @@ export const isMember = u.isObjectOf({
 
 export type Member = u.PredicateType<typeof isMember>;
 
-const isProjectMemberGetAttributes = u.isObjectOf({
-  id: u.isNumber,
-  query: u.isOptionalOf(u.isString),
-  user_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
-  skip_users: u.isOptionalOf(u.isArrayOf(u.isNumber)),
-  show_seat_info: u.isOptionalOf(u.isBoolean),
-});
-
-export type ProjectMemberGetAttributes = u.PredicateType<
-  typeof isProjectMemberGetAttributes
->;
-
 export async function requestGetProjectMembers(
   url: string,
   token: string,
-  attrs: ProjectMemberGetAttributes,
+  attrs: {
+    id: number;
+    query?: string;
+    user_ids?: number[];
+    skip_users?: number[];
+    show_seat_info?: boolean;
+  },
 ) {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/members`;
   const res = await request(gitlabApiPath, token, "GET");

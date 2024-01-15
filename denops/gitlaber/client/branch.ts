@@ -31,39 +31,13 @@ export const isBranch = u.isObjectOf({
 
 export type Branch = u.PredicateType<typeof isBranch>;
 
-const isBranchCreateAttributes = u.isObjectOf({
-  id: u.isNumber,
-  branch: u.isString,
-  ref: u.isString,
-});
-
-export type BranchCreateAttributes = u.PredicateType<
-  typeof isBranchCreateAttributes
->;
-
-const isBranchGetAttributes = u.isObjectOf({
-  id: u.isNumber,
-  branch: u.isString,
-});
-
-export type BranchGetAttributes = u.PredicateType<
-  typeof isBranchGetAttributes
->;
-
-const isBranchesGetAttributes = u.isObjectOf({
-  id: u.isNumber,
-  search: u.isOptionalOf(u.isString),
-  regex: u.isOptionalOf(u.isString),
-});
-
-export type BranchesGetAttributes = u.PredicateType<
-  typeof isBranchesGetAttributes
->;
-
 export async function getProjectBranch(
   url: string,
   token: string,
-  attrs: BranchGetAttributes,
+  attrs: {
+    id: number;
+    branch: string;
+  },
 ): Promise<Branch> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/repository/branches/${attrs.branch}`;
@@ -78,7 +52,11 @@ export async function getProjectBranch(
 export async function getProjectBranches(
   url: string,
   token: string,
-  attrs: BranchesGetAttributes,
+  attrs: {
+    id: number;
+    search?: string;
+    regex?: string;
+  },
 ): Promise<Branch[]> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/repository/branches`;
@@ -93,7 +71,11 @@ export async function getProjectBranches(
 export async function requestCreateIssueBranch(
   url: string,
   token: string,
-  attrs: BranchCreateAttributes,
+  attrs: {
+    id: number;
+    ref: string;
+    branch: string;
+  },
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/repository/branches`;

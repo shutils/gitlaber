@@ -92,7 +92,7 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       buffer_kind: "project_branches",
       resource_kind: "branch",
       config: {
-        direction: "botright new",
+        direction: "vertical botright new",
         node_creater: node.createProjectBranchesNodes,
         options: {
           nofile: true,

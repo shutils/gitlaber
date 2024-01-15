@@ -1,58 +1,6 @@
 import { unknownutil as u } from "../deps.ts";
 import { request } from "./util.ts";
 
-const isMergeRequestCreateAttributes = u.isObjectOf({
-  id: u.isNumber,
-  source_branch: u.isString,
-  target_branch: u.isString,
-  title: u.isString,
-  description: u.isOptionalOf(u.isString),
-  assignee_id: u.isOptionalOf(u.isNumber),
-  remove_source_branch: u.isOptionalOf(u.isBoolean),
-  squash: u.isOptionalOf(u.isBoolean),
-  ...u.isUnknown,
-});
-
-export type MergeRequestCreateAttributes = u.PredicateType<
-  typeof isMergeRequestCreateAttributes
->;
-
-const isMergeRequestGetAttributes = u.isObjectOf({
-  id: u.isNumber,
-  approved: u.isOptionalOf(u.isLiteralOneOf(["yes", "no"] as const)),
-  assignee_id: u.isOptionalOf(u.isNumber),
-  author_id: u.isOptionalOf(u.isNumber),
-  author_username: u.isOptionalOf(u.isString),
-  labels: u.isOptionalOf(u.isString),
-  ...u.isUnknown,
-});
-
-export type MergeRequestGetAttributes = u.PredicateType<
-  typeof isMergeRequestGetAttributes
->;
-
-const isMergeRequestEditAttributes = u.isObjectOf({
-  id: u.isNumber,
-  merge_request_iid: u.isNumber,
-  add_labels: u.isOptionalOf(u.isString),
-  assignee_id: u.isOptionalOf(u.isNumber),
-  assignee_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
-  description: u.isOptionalOf(u.isString),
-  labels: u.isOptionalOf(u.isString),
-  remove_labels: u.isOptionalOf(u.isString),
-  remove_source_branch: u.isOptionalOf(u.isBoolean),
-  reviewer_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
-  squash: u.isOptionalOf(u.isBoolean),
-  state_event: u.isOptionalOf(u.isLiteralOneOf(["close", "reopen"] as const)),
-  target_branch: u.isOptionalOf(u.isString),
-  title: u.isOptionalOf(u.isString),
-  ...u.isUnknown,
-});
-
-export type MergeRequestEditAttributes = u.PredicateType<
-  typeof isMergeRequestEditAttributes
->;
-
 export const isMergeRequest = u.isObjectOf({
   id: u.isNumber,
   iid: u.isNumber,
@@ -83,38 +31,19 @@ export const isMergeRequest = u.isObjectOf({
 
 export type MergeRequest = u.PredicateType<typeof isMergeRequest>;
 
-const isMergeRequestApproveAttributes = u.isObjectOf({
-  id: u.isNumber,
-  merge_request_iid: u.isNumber,
-  approval_password: u.isOptionalOf(u.isString),
-  sha: u.isOptionalOf(u.isString),
-  ...u.isUnknown,
-});
-
-export type MergeRequestApproveAttributes = u.PredicateType<
-  typeof isMergeRequestApproveAttributes
->;
-
-const isMergeRequestMergeAttributes = u.isObjectOf({
-  id: u.isNumber,
-  merge_request_iid: u.isNumber,
-  merge_commit_message: u.isOptionalOf(u.isString),
-  merge_when_pipeline_succeeds: u.isOptionalOf(u.isBoolean),
-  sha: u.isOptionalOf(u.isString),
-  should_remove_source_branch: u.isOptionalOf(u.isBoolean),
-  squash_commit_message: u.isOptionalOf(u.isString),
-  squash: u.isOptionalOf(u.isBoolean),
-  ...u.isUnknown,
-});
-
-export type MergeRequestMergeAttributes = u.PredicateType<
-  typeof isMergeRequestMergeAttributes
->;
-
 export async function requestCreateMergeRequest(
   url: string,
   token: string,
-  attrs: MergeRequestCreateAttributes,
+  attrs: {
+    id: number;
+    source_branch: string;
+    target_branch: string;
+    title: string;
+    description?: string;
+    assignee_id?: number;
+    remove_source_branch?: boolean;
+    squash?: boolean;
+  },
 ): Promise<void> {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/merge_requests`;
   const res = await request(
@@ -131,7 +60,14 @@ export async function requestCreateMergeRequest(
 export async function getProjectMergeRequests(
   url: string,
   token: string,
-  attrs: MergeRequestGetAttributes,
+  attrs: {
+    id: number;
+    approved?: "yes" | "no";
+    assignee_id?: number;
+    author_id?: number;
+    author_username?: string;
+    labels?: string;
+  },
 ): Promise<MergeRequest[]> {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/merge_requests`;
   const res = await request(gitlabApiPath, token, "GET");
@@ -145,7 +81,22 @@ export async function getProjectMergeRequests(
 export async function requestEditMergeRequest(
   url: string,
   token: string,
-  attrs: MergeRequestEditAttributes,
+  attrs: {
+    id: number;
+    merge_request_iid: number;
+    add_labels?: string;
+    assignee_id?: number;
+    assignee_ids?: number[];
+    description?: string;
+    labels?: string;
+    remove_labels?: string;
+    remove_source_branch?: boolean;
+    reviewer_ids?: number[];
+    squash?: boolean;
+    state_event?: "close" | "reopen";
+    target_branch?: string;
+    title?: string;
+  },
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}`;
@@ -163,7 +114,12 @@ export async function requestEditMergeRequest(
 export async function requestApproveMergeRequest(
   url: string,
   token: string,
-  attrs: MergeRequestApproveAttributes,
+  attrs: {
+    id: number;
+    merge_request_iid: number;
+    approval_password?: string;
+    sha?: string;
+  },
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/approve`;
@@ -181,7 +137,16 @@ export async function requestApproveMergeRequest(
 export async function requestMergeMergeRequest(
   url: string,
   token: string,
-  attrs: MergeRequestMergeAttributes,
+  attrs: {
+    id: number;
+    merge_request_iid: number;
+    merge_commit_message?: string;
+    merge_when_pipeline_succeeds?: boolean;
+    sha?: string;
+    should_remove_source_branch?: boolean;
+    squash_commit_message?: string;
+    squash?: boolean;
+  },
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/merge`;

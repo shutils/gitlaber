@@ -9,24 +9,17 @@ export const isProjectLabel = u.isObjectOf({
 
 export type ProjectLabel = u.PredicateType<typeof isProjectLabel>;
 
-const isProjectLabelsGetAttributes = u.isObjectOf({
-  id: u.isNumber,
-  with_counts: u.isOptionalOf(u.isBoolean),
-  include_ancestor_groups: u.isOptionalOf(u.isBoolean),
-  search: u.isOptionalOf(u.isString),
-});
-
-export type ProjectLabelsGetAttributes = u.PredicateType<
-  typeof isProjectLabelsGetAttributes
->;
-
 export async function requestGetProjectLabels(
   url: string,
   token: string,
-  attrs: ProjectLabelsGetAttributes,
+  attrs: {
+    id: number;
+    search?: string;
+    include_ancestor_groups?: boolean;
+    with_counts?: boolean;
+  },
 ) {
-  const gitlabApiPath =
-    `${url}/api/v4/projects/${attrs.id}/labels`;
+  const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/labels`;
   const res = await request(gitlabApiPath, token, "GET");
   if (!(res.status == 200)) {
     throw new Error("Failed to get project labels.");

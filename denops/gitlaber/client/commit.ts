@@ -18,21 +18,14 @@ export const isCommit = u.isObjectOf({
 
 export type Commit = u.PredicateType<typeof isCommit>;
 
-const isCommitGetAttributes = u.isObjectOf({
-  id: u.isNumber,
-  sha: u.isString,
-  stats: u.isOptionalOf(u.isBoolean),
-  ...u.isUnknown,
-});
-
-export type CommitGetAttributes = u.PredicateType<
-  typeof isCommitGetAttributes
->;
-
 export async function requestGetCommit(
   url: string,
   token: string,
-  attrs: CommitGetAttributes,
+  attrs: {
+    id: number;
+    sha: string;
+    stats?: boolean;
+  },
 ) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/repository/commits/${attrs.sha}`;

@@ -46,30 +46,6 @@ export type WikiCreateAttributes = u.PredicateType<
   typeof isWikiCreateAttributes
 >;
 
-const isWikiEditAttributes = u.isObjectOf({
-  id: u.isNumber,
-  content: u.isString,
-  title: u.isString,
-  format: u.isOptionalOf(
-    u.isLiteralOneOf(["markdown", "rdoc", "asciidoc", "org"] as const),
-  ),
-  slug: u.isString,
-  message: u.isOptionalOf(u.isString),
-  ...u.isUnknown,
-});
-
-export type WikiEditAttributes = u.PredicateType<typeof isWikiEditAttributes>;
-
-const isWikiDeleteAttributes = u.isObjectOf({
-  id: u.isNumber,
-  slug: u.isString,
-  ...u.isUnknown,
-});
-
-export type WikiDeleteAttributes = u.PredicateType<
-  typeof isWikiDeleteAttributes
->;
-
 export async function requestCreateNewProjectWiki(
   url: string,
   token: string,
@@ -101,7 +77,14 @@ export async function getProjectWikis(
 export async function requestEditWiki(
   url: string,
   token: string,
-  attrs: WikiEditAttributes,
+  attrs: {
+    id: number;
+    slug: string;
+    content: string;
+    title: string;
+    format?: "markdown" | "rdoc" | "asciidoc" | "org";
+    message?: string;
+  },
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
@@ -114,7 +97,10 @@ export async function requestEditWiki(
 export async function requestDeleteWiki(
   url: string,
   token: string,
-  attrs: WikiDeleteAttributes,
+  attrs: {
+    id: number;
+    slug: string;
+  },
 ): Promise<void> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;

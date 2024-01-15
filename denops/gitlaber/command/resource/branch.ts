@@ -1,6 +1,7 @@
-import { autocmd, Denops, helper } from "../../deps.ts";
+import { Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import { getCtx, updateGitlaberInstanceRecentResource } from "../../core.ts";
+import { getCtx } from "../../core.ts";
+import { executeRequest } from "./main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -45,19 +46,20 @@ export function main(denops: Denops): void {
       if (confirm !== "y") {
         return;
       }
-      try {
-        await client.requestCreateMergeRequest(instance.url, instance.token, {
+      executeRequest(
+        denops,
+        client.requestCreateMergeRequest,
+        instance.url,
+        instance.token,
+        {
           id: instance.project.id,
           title: title,
           source_branch: currentBranch,
           target_branch: terget,
-        });
-        helper.echo(denops, "Successfully created a new merge request.");
-        await updateGitlaberInstanceRecentResource(denops, "merge_request");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully created a new merge request.",
+        "merge_request",
+      );
     },
   };
 }

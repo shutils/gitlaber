@@ -1,10 +1,8 @@
-import { autocmd, Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
+import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
-import {
-  getCtx,
-  updateGitlaberInstanceRecentResource,
-} from "../../core.ts";
+import { getCtx } from "../../core.ts";
+import { executeRequest } from "./main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -18,17 +16,18 @@ export function main(denops: Denops): void {
       if (!title) {
         return;
       }
-      try {
-        await client.requestCreateNewProjectIssue(url, token, project.id, {
+      await executeRequest(
+        denops,
+        client.requestCreateNewProjectIssue,
+        url,
+        token,
+        {
           id: project.id,
           title: title,
-        });
-        helper.echo(denops, "Successfully created a new issue.");
-        await updateGitlaberInstanceRecentResource(denops, "issue");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully created a new issue.",
+        "issue",
+      );
     },
 
     async deleteProjectIssue(): Promise<void> {
@@ -45,19 +44,18 @@ export function main(denops: Denops): void {
       if (confirm !== "y") {
         return;
       }
-      try {
-        await client.requestDeleteIssue(
-          instance.url,
-          instance.token,
-          instance.project.id,
-          issue_iid,
-        );
-        helper.echo(denops, "Successfully delete a issue.");
-        await updateGitlaberInstanceRecentResource(denops, "issue");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+      await executeRequest(
+        denops,
+        client.requestDeleteIssue,
+        instance.url,
+        instance.token,
+        {
+          id: instance.project.id,
+          issue_iid: issue_iid,
+        },
+        "Successfully delete a issue.",
+        "issue",
+      );
     },
 
     async editProjectIssue(): Promise<void> {
@@ -71,18 +69,19 @@ export function main(denops: Denops): void {
       if (!unknownutil.isNumber(issue_iid)) {
         return;
       }
-      try {
-        await client.requestEditIssue(url, token, {
+      await executeRequest(
+        denops,
+        client.requestEditIssue,
+        url,
+        token,
+        {
           id: project.id,
           issue_iid: issue_iid,
           description: description,
-        });
-        helper.echo(denops, "Successfully edit a issue.");
-        await updateGitlaberInstanceRecentResource(denops, "issue");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully edit a issue.",
+        "issue",
+      );
     },
 
     async toggleProjectIssueState(): Promise<void> {
@@ -96,18 +95,19 @@ export function main(denops: Denops): void {
       if (state === "closed") {
         stateEvent = "reopen";
       }
-      try {
-        await client.requestEditIssue(instance.url, instance.token, {
+      await executeRequest(
+        denops,
+        client.requestEditIssue,
+        instance.url,
+        instance.token,
+        {
           id: instance.project.id,
           issue_iid: iid,
           state_event: stateEvent,
-        });
-        helper.echo(denops, "Successfully toggle a issue state.");
-        await updateGitlaberInstanceRecentResource(denops, "issue");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully toggle a issue state.",
+        "issue",
+      );
     },
 
     async assignIssueAssignee(): Promise<void> {
@@ -137,18 +137,19 @@ export function main(denops: Denops): void {
         return;
       }
       const { iid } = current_node.issue;
-      try {
-        await client.requestEditIssue(instance.url, instance.token, {
+      await executeRequest(
+        denops,
+        client.requestEditIssue,
+        instance.url,
+        instance.token,
+        {
           id: instance.project.id,
           issue_iid: iid,
           assignee_ids: [members[labelIndex - 1].id],
-        });
-        helper.echo(denops, "Successfully assine a member.");
-        await updateGitlaberInstanceRecentResource(denops, "issue");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully toggle a issue state.",
+        "issue",
+      );
     },
 
     async addProjectIssueLabel(): Promise<void> {
@@ -178,18 +179,19 @@ export function main(denops: Denops): void {
       if (!labelIndex) {
         return;
       }
-      try {
-        await client.requestEditIssue(instance.url, instance.token, {
+      await executeRequest(
+        denops,
+        client.requestEditIssue,
+        instance.url,
+        instance.token,
+        {
           id: instance.project.id,
           issue_iid: iid,
-          add_labels: labels[labelIndex - 1]?.name ?? undefined,
-        });
-        helper.echo(denops, "Successfully add a issue label.");
-        await updateGitlaberInstanceRecentResource(denops, "issue");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+          add_labels: labels[labelIndex - 1].name,
+        },
+        "Successfully toggle a issue state.",
+        "issue",
+      );
     },
 
     async removeProjectIssueLabel(): Promise<void> {
@@ -213,18 +215,19 @@ export function main(denops: Denops): void {
       if (!labelIndex) {
         return;
       }
-      try {
-        await client.requestEditIssue(instance.url, instance.token, {
+      await executeRequest(
+        denops,
+        client.requestEditIssue,
+        instance.url,
+        instance.token,
+        {
           id: instance.project.id,
           issue_iid: iid,
-          remove_labels: labels[labelIndex - 1] ?? undefined,
-        });
-        helper.echo(denops, "Successfully remove a issue label.");
-        await updateGitlaberInstanceRecentResource(denops, "issue");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+          remove_labels: labels[labelIndex - 1],
+        },
+        "Successfully remove a issue label.",
+        "issue",
+      );
     },
 
     async createIssueBranch(): Promise<void> {
@@ -251,18 +254,19 @@ export function main(denops: Denops): void {
       if (!ref) {
         return;
       }
-      try {
-        await client.requestCreateIssueBranch(instance.url, instance.token, {
+      await executeRequest(
+        denops,
+        client.requestCreateIssueBranch,
+        instance.url,
+        instance.token,
+        {
           id: instance.project.id,
           branch: branch,
           ref: ref,
-        });
-        helper.echo(denops, "Successfully create a new branch.");
-        await updateGitlaberInstanceRecentResource(denops, "issue");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
-      } catch (e) {
-        helper.echoerr(denops, e.message);
-      }
+        },
+        "Successfully create a new branch.",
+        "branch",
+      );
     },
   };
 }
