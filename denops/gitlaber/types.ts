@@ -48,12 +48,19 @@ export type ResourceKind = u.PredicateType<typeof isResourceKind>;
 
 export type NodeKind = u.PredicateType<typeof isNodeKind>;
 
+export const isResource = u.isOneOf([
+  isIssue,
+  isBranch,
+  isWiki,
+  isMergeRequest,
+]);
+
+export type Resource = u.PredicateType<typeof isResource>;
+
 export const isNode = u.isObjectOf({
   display: u.isString,
   kind: isNodeKind,
-  resource: u.isOptionalOf(
-    u.isOneOf([isIssue, isBranch, isWiki, isMergeRequest]),
-  ),
+  resource: u.isOptionalOf(isResource),
 });
 
 export type Node = u.PredicateType<typeof isNode>;

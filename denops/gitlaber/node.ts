@@ -1,8 +1,8 @@
 import { Denops, unknownutil as u } from "./deps.ts";
-import { Ctx, GitlaberInstance, Node, NodeKind } from "./types.ts";
+import { Ctx, GitlaberInstance, Node, NodeKind, Resource } from "./types.ts";
 import * as client from "./client/index.ts";
 
-import { Issue, Member, Project, Wiki } from "./client/index.ts";
+import { Issue, Project, Wiki } from "./client/index.ts";
 
 export const createMainPanelNodes = (
   gitlaberInstance: GitlaberInstance,
@@ -217,7 +217,7 @@ export const createProjectMergeRequestsNodes = async (
 };
 
 export const createNodes = (
-  records: Record<string, unknown>[],
+  resources: Resource[],
   columns: string[],
   kind: NodeKind,
 ): Node[] => {
@@ -226,15 +226,15 @@ export const createNodes = (
   const maxColumnWidths: Record<string, number> = {};
   columns.forEach((column) => {
     maxColumnWidths[column] = Math.max(column.length, 1);
-    records.forEach((record) => {
-      if (
-        u.isObjectOf({ ...u.isUnknown })(record[column])
-      ) {
+    resources.forEach((resource) => {
+      const prop = resource[column as keyof typeof resource];
+      if (u.isObjectOf({ ...u.isUnknown })(prop)) {
         throw new Error(
           `A column has been specified that cannot be displayed: ${column}`,
         );
       }
-      const value = (record[column] as string).toString();
+      const value = (prop as string | Array<string> | Array<number>)
+        .toString();
       const width = calculateStringWidth(value);
       if (maxColumnWidths[column] < width) {
         maxColumnWidths[column] = width;
@@ -260,23 +260,21 @@ export const createNodes = (
     kind: kind,
   });
 
-  records.forEach((record) => {
+  resources.forEach((resource: Resource) => {
     let display = "";
     columns.forEach((column, index) => {
-      if (
-        u.isObjectOf({ ...u.isUnknown })(record[column])
-      ) {
-        throw new Error(
-          `A column has been specified that cannot be displayed: ${column}`,
-        );
-      }
       let value: string;
-      if (column === "assignees" || column === "reviewers") {
-        value = (record[column] as Member[]).flatMap((member) => {
+      const prop = resource[column as keyof typeof resource];
+      if (
+        u.isArrayOf(u.isObjectOf({
+          name: u.isString,
+        }))(prop)
+      ) {
+        value = (prop as { name: string }[]).flatMap((member) => {
           return member.name;
         }).join(", ");
       } else {
-        value = (record[column] as string).toString();
+        value = (prop as string | Array<string> | Array<number>).toString();
       }
       const width = calculateStringWidth(value);
       const paddedValue = value.padEnd(
@@ -285,11 +283,10 @@ export const createNodes = (
       display += index === 0 ? paddedValue : ` | ${paddedValue}`;
     });
 
-    // TODO: fix the type
     nodes.push({
       display,
       kind: kind,
-      resource: record,
+      resource: resource,
     });
   });
 
