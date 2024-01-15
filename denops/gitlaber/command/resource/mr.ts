@@ -18,7 +18,8 @@ export function main(denops: Denops): void {
     async approveMergeRequest(): Promise<void> {
       const ctx = await getCtx(denops);
       const { current_node, instance } = ctx;
-      if (!("mr" in current_node)) {
+      if (!(client.isMergeRequest(current_node.resource))) {
+        helper.echo(denops, "This node is not a merge request.");
         return;
       }
       const confirm = await helper.input(denops, {
@@ -34,7 +35,7 @@ export function main(denops: Denops): void {
         instance.token,
         {
           id: instance.project.id,
-          merge_request_iid: current_node.mr.iid,
+          merge_request_iid: current_node.resource.iid,
         },
         "Successfully approve a merge request.",
         "merge_request",
@@ -46,7 +47,8 @@ export function main(denops: Denops): void {
     async mergeMergeRequest(): Promise<void> {
       const ctx = await getCtx(denops);
       const { current_node, instance } = ctx;
-      if (!("mr" in current_node)) {
+      if (!(client.isMergeRequest(current_node.resource))) {
+        helper.echo(denops, "This node is not a merge request.");
         return;
       }
       const confirm = await helper.input(denops, {
@@ -68,7 +70,7 @@ export function main(denops: Denops): void {
           instance.token,
           {
             id: instance.project.id,
-            branch: current_node.mr.source_branch,
+            branch: current_node.resource.source_branch,
           },
         );
         const input = await helper.input(denops, {
@@ -84,7 +86,7 @@ export function main(denops: Denops): void {
         instance.token,
         {
           id: instance.project.id,
-          merge_request_iid: current_node.mr.iid,
+          merge_request_iid: current_node.resource.iid,
           should_remove_source_branch: remove_source_branch === "y",
           squash: squash === "y",
           squash_commit_message: squash_commit_message,
@@ -102,7 +104,8 @@ async function assignMergeRequestMember(
 ) {
   const ctx = await getCtx(denops);
   const { current_node, instance } = ctx;
-  if (!("mr" in current_node)) {
+  if (!(client.isMergeRequest(current_node.resource))) {
+    helper.echo(denops, "This node is not a merge request.");
     return;
   }
   const members = await client.requestGetProjectMembers(
@@ -125,7 +128,7 @@ async function assignMergeRequestMember(
   if (!labelIndex) {
     return;
   }
-  const { iid } = current_node.mr;
+  const { iid } = current_node.resource;
   let extraAttrs: object;
   if (role === "assignee") {
     extraAttrs = {

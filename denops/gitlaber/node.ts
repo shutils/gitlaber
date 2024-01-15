@@ -140,6 +140,29 @@ export const createProjectIssueDescriptionNodes = (
   return nodes;
 };
 
+export const createPreviewNodes = async (
+  _denops: Denops,
+  ctx: Ctx,
+) => {
+  const nodes: Array<Node> = [];
+  const current_node = ctx.current_node;
+  if (
+    current_node?.resource === undefined ||
+    !("description" in current_node?.resource) ||
+    current_node.resource.description === null
+  ) {
+    return await Promise.resolve(nodes);
+  }
+  const lines = current_node.resource.description.split("\n");
+  lines.forEach((line) => {
+    nodes.push({
+      display: line,
+      kind: "other",
+    });
+  });
+  return await Promise.resolve(nodes);
+};
+
 export const createProjectWikiPanelNodes = async () => {
   const nodes: Array<Node> = [];
   nodes.push({
@@ -262,10 +285,11 @@ export const createNodes = (
       display += index === 0 ? paddedValue : ` | ${paddedValue}`;
     });
 
+    // TODO: fix the type
     nodes.push({
       display,
       kind: kind,
-      [kind]: record,
+      resource: record,
     });
   });
 

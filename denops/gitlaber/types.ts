@@ -48,61 +48,15 @@ export type ResourceKind = u.PredicateType<typeof isResourceKind>;
 
 export type NodeKind = u.PredicateType<typeof isNodeKind>;
 
-const baseNode = {
+export const isNode = u.isObjectOf({
   display: u.isString,
   kind: isNodeKind,
-};
-
-const isBaseNode = u.isObjectOf(baseNode);
-
-export type BaseNode = u.PredicateType<typeof isBaseNode>;
-
-export const isIssueNode = u.isObjectOf({
-  ...baseNode,
-  kind: u.isLiteralOf("issue"),
-  issue: isIssue,
+  resource: u.isOptionalOf(
+    u.isOneOf([isIssue, isBranch, isWiki, isMergeRequest]),
+  ),
 });
 
-export type IssueNode = u.PredicateType<typeof isIssueNode>;
-
-export const isBranchNode = u.isObjectOf({
-  ...baseNode,
-  kind: u.isLiteralOf("branch"),
-  branch: isBranch,
-});
-
-export type BranchNode = u.PredicateType<typeof isBranchNode>;
-
-export const isWikiNode = u.isObjectOf({
-  ...baseNode,
-  kind: u.isLiteralOf("wiki"),
-  wiki: isWiki,
-});
-
-export type WikiNode = u.PredicateType<typeof isWikiNode>;
-
-export const isMergeRequestNode = u.isObjectOf({
-  ...baseNode,
-  kind: u.isLiteralOf("mr"),
-  mr: isMergeRequest,
-});
-
-export type MergeRequestNode = u.PredicateType<typeof isMergeRequestNode>;
-
-export const isNode = u.isOneOf([
-  isBaseNode,
-  isIssueNode,
-  isBranchNode,
-  isWikiNode,
-  isMergeRequestNode,
-]);
-
-export type Node =
-  | BaseNode
-  | IssueNode
-  | BranchNode
-  | WikiNode
-  | MergeRequestNode;
+export type Node = u.PredicateType<typeof isNode>;
 
 const isBufferKind = u.isLiteralOneOf(
   [
@@ -116,6 +70,8 @@ const isBufferKind = u.isLiteralOneOf(
     "project_wikis",
     "project_merge_request",
     "project_merge_requests",
+    "issue_preview",
+    "merge_request_preview",
   ] as const,
 );
 

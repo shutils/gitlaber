@@ -148,6 +148,30 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         },
       },
     },
+    {
+      buffer_kind: "issue_preview",
+      resource_kind: "other",
+      config: {
+        direction: "new",
+        node_creater: node.createPreviewNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
+    {
+      buffer_kind: "merge_request_preview",
+      resource_kind: "other",
+      config: {
+        direction: "new",
+        node_creater: node.createPreviewNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+    },
   ];
   const bufferInfo = bufferInfos.find((buffer) => buffer.buffer_kind === kind);
   if (!bufferInfo) {
@@ -348,10 +372,11 @@ export function main(denops: Denops): void {
     async openProjectWikiPreview(): Promise<void> {
       const ctx = await getCtx(denops);
       const { current_node } = ctx;
-      if (!("wiki" in current_node)) {
+      if (!(client.isWiki(current_node.resource))) {
+        helper.echo(denops, "This node is not a wiki.");
         return;
       }
-      const nodes = node.createProjectWikiContentNodes(current_node.wiki);
+      const nodes = node.createProjectWikiContentNodes(current_node.resource);
       await fn.execute(denops, "new");
       const bufnr = await fn.bufnr(denops);
       await drawBuffer(denops, nodes, "project_wiki", bufnr, {
@@ -368,10 +393,11 @@ export function main(denops: Denops): void {
     async openEditProjectWikiBuf(): Promise<void> {
       const ctx = await getCtx(denops);
       const { instance, current_node } = ctx;
-      if (!("wiki" in current_node)) {
+      if (!(client.isWiki(current_node.resource))) {
+        helper.echo(denops, "This node is not a wiki.");
         return;
       }
-      const nodes = node.createProjectWikiContentNodes(current_node.wiki);
+      const nodes = node.createProjectWikiContentNodes(current_node.resource);
       await fn.execute(denops, "new");
       const bufname = await fn.tempname(denops);
       const bufnr = await fn.bufadd(denops, bufname);
@@ -380,8 +406,16 @@ export function main(denops: Denops): void {
       await setNodesOnBuf(denops, nodes, bufnr);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
       await vars.b.set(denops, "gitlaber_project_id", instance.project.id);
-      await vars.b.set(denops, "gitlaber_wiki_title", current_node.wiki.title);
-      await vars.b.set(denops, "gitlaber_wiki_slug", current_node.wiki.slug);
+      await vars.b.set(
+        denops,
+        "gitlaber_wiki_title",
+        current_node.resource.title,
+      );
+      await vars.b.set(
+        denops,
+        "gitlaber_wiki_slug",
+        current_node.resource.slug,
+      );
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
         helper.remove("BufWritePost");
         helper.define(
@@ -402,18 +436,18 @@ export function main(denops: Denops): void {
     async openProjectIssuePreview(): Promise<void> {
       const ctx = await getCtx(denops);
       const { current_node } = ctx;
-      if (!("issue" in current_node)) {
+      if (!(client.isIssue(current_node.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
-      if (current_node.issue.description == null) {
+      if (current_node.resource.description == null) {
         helper.echo(denops, "This issue does not have a description.");
         return;
       }
-      const nodes = node.createProjectIssueDescriptionNodes(current_node.issue);
+      const nodes = await node.createPreviewNodes(denops, ctx);
       await fn.execute(denops, "new");
       const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "project_issue", bufnr, {
+      await drawBuffer(denops, nodes, "issue_preview", bufnr, {
         nofile: true,
         nomodifiable: true,
         filetype: "markdown",
@@ -427,11 +461,14 @@ export function main(denops: Denops): void {
     async openProjectIssueEditBuf(): Promise<void> {
       const ctx = await getCtx(denops);
       const { current_node, instance } = ctx;
-      if (!("issue" in current_node)) {
+      if (!(client.isIssue(current_node.resource))) {
+        helper.echo(denops, "This node is not an issue.");
         return;
       }
       await fn.execute(denops, "new");
-      const nodes = node.createProjectIssueDescriptionNodes(current_node.issue);
+      const nodes = node.createProjectIssueDescriptionNodes(
+        current_node.resource,
+      );
       const bufname = await fn.tempname(denops);
       const bufnr = await fn.bufadd(denops, bufname);
       await fn.bufload(denops, bufnr);
@@ -439,7 +476,7 @@ export function main(denops: Denops): void {
       await setNodesOnBuf(denops, nodes, bufnr);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
       await vars.b.set(denops, "gitlaber_project_id", instance.project.id);
-      await vars.b.set(denops, "gitlaber_issue_iid", current_node.issue.iid);
+      await vars.b.set(denops, "gitlaber_issue_iid", current_node.resource.iid);
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
         helper.remove("BufWritePost");
         helper.define(
@@ -451,6 +488,31 @@ export function main(denops: Denops): void {
       await keymap.setMapping(denops, "base");
       await setFileType(denops, bufnr);
       await denops.cmd("redraw");
+      await setCtx(denops, {
+        ...ctx,
+        nodes: nodes,
+      }, bufnr);
+    },
+
+    async openProjectMergeRequestPreview(): Promise<void> {
+      const ctx = await getCtx(denops);
+      const { current_node } = ctx;
+      const nodes = await node.createPreviewNodes(denops, ctx);
+      if (!(client.isMergeRequest(current_node.resource))) {
+        helper.echo(denops, "This node is not a merge request.");
+        return;
+      }
+      if (current_node.resource.description == null) {
+        helper.echo(denops, "This merge request does not have a description.");
+        return;
+      }
+      await fn.execute(denops, "new");
+      const bufnr = await fn.bufnr(denops);
+      await drawBuffer(denops, nodes, "merge_request_preview", bufnr, {
+        nofile: true,
+        nomodifiable: true,
+        filetype: "markdown",
+      });
       await setCtx(denops, {
         ...ctx,
         nodes: nodes,

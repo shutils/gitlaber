@@ -7,7 +7,7 @@ import { getCtx } from "../../core.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    async _getCurrentNode(): Promise<types.BaseNode | types.IssueNode> {
+    async _getCurrentNode(): Promise<types.Node> {
       const ctx = await getCtx(denops);
       return ctx.current_node;
     },

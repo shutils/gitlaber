@@ -9,12 +9,12 @@ export function main(denops: Denops): void {
     async createNewBranchMr(): Promise<void> {
       const ctx = await getCtx(denops);
       const { current_node, instance } = ctx;
-      if (!("branch" in current_node)) {
-        helper.echoerr(denops, "This node is not branch.");
+      if (!(client.isBranch(current_node.resource))) {
+        helper.echo(denops, "This node is not a branch.");
         return;
       }
-      const currentBranch = current_node.branch.name;
-      const commitId = current_node.branch.commit.short_id;
+      const currentBranch = current_node.resource.name;
+      const commitId = current_node.resource.commit.short_id;
       const commit = await client.requestGetCommit(
         instance.url,
         instance.token,

@@ -311,6 +311,25 @@ export const mappings: BufMapping[] = [
         option: mapOption,
         description: "Merge a merge request",
       },
+      {
+        lhs: "p",
+        rhs:
+          "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestPreview', [])<CR>",
+        option: mapOption,
+        description: "Open wiki preview",
+      },
+    ],
+  },
+  {
+    kind: "issue_preview",
+    mappings: [
+      ...baseMappings.mappings,
+    ],
+  },
+  {
+    kind: "merge_request_preview",
+    mappings: [
+      ...baseMappings.mappings,
     ],
   },
 ];

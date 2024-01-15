@@ -1,7 +1,12 @@
 import { Denops, helper } from "../../deps.ts";
 import * as util from "../../util.ts";
-import * as types from "../../types.ts";
 import { getCtx } from "../../core.ts";
+import {
+  isBranch,
+  isIssue,
+  isMergeRequest,
+  isWiki,
+} from "../../client/index.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -16,17 +21,21 @@ export function main(denops: Denops): void {
       const { current_node } = ctx;
       let url: string;
 
-      if (types.isIssueNode(current_node)) {
-        url = current_node.issue.web_url;
-      } else if (types.isWikiNode(current_node)) {
-        const slug = current_node.wiki.slug;
+      if (isIssue(current_node.resource)) {
+        url = current_node.resource.web_url;
+      } else if (isWiki(current_node.resource)) {
+        const slug = current_node.resource.slug;
         url = ctx.instance.url + "/-/wikis/" + slug;
-      } else if (types.isBranchNode(current_node)) {
-        url = current_node.branch.web_url;
-      } else if (types.isMergeRequestNode(current_node)) {
-        url = current_node.mr.web_url;
+      } else if (isBranch(current_node.resource)) {
+        url = current_node.resource.web_url;
+      } else if (isMergeRequest(current_node.resource)) {
+        url = current_node.resource.web_url;
       } else {
         helper.echo(denops, "This node cannot be opened in a browser.");
+        helper.echo(
+          denops,
+          Deno.inspect(current_node.resource, { depth: Infinity }),
+        );
         return;
       }
 

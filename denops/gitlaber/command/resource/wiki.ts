@@ -80,8 +80,12 @@ export function main(denops: Denops): void {
       if (!("wiki" in current_node)) {
         return;
       }
-      const slug = current_node.wiki.slug;
-      const title = current_node.wiki.title;
+      if (!(client.isWiki(current_node.resource))) {
+        helper.echo(denops, "This node is not a wiki.");
+        return;
+      }
+      const slug = current_node.resource.slug;
+      const title = current_node.resource.title;
       const confirm = await helper.input(denops, {
         prompt: `Are you sure you want to delete the wiki(${title})? y/N: `,
       });
