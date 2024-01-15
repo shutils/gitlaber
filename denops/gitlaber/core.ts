@@ -1,6 +1,13 @@
-import { Denops, fn, unknownutil as u } from "./deps.ts";
+import { Denops, fn, unknownutil as u, vars } from "./deps.ts";
 
-import { Ctx, isGitlaberInstance, isNode } from "./types.ts";
+import {
+  Ctx,
+  GitlaberVar,
+  isGitlaberInstance,
+  isGitlaberVar,
+  isNode,
+  ResourceKind,
+} from "./types.ts";
 
 export async function setCtx(
   denops: Denops,
@@ -43,4 +50,61 @@ export const getCurrentNode = async (
   const nodes = ctx.nodes;
   const index = await fn.line(denops, ".") - 1;
   return nodes[index];
+};
+
+export const getGitlaberVar = async (denops: Denops): Promise<GitlaberVar> => {
+  try {
+    const gitlaberVar = await vars.g.get(denops, "gitlaber_var");
+    if (!gitlaberVar) {
+      return { instances: [], recent_instance_index: 0 };
+    }
+    if (!isGitlaberVar(gitlaberVar)) {
+      return { instances: [], recent_instance_index: 0 };
+    }
+    return gitlaberVar;
+  } catch {
+    return { instances: [], recent_instance_index: 0 };
+  }
+};
+
+export const setGitlaberVar = async (
+  denops: Denops,
+  gitlaberVar: GitlaberVar,
+) => {
+  await vars.g.set(denops, "gitlaber_var", gitlaberVar);
+};
+
+export const getCurrentGitlaberInstanceIndex = (
+  gitalberVar: GitlaberVar,
+  cwd: string,
+) => {
+  return gitalberVar.instances.findIndex((gitlaber) => gitlaber.cwd === cwd);
+};
+
+export const getCurrentGitlaberInstance = async (
+  denops: Denops,
+) => {
+  const cwd = await fn.getcwd(denops);
+  const gitlaberVar = await getGitlaberVar(denops);
+  const index = getCurrentGitlaberInstanceIndex(gitlaberVar, cwd);
+  if (index === -1) {
+    throw new Error("Not found current gitlaber instance");
+  }
+  return gitlaberVar.instances[index];
+};
+
+export const updateGitlaberInstanceRecentResource = async (
+  denops: Denops,
+  kind: ResourceKind,
+) => {
+  const gitlaberVar = await getGitlaberVar(denops);
+  const index = getCurrentGitlaberInstanceIndex(
+    gitlaberVar,
+    await fn.getcwd(denops),
+  );
+  if (index === -1) {
+    throw new Error("Not found current gitlaber instance");
+  }
+  gitlaberVar.instances[index].recent_resource = kind;
+  await setGitlaberVar(denops, gitlaberVar);
 };

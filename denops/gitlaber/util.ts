@@ -1,40 +1,4 @@
-import { Denops, fn, helper, vars } from "./deps.ts";
-
-import { GitlaberVar, isGitlaberVar } from "./types.ts";
-
-export const getGitlaberVar = async (denops: Denops): Promise<GitlaberVar> => {
-  try {
-    const gitlaberVar = await vars.g.get(denops, "gitlaber_var");
-    if (!gitlaberVar) {
-      return [];
-    }
-    if (!isGitlaberVar(gitlaberVar)) {
-      return [];
-    }
-    return gitlaberVar;
-  } catch {
-    return [];
-  }
-};
-
-export const getCurrentGitlaberInstanceIndex = (
-  gitalberVar: GitlaberVar,
-  cwd: string,
-) => {
-  return gitalberVar.findIndex((gitlaber) => gitlaber.cwd === cwd);
-};
-
-export const getCurrentGitlaberInstance = async (
-  denops: Denops,
-) => {
-  const cwd = await fn.getcwd(denops);
-  const gitlaberVar = await getGitlaberVar(denops);
-  const index = getCurrentGitlaberInstanceIndex(gitlaberVar, cwd);
-  if (index === -1) {
-    throw new Error("Not found current gitlaber instance");
-  }
-  return gitlaberVar[index];
-};
+import { Denops, fn, helper } from "./deps.ts";
 
 export const flattenBuffer = async (denops: Denops, bufname: string) => {
   const lines = await fn.getbufline(

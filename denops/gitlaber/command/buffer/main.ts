@@ -7,12 +7,17 @@ import {
   vars,
 } from "../../deps.ts";
 
-import * as util from "../../util.ts";
 import * as node from "../../node.ts";
 import * as types from "../../types.ts";
 import * as keymap from "../../keymap.ts";
 import * as client from "../../client/index.ts";
-import { getCtx, setCtx } from "../../core.ts";
+import {
+  getCtx,
+  getCurrentGitlaberInstance,
+  getGitlaberVar,
+  setCtx,
+  setGitlaberVar,
+} from "../../core.ts";
 
 async function setBufferInfo(
   denops: Denops,
@@ -35,7 +40,7 @@ export async function getBufferInfo(
   const bufferInfo = await fn.getbufvar(denops, bufnr, "gitlaber_buffer_info");
   if (
     u.isObjectOf({
-      kind: u.isString,
+      buffer_kind: u.isString,
       ...u.isUnknown,
     })
   ) {
@@ -48,7 +53,8 @@ export async function getBufferInfo(
 function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
   const bufferInfos: types.BufferInfo[] = [
     {
-      kind: "project_issue",
+      buffer_kind: "project_issue",
+      resource_kind: "other",
       config: {
         direction: "botright new",
         node_creater: node.createProjectIssuePanelNodes,
@@ -59,7 +65,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       },
     },
     {
-      kind: "project_issues",
+      buffer_kind: "project_issues",
+      resource_kind: "issue",
       config: {
         direction: "vertical botright new",
         node_creater: node.createProjectIssuesNodes,
@@ -70,7 +77,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       },
     },
     {
-      kind: "project_branch",
+      buffer_kind: "project_branch",
+      resource_kind: "other",
       config: {
         direction: "botright new",
         node_creater: node.createProjectBranchPanelNodes,
@@ -81,7 +89,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       },
     },
     {
-      kind: "project_branches",
+      buffer_kind: "project_branches",
+      resource_kind: "branch",
       config: {
         direction: "botright new",
         node_creater: node.createProjectBranchesNodes,
@@ -92,7 +101,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       },
     },
     {
-      kind: "project_wiki",
+      buffer_kind: "project_wiki",
+      resource_kind: "other",
       config: {
         direction: "botright new",
         node_creater: node.createProjectWikiPanelNodes,
@@ -103,7 +113,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       },
     },
     {
-      kind: "project_wikis",
+      buffer_kind: "project_wikis",
+      resource_kind: "wiki",
       config: {
         direction: "vertical botright new",
         node_creater: node.createProjectWikiNodes,
@@ -114,7 +125,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       },
     },
     {
-      kind: "project_merge_request",
+      buffer_kind: "project_merge_request",
+      resource_kind: "other",
       config: {
         direction: "botright new",
         node_creater: node.createProjectMergeRequestPanelNodes,
@@ -125,7 +137,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       },
     },
     {
-      kind: "project_merge_requests",
+      buffer_kind: "project_merge_requests",
+      resource_kind: "merge_request",
       config: {
         direction: "vertical botright new",
         node_creater: node.createProjectMergeRequestsNodes,
@@ -136,7 +149,7 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
       },
     },
   ];
-  const bufferInfo = bufferInfos.find((buffer) => buffer.kind === kind);
+  const bufferInfo = bufferInfos.find((buffer) => buffer.buffer_kind === kind);
   if (!bufferInfo) {
     throw new Error("Cannot find buffer info for specified kind");
   }
@@ -144,18 +157,37 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
 }
 
 async function renderBuffer(denops: Denops, bufferInfo: types.BufferInfo) {
+  const gitlaberVar = await getGitlaberVar(denops);
   const ctx = await getCtx(denops);
   const config = bufferInfo.config;
 
   const nodes = await config.node_creater(denops, ctx);
   await fn.execute(denops, config.direction);
   const bufnr = await fn.bufnr(denops);
-  await drawBuffer(denops, nodes, bufferInfo.kind, bufnr, config.options);
+  await drawBuffer(
+    denops,
+    nodes,
+    bufferInfo.buffer_kind,
+    bufnr,
+    config.options,
+  );
   await setCtx(denops, {
     ...ctx,
     nodes: nodes,
   }, bufnr);
   await setBufferInfo(denops, bufferInfo);
+  const instance = await getCurrentGitlaberInstance(denops);
+  instance.buffers.push({
+    resource_kind: bufferInfo.resource_kind,
+    bufnr: bufnr,
+  });
+  gitlaberVar.instances[gitlaberVar.recent_instance_index] = instance;
+  await setGitlaberVar(denops, {
+    ...gitlaberVar,
+    recent_instance_index: gitlaberVar.instances.findIndex((instance) =>
+      instance.cwd === ctx.instance.cwd
+    ),
+  });
 }
 
 async function reRenderBuffer(
@@ -165,12 +197,18 @@ async function reRenderBuffer(
   if (!bufnr) {
     bufnr = await fn.bufnr(denops);
   }
-  const bufferInfo = await getBufferInfo(denops);
+  const bufferInfo = await getBufferInfo(denops, bufnr);
   const ctx = await getCtx(denops);
-  const config = selectBufferInfo(bufferInfo.kind).config;
+  const config = selectBufferInfo(bufferInfo.buffer_kind).config;
 
   const nodes = await config.node_creater(denops, ctx);
-  await drawBuffer(denops, nodes, bufferInfo.kind, bufnr, config.options);
+  await drawBuffer(
+    denops,
+    nodes,
+    bufferInfo.buffer_kind,
+    bufnr,
+    config.options,
+  );
   await setCtx(denops, {
     ...ctx,
     nodes: nodes,
@@ -208,41 +246,29 @@ export function main(denops: Denops): void {
       const url = client.getGitlabUrl(cwd);
       const token = client.getGitlabToken(cwd);
       const singleProject = await client.getSingleProject(url, token, cwd);
-      const gitlaberVar = await util.getGitlaberVar(denops);
-      if (gitlaberVar.length === 0) {
+      const gitlaberVar = await getGitlaberVar(denops);
+      await fn.execute(denops, "tabnew");
+      const bufnr = await fn.bufnr(denops);
+      try {
+        await getCurrentGitlaberInstance(denops);
+      } catch {
         const currentGitlaberInstance: types.GitlaberInstance = {
-          index: 0,
           cwd: cwd,
           project: singleProject,
           url: url,
           token: token,
+          buffers: [{ resource_kind: "other", bufnr: bufnr }],
         };
-        gitlaberVar.push(currentGitlaberInstance);
-        await vars.g.set(denops, "gitlaber_var", gitlaberVar);
-      } else {
-        try {
-          await util.getCurrentGitlaberInstance(denops);
-        } catch {
-          const currentGitlaberInstance = {
-            index: gitlaberVar.length,
-            cwd: cwd,
-            project: singleProject,
-            url: url,
-            token: token,
-          };
-          gitlaberVar.push(currentGitlaberInstance);
-          await vars.g.set(denops, "gitlaber_var", gitlaberVar);
-        }
+        gitlaberVar.instances.push(currentGitlaberInstance);
+        await setGitlaberVar(denops, gitlaberVar);
       }
-      const currentGitlaberInstance = await util.getCurrentGitlaberInstance(
+      const currentGitlaberInstance = await getCurrentGitlaberInstance(
         denops,
       );
       const nodes = node.createMainPanelNodes(
         currentGitlaberInstance,
         singleProject,
       );
-      await fn.execute(denops, "tabnew");
-      const bufnr = await fn.bufnr(denops);
       await drawBuffer(denops, nodes, "main", bufnr, {
         nofile: true,
         nomodifiable: true,
@@ -430,11 +456,25 @@ export function main(denops: Denops): void {
         nodes: nodes,
       }, bufnr);
     },
+
     async reloadBuffer(bufnr: unknown): Promise<void> {
       if (!u.isNumber(bufnr)) {
         return;
       }
       await reRenderBuffer(denops, bufnr);
+    },
+
+    async updateResourceBuffer(): Promise<void> {
+      const gitlaberVar = await getGitlaberVar(denops);
+      const recentInstance = gitlaberVar.recent_instance_index;
+      const instance = gitlaberVar.instances[recentInstance];
+      const recentResource = instance.recent_resource;
+      const targetBuffers = instance.buffers.filter((buffer) =>
+        buffer.resource_kind === recentResource
+      );
+      targetBuffers.forEach(async (buffer) => {
+        await reRenderBuffer(denops, buffer.bufnr);
+      });
     },
   };
 }

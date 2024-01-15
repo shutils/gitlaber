@@ -1,13 +1,17 @@
-import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
+import { autocmd, Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
-import { getCtx } from "../../core.ts";
+import {
+  getCtx,
+  getCurrentGitlaberInstance,
+  updateGitlaberInstanceRecentResource,
+} from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     async createProjectNewWiki(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await getCurrentGitlaberInstance(
         denops,
       );
       const content = await util.flattenBuffer(
@@ -25,13 +29,15 @@ export function main(denops: Denops): void {
           content: content,
         });
         helper.echo(denops, "Successfully create a new wiki.");
+        await updateGitlaberInstanceRecentResource(denops, "wiki");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
     },
 
     async editProjectWiki(): Promise<void> {
-      const { url, token, project } = await util.getCurrentGitlaberInstance(
+      const { url, token, project } = await getCurrentGitlaberInstance(
         denops,
       );
       const content = await util.flattenBuffer(
@@ -62,6 +68,8 @@ export function main(denops: Denops): void {
           message: commitMessage,
         });
         helper.echo(denops, "Successfully edit a wiki.");
+        await updateGitlaberInstanceRecentResource(denops, "wiki");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -87,6 +95,8 @@ export function main(denops: Denops): void {
           slug: slug,
         });
         helper.echo(denops, "Successfully delete a wiki.");
+        await updateGitlaberInstanceRecentResource(denops, "wiki");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }

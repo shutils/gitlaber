@@ -1,7 +1,10 @@
-import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
+import { autocmd, Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
-import { getCtx } from "../../core.ts";
+import {
+  getCtx,
+  updateGitlaberInstanceRecentResource,
+} from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -21,6 +24,8 @@ export function main(denops: Denops): void {
           title: title,
         });
         helper.echo(denops, "Successfully created a new issue.");
+        await updateGitlaberInstanceRecentResource(denops, "issue");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -48,6 +53,8 @@ export function main(denops: Denops): void {
           issue_iid,
         );
         helper.echo(denops, "Successfully delete a issue.");
+        await updateGitlaberInstanceRecentResource(denops, "issue");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -71,6 +78,8 @@ export function main(denops: Denops): void {
           description: description,
         });
         helper.echo(denops, "Successfully edit a issue.");
+        await updateGitlaberInstanceRecentResource(denops, "issue");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -94,6 +103,8 @@ export function main(denops: Denops): void {
           state_event: stateEvent,
         });
         helper.echo(denops, "Successfully toggle a issue state.");
+        await updateGitlaberInstanceRecentResource(denops, "issue");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -133,6 +144,8 @@ export function main(denops: Denops): void {
           assignee_ids: [members[labelIndex - 1].id],
         });
         helper.echo(denops, "Successfully assine a member.");
+        await updateGitlaberInstanceRecentResource(denops, "issue");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -172,6 +185,8 @@ export function main(denops: Denops): void {
           add_labels: labels[labelIndex - 1]?.name ?? undefined,
         });
         helper.echo(denops, "Successfully add a issue label.");
+        await updateGitlaberInstanceRecentResource(denops, "issue");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -205,6 +220,8 @@ export function main(denops: Denops): void {
           remove_labels: labels[labelIndex - 1] ?? undefined,
         });
         helper.echo(denops, "Successfully remove a issue label.");
+        await updateGitlaberInstanceRecentResource(denops, "issue");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -241,6 +258,8 @@ export function main(denops: Denops): void {
           ref: ref,
         });
         helper.echo(denops, "Successfully create a new branch.");
+        await updateGitlaberInstanceRecentResource(denops, "issue");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }

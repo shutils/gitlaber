@@ -1,7 +1,7 @@
-import { Denops, helper } from "../../deps.ts";
+import { autocmd, Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
-import { getCtx } from "../../core.ts";
+import { getCtx, updateGitlaberInstanceRecentResource } from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -30,6 +30,8 @@ export function main(denops: Denops): void {
         id: instance.project.id,
         merge_request_iid: current_node.mr.iid,
       });
+      await updateGitlaberInstanceRecentResource(denops, "merge_request");
+      autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
     },
 
     async mergeMergeRequest(): Promise<void> {
@@ -75,6 +77,8 @@ export function main(denops: Denops): void {
           squash_commit_message: squash_commit_message,
         });
         helper.echo(denops, "Successfully merge a merge request.");
+        await updateGitlaberInstanceRecentResource(denops, "merge_request");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
@@ -91,9 +95,13 @@ async function assignMergeRequestMember(
   if (!("mr" in current_node)) {
     return;
   }
-  const members = await client.requestGetProjectMembers(instance.url, instance.token, {
-    id: instance.project.id,
-  });
+  const members = await client.requestGetProjectMembers(
+    instance.url,
+    instance.token,
+    {
+      id: instance.project.id,
+    },
+  );
   if (members.length === 0) {
     helper.echo(denops, "Project has not members.");
     return;
@@ -125,6 +133,8 @@ async function assignMergeRequestMember(
       ...extraAttrs,
     });
     helper.echo(denops, "Successfully assine a member.");
+    await updateGitlaberInstanceRecentResource(denops, "merge_request");
+    autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
   } catch (e) {
     helper.echoerr(denops, e.message);
   }

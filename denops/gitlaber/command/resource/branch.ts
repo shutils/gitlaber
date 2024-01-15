@@ -1,6 +1,6 @@
-import { Denops, helper } from "../../deps.ts";
+import { autocmd, Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import { getCtx } from "../../core.ts";
+import { getCtx, updateGitlaberInstanceRecentResource } from "../../core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -53,6 +53,8 @@ export function main(denops: Denops): void {
           target_branch: terget,
         });
         helper.echo(denops, "Successfully created a new merge request.");
+        await updateGitlaberInstanceRecentResource(denops, "merge_request");
+        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       } catch (e) {
         helper.echoerr(denops, e.message);
       }
