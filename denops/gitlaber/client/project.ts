@@ -6,6 +6,8 @@ export const isProject = u.isObjectOf({
   description: u.isOneOf([u.isString, u.isNull]),
   web_url: u.isString,
   name: u.isString,
+  path: u.isString,
+  path_with_namespace: u.isString,
   open_issues_count: u.isNumber,
   created_at: u.isString,
   updated_at: u.isOptionalOf(u.isString),

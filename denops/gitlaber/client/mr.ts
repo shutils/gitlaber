@@ -63,6 +63,21 @@ export const isMergeRequest = u.isObjectOf({
   draft: u.isBoolean,
   web_url: u.isString,
   squash: u.isBoolean,
+  approved: u.isBoolean,
+  assignees: u.isArrayOf(
+    u.isObjectOf({
+      username: u.isString,
+      name: u.isString,
+      ...u.isUnknown,
+    }),
+  ),
+  reviewers: u.isArrayOf(
+    u.isObjectOf({
+      username: u.isString,
+      name: u.isString,
+      ...u.isUnknown,
+    }),
+  ),
   ...u.isUnknown,
 });
 
@@ -174,4 +189,126 @@ export async function requestMergeMergeRequest(
   if (![200, 201].includes(res.status)) {
     throw new Error("Failed to merge a merge request.");
   }
+}
+
+export async function getProjectMergeRequestsGraphQL(
+  url: string,
+  token: string,
+  fullPath: string,
+  projetId: number,
+): Promise<MergeRequest[]> {
+  const query = `
+    query getMergeRequests($fullPath: ID!){
+      project(fullPath: $fullPath) {
+        mergeRequests {
+          nodes {
+            id
+            iid
+            title
+            description
+            targetBranch
+            sourceBranch
+            state
+            approvedBy {
+              nodes {
+                id
+                username
+                name
+              }
+            }
+            assignees {
+              nodes {
+                id
+                username
+                name
+              }
+            }
+            reviewers {
+              nodes {
+                id
+                username
+                name
+              }
+            }
+            draft
+            webUrl
+            squash
+          }
+        }
+      }
+    }
+  `;
+  const variables = { fullPath };
+  const res = await request(
+    `${url}/api/graphql`,
+    token,
+    "POST",
+    JSON.stringify({ query, variables }),
+  );
+  const json = await res.json();
+  const mrs = json.data.project.mergeRequests.nodes;
+  const convertedMrs: MergeRequest[] = mrs.map((mr: {
+    id: string;
+    iid: string;
+    title: string;
+    description: string | null;
+    targetBranch: string;
+    sourceBranch: string;
+    draft: boolean;
+    webUrl: string;
+    squash: boolean;
+    state: string;
+    approvedBy: {
+      nodes: {
+        username: string;
+        name: string;
+      }[];
+    };
+    assignees: {
+      nodes: {
+        username: string;
+        name: string;
+      }[];
+    };
+    reviewers: {
+      nodes: {
+        username: string;
+        name: string;
+      }[];
+    };
+  }) => {
+    return {
+      id: projetId,
+      iid: Number(mr.iid),
+      title: mr.title,
+      description: mr.description,
+      target_branch: mr.targetBranch,
+      source_branch: mr.sourceBranch,
+      draft: mr.draft,
+      web_url: mr.webUrl,
+      squash: mr.squash,
+      state: mr.state,
+      approved: mr.approvedBy.nodes.length > 0,
+      assignees: mr.assignees.nodes.map((assignee) => {
+        return {
+          username: assignee.username,
+          name: assignee.name,
+        };
+      }),
+      reviewers: mr.reviewers.nodes.map((reviewer) => {
+        return {
+          username: reviewer.username,
+          name: reviewer.name,
+        };
+      }),
+    };
+  });
+  if (!u.isArrayOf(isMergeRequest)(convertedMrs)) {
+    throw new Error(
+      `Failed to get merge requests. reason: ${
+        Deno.inspect(convertedMrs, { depth: Infinity })
+      }`,
+    );
+  }
+  return convertedMrs;
 }

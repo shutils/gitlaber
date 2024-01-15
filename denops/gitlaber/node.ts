@@ -180,14 +180,15 @@ export const createProjectMergeRequestsNodes = async (
   ctx: Ctx,
 ) => {
   const { project, url, token } = ctx.instance;
-  const projectMergeRequests = await client.getProjectMergeRequests(
+  const projectMergeRequests = await client.getProjectMergeRequestsGraphQL(
     url,
     token,
-    { id: project.id },
+    project.path_with_namespace,
+    project.id,
   );
   return await Promise.resolve(createNodes(
     projectMergeRequests,
-    ["iid", "title", "state", "assignees", "reviewers"],
+    ["iid", "title", "state", "assignees", "reviewers", "approved"],
     "mr",
   ));
 };
