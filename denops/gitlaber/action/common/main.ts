@@ -1,6 +1,6 @@
 import { Denops, helper } from "../../deps.ts";
 import { doAction } from "../main.ts";
-import { getBufferInfo } from "../../command/buffer/main.ts";
+import { getBufferInfo } from "../../command/buffer/helper.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {

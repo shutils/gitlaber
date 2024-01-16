@@ -4,7 +4,7 @@ import * as util from "../../util.ts";
 import { getCurrentNode } from "../../core.ts";
 import { executeRequest } from "./main.ts";
 import { doAction } from "../main.ts";
-import { getBufferInfo } from "../../command/buffer/main.ts";
+import { getBufferInfo } from "../../command/buffer/helper.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
