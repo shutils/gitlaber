@@ -1,6 +1,6 @@
 import { autocmd, Denops, helper } from "../../deps.ts";
 import { ResourceKind } from "../../types.ts";
-import { updateGitlaberInstanceRecentResource } from "../../core.ts";
+import { updateGitlaberInstanceRecentResource } from "../../helper.ts";
 
 export async function executeRequest<T>(
   denops: Denops,

@@ -5,7 +5,7 @@ import {
   getCtx,
   getCurrentNode,
   updateGitlaberInstanceRecentResource,
-} from "../../core.ts";
+} from "../../helper.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
 

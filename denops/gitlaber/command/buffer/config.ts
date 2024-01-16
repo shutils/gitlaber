@@ -1,6 +1,6 @@
 import { mapping } from "../../deps.ts";
 
-import * as node from "../../node.ts";
+import * as node from "./node.ts";
 import * as types from "../../types.ts";
 
 const MAP_OPTION: mapping.MapOptions = {

@@ -1,6 +1,6 @@
 import { Denops, fn, helper } from "../../deps.ts";
 import { doAction } from "../main.ts";
-import { getCurrentNode } from "../../core.ts";
+import { getCurrentNode } from "../../helper.ts";
 import {
   isBranch,
   isIssue,

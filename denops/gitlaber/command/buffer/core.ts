@@ -7,7 +7,7 @@ import {
   getGitlaberVar,
   setCtx,
   setGitlaberVar,
-} from "../../core.ts";
+} from "../../helper.ts";
 import { selectBufferInfo } from "./config.ts";
 import {
   getBufferInfo,

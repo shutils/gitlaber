@@ -1,5 +1,5 @@
 import { Denops } from "../deps.ts";
-import { getCtx } from "../core.ts";
+import { getCtx } from "../helper.ts";
 import { Ctx } from "../types.ts";
 
 import { main as mainResource } from "./resource/main.ts";

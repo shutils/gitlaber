@@ -1,6 +1,6 @@
 import { Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import { getCurrentNode } from "../../core.ts";
+import { getCurrentNode } from "../../helper.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
 
