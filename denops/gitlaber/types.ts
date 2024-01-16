@@ -129,7 +129,5 @@ export type GitlaberVar = u.PredicateType<typeof isGitlaberVar>;
 
 export type Ctx = {
   instance: GitlaberInstance;
-  parent_nodes: Node[];
   nodes: Node[];
-  current_node: Node;
 };

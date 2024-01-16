@@ -1,6 +1,6 @@
 import { Denops, helper } from "../../deps.ts";
 import * as util from "../../util.ts";
-import { getCtx } from "../../core.ts";
+import { getCtx, getCurrentNode } from "../../core.ts";
 import {
   isBranch,
   isIssue,
@@ -18,23 +18,23 @@ export function main(denops: Denops): void {
 
     async openBrowserNode(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
       let url: string;
 
-      if (isIssue(current_node.resource)) {
-        url = current_node.resource.web_url;
-      } else if (isWiki(current_node.resource)) {
-        const slug = current_node.resource.slug;
+      if (isIssue(currentNode.resource)) {
+        url = currentNode.resource.web_url;
+      } else if (isWiki(currentNode.resource)) {
+        const slug = currentNode.resource.slug;
         url = ctx.instance.url + "/-/wikis/" + slug;
-      } else if (isBranch(current_node.resource)) {
-        url = current_node.resource.web_url;
-      } else if (isMergeRequest(current_node.resource)) {
-        url = current_node.resource.web_url;
+      } else if (isBranch(currentNode.resource)) {
+        url = currentNode.resource.web_url;
+      } else if (isMergeRequest(currentNode.resource)) {
+        url = currentNode.resource.web_url;
       } else {
         helper.echo(denops, "This node cannot be opened in a browser.");
         helper.echo(
           denops,
-          Deno.inspect(current_node.resource, { depth: Infinity }),
+          Deno.inspect(currentNode.resource, { depth: Infinity }),
         );
         return;
       }

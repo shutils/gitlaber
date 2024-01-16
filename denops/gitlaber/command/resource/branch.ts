@@ -1,6 +1,6 @@
 import { Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import { getCtx } from "../../core.ts";
+import { getCtx, getCurrentNode } from "../../core.ts";
 import { executeRequest } from "./main.ts";
 
 export function main(denops: Denops): void {
@@ -8,13 +8,14 @@ export function main(denops: Denops): void {
     ...denops.dispatcher,
     async createNewBranchMr(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node, instance } = ctx;
-      if (!(client.isBranch(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isBranch(currentNode.resource))) {
         helper.echo(denops, "This node is not a branch.");
         return;
       }
-      const currentBranch = current_node.resource.name;
-      const commitId = current_node.resource.commit.short_id;
+      const currentBranch = currentNode.resource.name;
+      const commitId = currentNode.resource.commit.short_id;
       const commit = await client.requestGetCommit(
         instance.url,
         instance.token,

@@ -14,10 +14,7 @@ export async function setCtx(
   ctx: Ctx,
   bufnr: number,
 ) {
-  await fn.setbufvar(denops, bufnr, "gitlaber_ctx", {
-    ...ctx,
-    parent_nodes: [...ctx.parent_nodes, ctx.current_node],
-  });
+  await fn.setbufvar(denops, bufnr, "gitlaber_ctx", ctx);
 }
 
 export async function getCtx(denops: Denops, bufnr?: number): Promise<Ctx> {
@@ -29,15 +26,9 @@ export async function getCtx(denops: Denops, bufnr?: number): Promise<Ctx> {
     u.isObjectOf({
       instance: isGitlaberInstance,
       nodes: u.isArrayOf(isNode),
-      parent_nodes: u.isArrayOf(isNode),
-      current_node: isNode,
     })(ctx)
   ) {
-    const current_node = await getCurrentNode(denops, ctx);
-    return {
-      ...ctx,
-      current_node: current_node,
-    };
+    return ctx;
   } else {
     throw new Error("ctx is not set");
   }

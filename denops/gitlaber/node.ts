@@ -3,6 +3,7 @@ import { Ctx, GitlaberInstance, Node, NodeKind, Resource } from "./types.ts";
 import * as client from "./client/index.ts";
 
 import { Issue, Project, Wiki } from "./client/index.ts";
+import { getCurrentNode } from "./core.ts";
 
 export const createMainPanelNodes = (
   gitlaberInstance: GitlaberInstance,
@@ -141,19 +142,19 @@ export const createProjectIssueDescriptionNodes = (
 };
 
 export const createPreviewNodes = async (
-  _denops: Denops,
+  denops: Denops,
   ctx: Ctx,
 ) => {
   const nodes: Array<Node> = [];
-  const current_node = ctx.current_node;
+  const currentNode = await getCurrentNode(denops, ctx);
   if (
-    current_node?.resource === undefined ||
-    !("description" in current_node?.resource) ||
-    current_node.resource.description === null
+    currentNode?.resource === undefined ||
+    !("description" in currentNode?.resource) ||
+    currentNode.resource.description === null
   ) {
     return await Promise.resolve(nodes);
   }
-  const lines = current_node.resource.description.split("\n");
+  const lines = currentNode.resource.description.split("\n");
   lines.forEach((line) => {
     nodes.push({
       display: line,

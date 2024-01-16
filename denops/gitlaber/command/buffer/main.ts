@@ -14,6 +14,7 @@ import * as client from "../../client/index.ts";
 import {
   getCtx,
   getCurrentGitlaberInstance,
+  getCurrentNode,
   getGitlaberVar,
   setCtx,
   setGitlaberVar,
@@ -175,7 +176,9 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
   ];
   const bufferInfo = bufferInfos.find((buffer) => buffer.buffer_kind === kind);
   if (!bufferInfo) {
-    throw new Error("Cannot find buffer info for specified kind");
+    throw new Error(
+      `Cannot find buffer info for specified kind. kind: ${kind}`,
+    );
   }
   return bufferInfo;
 }
@@ -300,8 +303,6 @@ export function main(denops: Denops): void {
       await setCtx(denops, {
         instance: currentGitlaberInstance,
         nodes: nodes,
-        parent_nodes: [],
-        current_node: nodes[0],
       }, bufnr);
     },
 
@@ -371,12 +372,12 @@ export function main(denops: Denops): void {
 
     async openProjectWikiPreview(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node } = ctx;
-      if (!(client.isWiki(current_node.resource))) {
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isWiki(currentNode.resource))) {
         helper.echo(denops, "This node is not a wiki.");
         return;
       }
-      const nodes = node.createProjectWikiContentNodes(current_node.resource);
+      const nodes = node.createProjectWikiContentNodes(currentNode.resource);
       await fn.execute(denops, "new");
       const bufnr = await fn.bufnr(denops);
       await drawBuffer(denops, nodes, "project_wiki", bufnr, {
@@ -392,12 +393,13 @@ export function main(denops: Denops): void {
 
     async openEditProjectWikiBuf(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { instance, current_node } = ctx;
-      if (!(client.isWiki(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isWiki(currentNode.resource))) {
         helper.echo(denops, "This node is not a wiki.");
         return;
       }
-      const nodes = node.createProjectWikiContentNodes(current_node.resource);
+      const nodes = node.createProjectWikiContentNodes(currentNode.resource);
       await fn.execute(denops, "new");
       const bufname = await fn.tempname(denops);
       const bufnr = await fn.bufadd(denops, bufname);
@@ -409,12 +411,12 @@ export function main(denops: Denops): void {
       await vars.b.set(
         denops,
         "gitlaber_wiki_title",
-        current_node.resource.title,
+        currentNode.resource.title,
       );
       await vars.b.set(
         denops,
         "gitlaber_wiki_slug",
-        current_node.resource.slug,
+        currentNode.resource.slug,
       );
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
         helper.remove("BufWritePost");
@@ -435,12 +437,12 @@ export function main(denops: Denops): void {
 
     async openProjectIssuePreview(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node } = ctx;
-      if (!(client.isIssue(current_node.resource))) {
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
-      if (current_node.resource.description == null) {
+      if (currentNode.resource.description == null) {
         helper.echo(denops, "This issue does not have a description.");
         return;
       }
@@ -460,14 +462,15 @@ export function main(denops: Denops): void {
 
     async openProjectIssueEditBuf(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node, instance } = ctx;
-      if (!(client.isIssue(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
       await fn.execute(denops, "new");
       const nodes = node.createProjectIssueDescriptionNodes(
-        current_node.resource,
+        currentNode.resource,
       );
       const bufname = await fn.tempname(denops);
       const bufnr = await fn.bufadd(denops, bufname);
@@ -476,7 +479,7 @@ export function main(denops: Denops): void {
       await setNodesOnBuf(denops, nodes, bufnr);
       await vars.b.set(denops, "gitlaber_nodes", nodes);
       await vars.b.set(denops, "gitlaber_project_id", instance.project.id);
-      await vars.b.set(denops, "gitlaber_issue_iid", current_node.resource.iid);
+      await vars.b.set(denops, "gitlaber_issue_iid", currentNode.resource.iid);
       await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
         helper.remove("BufWritePost");
         helper.define(
@@ -496,13 +499,13 @@ export function main(denops: Denops): void {
 
     async openProjectMergeRequestPreview(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
       const nodes = await node.createPreviewNodes(denops, ctx);
-      if (!(client.isMergeRequest(current_node.resource))) {
+      if (!(client.isMergeRequest(currentNode.resource))) {
         helper.echo(denops, "This node is not a merge request.");
         return;
       }
-      if (current_node.resource.description == null) {
+      if (currentNode.resource.description == null) {
         helper.echo(denops, "This merge request does not have a description.");
         return;
       }

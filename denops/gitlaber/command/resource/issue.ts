@@ -1,7 +1,7 @@
 import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
-import { getCtx } from "../../core.ts";
+import { getCtx, getCurrentNode } from "../../core.ts";
 import { executeRequest } from "./main.ts";
 
 export function main(denops: Denops): void {
@@ -32,12 +32,13 @@ export function main(denops: Denops): void {
 
     async deleteProjectIssue(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node, instance } = ctx;
-      if (!(client.isIssue(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
-      const issue_iid = current_node.resource.iid;
+      const issue_iid = currentNode.resource.iid;
       const confirm = await helper.input(denops, {
         prompt:
           `Are you sure you want to delete the issue(${issue_iid})? y/N: `,
@@ -87,12 +88,13 @@ export function main(denops: Denops): void {
 
     async toggleProjectIssueState(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node, instance } = ctx;
-      if (!(client.isIssue(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
-      const { iid, state } = current_node.resource;
+      const { iid, state } = currentNode.resource;
       let stateEvent: "close" | "reopen" = "close";
       if (state === "closed") {
         stateEvent = "reopen";
@@ -114,8 +116,9 @@ export function main(denops: Denops): void {
 
     async assignIssueAssignee(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node, instance } = ctx;
-      if (!(client.isIssue(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
@@ -139,7 +142,7 @@ export function main(denops: Denops): void {
       if (!labelIndex) {
         return;
       }
-      const { iid } = current_node.resource;
+      const { iid } = currentNode.resource;
       await executeRequest(
         denops,
         client.requestEditIssue,
@@ -157,8 +160,9 @@ export function main(denops: Denops): void {
 
     async addProjectIssueLabel(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node, instance } = ctx;
-      if (!(client.isIssue(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
@@ -178,7 +182,7 @@ export function main(denops: Denops): void {
       for (let i = 0; i < labels.length; i++) {
         textlist.unshift(`${i + 1}. ${labels[i].name}`);
       }
-      const { iid } = current_node.resource;
+      const { iid } = currentNode.resource;
       const labelIndex = await fn.inputlist(denops, textlist.reverse());
       if (!labelIndex) {
         return;
@@ -200,12 +204,13 @@ export function main(denops: Denops): void {
 
     async removeProjectIssueLabel(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node, instance } = ctx;
-      if (!(client.isIssue(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
-      const labels = current_node.resource.labels;
+      const labels = currentNode.resource.labels;
       if (labels.length === 0) {
         helper.echo(denops, "This issue has not labels.");
         return;
@@ -215,7 +220,7 @@ export function main(denops: Denops): void {
       for (let i = 0; i < labels.length; i++) {
         textlist.unshift(`${i + 1}. ${labels[i]}`);
       }
-      const { iid } = current_node.resource;
+      const { iid } = currentNode.resource;
       const labelIndex = await fn.inputlist(denops, textlist.reverse());
       if (!labelIndex) {
         return;
@@ -237,14 +242,15 @@ export function main(denops: Denops): void {
 
     async createIssueBranch(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { current_node, instance } = ctx;
-      if (!(client.isIssue(current_node.resource))) {
+      const { instance } = ctx;
+      const currentNode = await getCurrentNode(denops, ctx);
+      if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
       const defaultBranch = instance.project.default_branch;
-      const title = current_node.resource.title;
-      const issue_iid = current_node.resource.iid;
+      const title = currentNode.resource.title;
+      const issue_iid = currentNode.resource.iid;
       const branch = await helper.input(denops, {
         prompt: "New branch name: ",
         text: `${issue_iid}-${title}`,
