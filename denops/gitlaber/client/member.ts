@@ -21,7 +21,7 @@ export async function requestGetProjectMembers(
     show_seat_info?: boolean;
   },
 ) {
-  const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/members`;
+  const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/members/all`;
   const res = await request(gitlabApiPath, token, "GET");
   if (!(res.status == 200)) {
     throw new Error("Failed to get project members.");
