@@ -67,13 +67,15 @@ const baseMappings = [
   },
   {
     lhs: "I",
-    rhs: "<Cmd>echo gitlaber#denops#get_current_node()<CR>",
+    rhs:
+      "<Cmd>call denops#notify('gitlaber', 'action:common:echo:node', [])<CR>",
     option: mapOption,
     description: "Show current node",
   },
   {
     lhs: "g?",
-    rhs: "<Cmd>call denops#notify('gitlaber', 'echoKeymaps', [])<CR>",
+    rhs:
+      "<Cmd>call denops#notify('gitlaber', 'action:common:echo:keymaps', [])<CR>",
     option: mapOption,
     description: "Show keymaps",
   },
@@ -97,19 +99,21 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         {
           lhs: "o",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'openBrowserProject', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:browse:project', [])<CR>",
           option: mapOption,
           description: "Open project in browser",
         },
         {
           lhs: "i",
-          rhs: "<Cmd>call gitlaber#denops#open_issue_panel()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectIssuePanel', [])<CR>",
           option: mapOption,
           description: "Open issue panel",
         },
         {
           lhs: "w",
-          rhs: "<Cmd>call gitlaber#denops#open_wiki_panel()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectWikiPanel', [])<CR>",
           option: mapOption,
           description: "Open wiki panel",
         },
@@ -144,13 +148,15 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         ...baseMappings,
         {
           lhs: "l",
-          rhs: "<Cmd>call gitlaber#denops#open_issues_panel()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectIssuesPanel', [])<CR>",
           option: mapOption,
           description: "Open issues panel",
         },
         {
           lhs: "n",
-          rhs: "<Cmd>call gitlaber#denops#create_new_pro_issue()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:new', [])<CR>",
           option: mapOption,
           description: "Create new issue",
         },
@@ -171,7 +177,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         ...baseMappings,
         {
           lhs: "d",
-          rhs: "<Cmd>call gitlaber#denops#delete_pro_issue()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:delete', [])<CR>",
           option: mapOption,
           description: "Delete issue",
         },
@@ -184,55 +191,57 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         },
         {
           lhs: "p",
-          rhs: "<Cmd>call gitlaber#denops#open_pro_issue_preview()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:prev', [])<CR>",
           option: mapOption,
           description: "Open issue preview",
         },
         {
           lhs: "e",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'openProjectIssueEditBuf', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:edit', [])<CR>",
           option: mapOption,
           description: "Open issue edit",
         },
         {
           lhs: "b",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'createIssueBranch', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:branch:new:relate:issue', [])<CR>",
           option: mapOption,
-          description: "Create issue branch",
+          description: "Create related branch",
         },
         {
           lhs: "t",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'toggleProjectIssueState', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:state:toggle', [])<CR>",
           option: mapOption,
           description: "Toggle issue state",
         },
         {
           lhs: "o",
-          rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:browse:node', [])<CR>",
           option: mapOption,
           description: "Open issue in browser",
         },
         {
           lhs: "la",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'addProjectIssueLabel', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:label:add', [])<CR>",
           option: mapOption,
           description: "Add issue label",
         },
         {
           lhs: "lr",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'removeProjectIssueLabel', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:label:remove', [])<CR>",
           option: mapOption,
           description: "Remove issue label",
         },
         {
           lhs: "a",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'assignIssueAssignee', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:assign', [])<CR>",
           option: mapOption,
           description: "Assign issue assignee",
         },
@@ -276,13 +285,14 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         {
           lhs: "M",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'createNewBranchMr', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:new:relate:branch', [])<CR>",
           option: mapOption,
-          description: "Create new branch merge request",
+          description: "Create related merge request",
         },
         {
           lhs: "o",
-          rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:browse:node', [])<CR>",
           option: mapOption,
           description: "Open branch in browser",
         },
@@ -303,13 +313,15 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         ...baseMappings,
         {
           lhs: "l",
-          rhs: "<Cmd>call gitlaber#denops#open_wikis_panel()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectWikisPanel', [])<CR>",
           option: mapOption,
           description: "Open wikis panel",
         },
         {
           lhs: "n",
-          rhs: "<Cmd>call gitlaber#denops#open_create_new_pro_wiki_buf()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:wiki:new', [])<CR>",
           option: mapOption,
           description: "Create new wiki",
         },
@@ -330,7 +342,8 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         ...baseMappings,
         {
           lhs: "d",
-          rhs: "<Cmd>call gitlaber#denops#delete_pro_wiki()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:wiki:delete', [])<CR>",
           option: mapOption,
           description: "Delete wiki",
         },
@@ -343,19 +356,22 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         },
         {
           lhs: "p",
-          rhs: "<Cmd>call gitlaber#denops#open_pro_wiki_preview()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:wiki:prev', [])<CR>",
           option: mapOption,
           description: "Open wiki preview",
         },
         {
           lhs: "e",
-          rhs: "<Cmd>call gitlaber#denops#open_edit_pro_wiki_buf()<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:wiki:edit', [])<CR>",
           option: mapOption,
           description: "Open wiki edit",
         },
         {
           lhs: "o",
-          rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:common:echo:node', [])<CR>",
           option: mapOption,
           description: "Open wiki in browser",
         },
@@ -398,41 +414,43 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         ...baseMappings,
         {
           lhs: "o",
-          rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:browse:node', [])<CR>",
           option: mapOption,
           description: "Open merge request in browser",
         },
         {
           lhs: "a",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'assignMergeRequestAssignee', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:assign:assignee', [])<CR>",
           option: mapOption,
           description: "Assign merge request assignee",
         },
         {
           lhs: "r",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'assignMergeRequestReviewer', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:assign:reviewer', [])<CR>",
           option: mapOption,
           description: "Assign merge request reviewer",
         },
         {
           lhs: "A",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'approveMergeRequest', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:approve', [])<CR>",
           option: mapOption,
           description: "Approve a merge request",
         },
         {
           lhs: "M",
-          rhs: "<Cmd>call denops#notify('gitlaber', '', [])<CR>",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:merge', [])<CR>",
           option: mapOption,
           description: "Merge a merge request",
         },
         {
           lhs: "p",
           rhs:
-            "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestPreview', [])<CR>",
+            "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:prev', [])<CR>",
           option: mapOption,
           description: "Open a merge request preview",
         },
@@ -732,7 +750,7 @@ export function main(denops: Denops): void {
           helper.define(
             "BufWritePost",
             bufname,
-            "call gitlaber#denops#create_new_pro_wiki()",
+            "call denops#notify('gitlaber', 'action:resource:wiki:_new', [])",
           );
         });
       };
@@ -779,7 +797,7 @@ export function main(denops: Denops): void {
           helper.define(
             "BufWritePost",
             bufname,
-            "call gitlaber#denops#edit_wiki()",
+            "call denops#notify('gitlaber', 'action:resource:wiki:_edit', [])",
           );
         });
       };
@@ -830,7 +848,7 @@ export function main(denops: Denops): void {
           helper.define(
             "BufWritePost",
             bufname,
-            "call gitlaber#denops#edit_issue()",
+            "call denops#notify('gitlaber', 'action:resource:issue:_edit', [])",
           );
         });
       };

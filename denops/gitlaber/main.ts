@@ -1,9 +1,7 @@
 import { autocmd, Denops } from "./deps.ts";
 
-import { main as mainBrowse } from "./command/browse/main.ts";
 import { main as mainBuffer } from "./command/buffer/main.ts";
-import { main as mainResource } from "./command/resource/main.ts";
-import { main as mainCommon } from "./command/common/main.ts";
+import { main as mainAction } from "./action/main.ts";
 
 export async function main(denops: Denops) {
   await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
@@ -14,8 +12,6 @@ export async function main(denops: Denops) {
       "call denops#notify('gitlaber', 'updateResourceBuffer', [])",
     );
   });
-  mainBrowse(denops);
   mainBuffer(denops);
-  mainResource(denops);
-  mainCommon(denops);
+  mainAction(denops);
 }

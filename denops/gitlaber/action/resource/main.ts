@@ -1,10 +1,11 @@
 import { autocmd, Denops, helper } from "../../deps.ts";
-import { main as mainIssue } from "./issue.ts";
-import { main as mainWiki } from "./wiki.ts";
-import { main as mainBranch } from "./branch.ts";
-import { main as mainMr } from "./mr.ts";
 import { ResourceKind } from "../../types.ts";
 import { updateGitlaberInstanceRecentResource } from "../../core.ts";
+
+import { main as mainIssue } from "./issue.ts";
+import { main as mainBranch } from "./branch.ts";
+import { main as mainMr } from "./mr.ts";
+import { main as mainWiki } from "./wiki.ts";
 
 export async function executeRequest<T>(
   denops: Denops,
@@ -27,7 +28,7 @@ export async function executeRequest<T>(
 
 export function main(denops: Denops): void {
   mainIssue(denops);
-  mainWiki(denops);
   mainBranch(denops);
   mainMr(denops);
+  mainWiki(denops);
 }
