@@ -656,7 +656,6 @@ export function main(denops: Denops): void {
       const token = client.getGitlabToken(cwd);
       const singleProject = await client.getSingleProject(url, token, cwd);
       const gitlaberVar = await getGitlaberVar(denops);
-      await fn.execute(denops, "tabnew");
       const bufnr = await fn.bufnr(denops);
       try {
         await getCurrentGitlaberInstance(denops);
