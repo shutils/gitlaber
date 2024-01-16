@@ -1,4 +1,4 @@
-import { Denops, fn, helper } from "../../deps.ts";
+import { Denops, helper } from "../../deps.ts";
 import { doAction } from "../main.ts";
 import { getCurrentNode } from "../../helper.ts";
 import {
@@ -7,23 +7,7 @@ import {
   isMergeRequest,
   isWiki,
 } from "../../client/index.ts";
-
-export const checkOpenbrowser = async (denops: Denops) => {
-  const checkOpenbrowser = await fn.exists(denops, "*OpenBrowser");
-  if (!checkOpenbrowser) {
-    helper.echoerr(denops, "OpenBrowser is not installed.");
-    return false;
-  }
-  return true;
-};
-
-export const openWithBrowser = async (denops: Denops, url: string) => {
-  const check = await checkOpenbrowser(denops);
-  if (!check) {
-    return;
-  }
-  await denops.call("OpenBrowser", url);
-};
+import { openWithBrowser } from "./core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
