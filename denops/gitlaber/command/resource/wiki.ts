@@ -1,4 +1,4 @@
-import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
+import { Denops, fn, helper, unknownutil } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
 import {
@@ -7,6 +7,7 @@ import {
   getCurrentNode,
 } from "../../core.ts";
 import { executeRequest } from "./main.ts";
+import { getBufferInfo } from "../buffer/main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -15,12 +16,15 @@ export function main(denops: Denops): void {
       const { url, token, project } = await getCurrentGitlaberInstance(
         denops,
       );
+      const bufinfo = await getBufferInfo(denops);
       const content = await util.flattenBuffer(
         denops,
         await fn.bufname(denops),
       );
-      const title = await vars.b.get(denops, "gitlaber_new_wiki_title");
+
+      const title = bufinfo.params?.user_input?.title;
       if (!unknownutil.isString(title)) {
+        helper.echo(denops, "Title has not been set.");
         return;
       }
       await executeRequest(
@@ -46,11 +50,12 @@ export function main(denops: Denops): void {
         denops,
         await fn.bufname(denops),
       );
-      const title = await vars.b.get(denops, "gitlaber_wiki_title");
+      const bufinfo = await getBufferInfo(denops);
+      const title = bufinfo.params?.user_input?.title;
+      const slug = bufinfo.params?.user_input?.slug;
       if (!unknownutil.isString(title)) {
         return;
       }
-      const slug = await vars.b.get(denops, "gitlaber_wiki_slug");
       if (!unknownutil.isString(slug)) {
         return;
       }

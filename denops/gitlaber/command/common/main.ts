@@ -1,8 +1,8 @@
 import { Denops, helper } from "../../deps.ts";
 
 import * as types from "../../types.ts";
-import * as keymap from "../../keymap.ts";
 import { getCtx, getCurrentNode } from "../../core.ts";
+import { getBufferInfo } from "../buffer/main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -13,7 +13,8 @@ export function main(denops: Denops): void {
     },
 
     async echoKeymaps(): Promise<void> {
-      const keymaps = await keymap.getCurrentMapping(denops);
+      const info = await getBufferInfo(denops);
+      const keymaps = info.keymaps;
       const rows: string[] = [];
       const keyColumn = "Key(s)";
       const commandColumn = "Command";

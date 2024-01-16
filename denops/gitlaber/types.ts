@@ -1,4 +1,4 @@
-import { Denops, unknownutil as u } from "./deps.ts";
+import { Denops, mapping, unknownutil as u } from "./deps.ts";
 import {
   isBranch,
   isIssue,
@@ -65,6 +65,13 @@ export const isNode = u.isObjectOf({
 
 export type Node = u.PredicateType<typeof isNode>;
 
+export type Mapping = {
+  lhs: string;
+  rhs: string;
+  option?: mapping.MapOptions;
+  description?: string;
+};
+
 const isBufferKind = u.isLiteralOneOf(
   [
     "base",
@@ -77,8 +84,13 @@ const isBufferKind = u.isLiteralOneOf(
     "project_wikis",
     "project_merge_request",
     "project_merge_requests",
+    "issue_edit",
     "issue_preview",
+    "merge_request_edit",
     "merge_request_preview",
+    "wiki_create",
+    "wiki_edit",
+    "wiki_preview",
   ] as const,
 );
 
@@ -95,13 +107,21 @@ export type BufferOptions = u.PredicateType<typeof isBufferOptions>;
 export type BufferConfig = {
   direction: string;
   options: BufferOptions;
-  node_creater: (denops: Denops, ctx: Ctx) => Promise<Node[]>;
+  node_creater: (denops: Denops, ctx?: Ctx) => Promise<Node[]>;
+  tmp?: boolean;
 };
 
 export type BufferInfo = {
   buffer_kind: BufferKind;
   resource_kind: ResourceKind;
   config: BufferConfig;
+  params?: {
+    user_input: {
+      [key: string]: unknown;
+    };
+  };
+  autocmd?: (params: { [key: string]: unknown }) => Promise<void>;
+  keymaps: Mapping[];
 };
 
 export const isGitlaberInstance = u.isObjectOf({

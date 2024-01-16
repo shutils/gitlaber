@@ -3,13 +3,13 @@ import {
   Denops,
   fn,
   helper,
+  mapping,
   unknownutil as u,
   vars,
 } from "../../deps.ts";
 
 import * as node from "../../node.ts";
 import * as types from "../../types.ts";
-import * as keymap from "../../keymap.ts";
 import * as client from "../../client/index.ts";
 import {
   getCtx,
@@ -51,8 +51,84 @@ export async function getBufferInfo(
   }
 }
 
+const mapOption: mapping.MapOptions = {
+  mode: "n",
+  noremap: true,
+  silent: true,
+  buffer: true,
+};
+
+const baseMappings = [
+  {
+    lhs: "q",
+    rhs: "<Cmd>bd!<CR>",
+    option: mapOption,
+    description: "Close buffer",
+  },
+  {
+    lhs: "I",
+    rhs: "<Cmd>echo gitlaber#denops#get_current_node()<CR>",
+    option: mapOption,
+    description: "Show current node",
+  },
+  {
+    lhs: "g?",
+    rhs: "<Cmd>call denops#notify('gitlaber', 'echoKeymaps', [])<CR>",
+    option: mapOption,
+    description: "Show keymaps",
+  },
+];
+
 function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
   const bufferInfos: types.BufferInfo[] = [
+    {
+      buffer_kind: "main",
+      resource_kind: "other",
+      config: {
+        direction: "tabnew",
+        node_creater: node.createMainPanelNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+        },
+      },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "o",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openBrowserProject', [])<CR>",
+          option: mapOption,
+          description: "Open project in browser",
+        },
+        {
+          lhs: "i",
+          rhs: "<Cmd>call gitlaber#denops#open_issue_panel()<CR>",
+          option: mapOption,
+          description: "Open issue panel",
+        },
+        {
+          lhs: "w",
+          rhs: "<Cmd>call gitlaber#denops#open_wiki_panel()<CR>",
+          option: mapOption,
+          description: "Open wiki panel",
+        },
+        {
+          lhs: "b",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectBranchPanel', [])<CR>",
+          option: mapOption,
+          description: "Open branch panel",
+        },
+        {
+          lhs: "m",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestPanel', [])<CR>",
+          option: mapOption,
+          description: "Open merge request panel",
+        },
+      ],
+    },
     {
       buffer_kind: "project_issue",
       resource_kind: "other",
@@ -64,6 +140,21 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
           nomodifiable: true,
         },
       },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "l",
+          rhs: "<Cmd>call gitlaber#denops#open_issues_panel()<CR>",
+          option: mapOption,
+          description: "Open issues panel",
+        },
+        {
+          lhs: "n",
+          rhs: "<Cmd>call gitlaber#denops#create_new_pro_issue()<CR>",
+          option: mapOption,
+          description: "Create new issue",
+        },
+      ],
     },
     {
       buffer_kind: "project_issues",
@@ -76,6 +167,76 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
           nomodifiable: true,
         },
       },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "d",
+          rhs: "<Cmd>call gitlaber#denops#delete_pro_issue()<CR>",
+          option: mapOption,
+          description: "Delete issue",
+        },
+        {
+          lhs: "R",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'reloadBuffer', [bufnr()])<CR>",
+          option: mapOption,
+          description: "Reload issues",
+        },
+        {
+          lhs: "p",
+          rhs: "<Cmd>call gitlaber#denops#open_pro_issue_preview()<CR>",
+          option: mapOption,
+          description: "Open issue preview",
+        },
+        {
+          lhs: "e",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectIssueEditBuf', [])<CR>",
+          option: mapOption,
+          description: "Open issue edit",
+        },
+        {
+          lhs: "b",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'createIssueBranch', [])<CR>",
+          option: mapOption,
+          description: "Create issue branch",
+        },
+        {
+          lhs: "t",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'toggleProjectIssueState', [])<CR>",
+          option: mapOption,
+          description: "Toggle issue state",
+        },
+        {
+          lhs: "o",
+          rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+          option: mapOption,
+          description: "Open issue in browser",
+        },
+        {
+          lhs: "la",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'addProjectIssueLabel', [])<CR>",
+          option: mapOption,
+          description: "Add issue label",
+        },
+        {
+          lhs: "lr",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'removeProjectIssueLabel', [])<CR>",
+          option: mapOption,
+          description: "Remove issue label",
+        },
+        {
+          lhs: "a",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'assignIssueAssignee', [])<CR>",
+          option: mapOption,
+          description: "Assign issue assignee",
+        },
+      ],
     },
     {
       buffer_kind: "project_branch",
@@ -88,6 +249,16 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
           nomodifiable: true,
         },
       },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "l",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectBranchesPanel', [])<CR>",
+          option: mapOption,
+          description: "Open branches panel",
+        },
+      ],
     },
     {
       buffer_kind: "project_branches",
@@ -100,6 +271,22 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
           nomodifiable: true,
         },
       },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "M",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'createNewBranchMr', [])<CR>",
+          option: mapOption,
+          description: "Create new branch merge request",
+        },
+        {
+          lhs: "o",
+          rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+          option: mapOption,
+          description: "Open branch in browser",
+        },
+      ],
     },
     {
       buffer_kind: "project_wiki",
@@ -112,6 +299,21 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
           nomodifiable: true,
         },
       },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "l",
+          rhs: "<Cmd>call gitlaber#denops#open_wikis_panel()<CR>",
+          option: mapOption,
+          description: "Open wikis panel",
+        },
+        {
+          lhs: "n",
+          rhs: "<Cmd>call gitlaber#denops#open_create_new_pro_wiki_buf()<CR>",
+          option: mapOption,
+          description: "Create new wiki",
+        },
+      ],
     },
     {
       buffer_kind: "project_wikis",
@@ -124,6 +326,40 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
           nomodifiable: true,
         },
       },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "d",
+          rhs: "<Cmd>call gitlaber#denops#delete_pro_wiki()<CR>",
+          option: mapOption,
+          description: "Delete wiki",
+        },
+        {
+          lhs: "R",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'reloadBuffer', [bufnr()])<CR>",
+          option: mapOption,
+          description: "Reload wikis",
+        },
+        {
+          lhs: "p",
+          rhs: "<Cmd>call gitlaber#denops#open_pro_wiki_preview()<CR>",
+          option: mapOption,
+          description: "Open wiki preview",
+        },
+        {
+          lhs: "e",
+          rhs: "<Cmd>call gitlaber#denops#open_edit_pro_wiki_buf()<CR>",
+          option: mapOption,
+          description: "Open wiki edit",
+        },
+        {
+          lhs: "o",
+          rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+          option: mapOption,
+          description: "Open wiki in browser",
+        },
+      ],
     },
     {
       buffer_kind: "project_merge_request",
@@ -136,6 +372,16 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
           nomodifiable: true,
         },
       },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "l",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestsPanel', [])<CR>",
+          option: mapOption,
+          description: "Open merge requests panel",
+        },
+      ],
     },
     {
       buffer_kind: "project_merge_requests",
@@ -148,6 +394,49 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
           nomodifiable: true,
         },
       },
+      keymaps: [
+        ...baseMappings,
+        {
+          lhs: "o",
+          rhs: "<Cmd>call denops#notify('gitlaber', 'openBrowserNode', [])<CR>",
+          option: mapOption,
+          description: "Open merge request in browser",
+        },
+        {
+          lhs: "a",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'assignMergeRequestAssignee', [])<CR>",
+          option: mapOption,
+          description: "Assign merge request assignee",
+        },
+        {
+          lhs: "r",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'assignMergeRequestReviewer', [])<CR>",
+          option: mapOption,
+          description: "Assign merge request reviewer",
+        },
+        {
+          lhs: "A",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'approveMergeRequest', [])<CR>",
+          option: mapOption,
+          description: "Approve a merge request",
+        },
+        {
+          lhs: "M",
+          rhs: "<Cmd>call denops#notify('gitlaber', '', [])<CR>",
+          option: mapOption,
+          description: "Merge a merge request",
+        },
+        {
+          lhs: "p",
+          rhs:
+            "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestPreview', [])<CR>",
+          option: mapOption,
+          description: "Open a merge request preview",
+        },
+      ],
     },
     {
       buffer_kind: "issue_preview",
@@ -158,8 +447,29 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         options: {
           nofile: true,
           nomodifiable: true,
+          filetype: "markdown",
         },
       },
+      keymaps: [
+        ...baseMappings,
+      ],
+    },
+    {
+      buffer_kind: "issue_edit",
+      resource_kind: "other",
+      config: {
+        direction: "new",
+        node_creater: node.createPreviewNodes,
+        options: {
+          nofile: false,
+          nomodifiable: false,
+          filetype: "markdown",
+        },
+        tmp: true,
+      },
+      keymaps: [
+        ...baseMappings,
+      ],
     },
     {
       buffer_kind: "merge_request_preview",
@@ -170,8 +480,62 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
         options: {
           nofile: true,
           nomodifiable: true,
+          filetype: "markdown",
         },
       },
+      keymaps: [
+        ...baseMappings,
+      ],
+    },
+    {
+      buffer_kind: "wiki_create",
+      resource_kind: "other",
+      config: {
+        direction: "vertical botright new",
+        node_creater: (_denops, _ctx) => Promise.resolve([]),
+        options: {
+          nofile: false,
+          nomodifiable: false,
+          filetype: "markdown",
+        },
+        tmp: true,
+      },
+      keymaps: [
+        ...baseMappings,
+      ],
+    },
+    {
+      buffer_kind: "wiki_edit",
+      resource_kind: "other",
+      config: {
+        direction: "new",
+        node_creater: node.createProjectWikiContentNodes,
+        options: {
+          nofile: false,
+          nomodifiable: false,
+          filetype: "markdown",
+        },
+        tmp: true,
+      },
+      keymaps: [
+        ...baseMappings,
+      ],
+    },
+    {
+      buffer_kind: "wiki_preview",
+      resource_kind: "other",
+      config: {
+        direction: "new",
+        node_creater: node.createProjectWikiContentNodes,
+        options: {
+          nofile: true,
+          nomodifiable: true,
+          filetype: "markdown",
+        },
+      },
+      keymaps: [
+        ...baseMappings,
+      ],
     },
   ];
   const bufferInfo = bufferInfos.find((buffer) => buffer.buffer_kind === kind);
@@ -183,19 +547,35 @@ function selectBufferInfo(kind: types.BufferKind): types.BufferInfo {
   return bufferInfo;
 }
 
-async function renderBuffer(denops: Denops, bufferInfo: types.BufferInfo) {
+async function renderBuffer(
+  denops: Denops,
+  bufferInfo: types.BufferInfo,
+) {
   const gitlaberVar = await getGitlaberVar(denops);
   const ctx = await getCtx(denops);
   const config = bufferInfo.config;
 
   const nodes = await config.node_creater(denops, ctx);
   await fn.execute(denops, config.direction);
-  const bufnr = await fn.bufnr(denops);
+  let bufnr: number;
+  if (config.tmp) {
+    const bufname = await fn.tempname(denops);
+    bufnr = await fn.bufadd(denops, bufname);
+    await fn.bufload(denops, bufnr);
+    await fn.execute(denops, `buffer ${bufnr}`);
+    if (bufferInfo.autocmd) {
+      await bufferInfo.autocmd({
+        bufname: bufname,
+      });
+    }
+  } else {
+    bufnr = await fn.bufnr(denops);
+  }
   await drawBuffer(
     denops,
     nodes,
-    bufferInfo.buffer_kind,
     bufnr,
+    bufferInfo.keymaps,
     config.options,
   );
   await setCtx(denops, {
@@ -232,8 +612,8 @@ async function reRenderBuffer(
   await drawBuffer(
     denops,
     nodes,
-    bufferInfo.buffer_kind,
     bufnr,
+    bufferInfo.keymaps,
     config.options,
   );
   await setCtx(denops, {
@@ -245,14 +625,16 @@ async function reRenderBuffer(
 async function drawBuffer(
   denops: Denops,
   nodes: types.Node[],
-  kind: types.BufferKind,
   bufnr: number,
+  keymaps: types.Mapping[],
   option?: types.BufferOptions,
 ) {
   await setModifiable(denops, bufnr);
   await setNodesOnBuf(denops, nodes, bufnr);
   await vars.b.set(denops, "gitlaber_nodes", nodes);
-  await keymap.setMapping(denops, kind);
+  keymaps.map(async (keymap) => {
+    await mapping.map(denops, keymap.lhs, keymap.rhs, keymap.option);
+  });
   if (option?.nofile) {
     await setNofile(denops, bufnr);
   }
@@ -289,21 +671,11 @@ export function main(denops: Denops): void {
         gitlaberVar.instances.push(currentGitlaberInstance);
         await setGitlaberVar(denops, gitlaberVar);
       }
-      const currentGitlaberInstance = await getCurrentGitlaberInstance(
-        denops,
-      );
-      const nodes = node.createMainPanelNodes(
-        currentGitlaberInstance,
-        singleProject,
-      );
-      await drawBuffer(denops, nodes, "main", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-      });
       await setCtx(denops, {
-        instance: currentGitlaberInstance,
-        nodes: nodes,
+        instance: await getCurrentGitlaberInstance(denops),
+        nodes: [],
       }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("main"));
     },
 
     async openProjectIssuePanel(): Promise<void> {
@@ -339,35 +711,38 @@ export function main(denops: Denops): void {
     },
 
     async openCreateNewProjectWikiBuf(): Promise<void> {
-      const ctx = await getCtx(denops);
-      const { project } = ctx.instance;
       const title = await helper.input(denops, {
         prompt: "New wiki title: ",
       });
       if (!title) {
         return;
       }
-      await fn.execute(denops, "vertical botright new");
-      const bufname = await fn.tempname(denops);
-      const bufnr = await fn.bufadd(denops, bufname);
-      await fn.bufload(denops, bufnr);
-      await fn.execute(denops, `buffer ${bufnr}`);
-      await vars.b.set(denops, "gitlaber_new_wiki_title", title);
-      await vars.b.set(denops, "gitlaber_project_id", project.id);
-      await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
-        helper.remove("BufWritePost");
-        helper.define(
-          "BufWritePost",
-          bufname,
-          "call gitlaber#denops#create_new_pro_wiki()",
-        );
-      });
-      await keymap.setMapping(denops, "base");
-      await setFileType(denops, bufnr);
-      await denops.cmd("redraw");
-      await setCtx(denops, {
-        ...ctx,
-      }, bufnr);
+      const bufinfo = selectBufferInfo("wiki_create");
+      bufinfo.autocmd = async (params) => {
+        const bufname = params?.bufname;
+        if (!bufname) {
+          helper.echoerr(denops, "bufname is not set");
+          return;
+        }
+        if (!u.isString(bufname)) {
+          helper.echoerr(denops, "bufname is not string");
+          return;
+        }
+        await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
+          helper.remove("BufWritePost");
+          helper.define(
+            "BufWritePost",
+            bufname,
+            "call gitlaber#denops#create_new_pro_wiki()",
+          );
+        });
+      };
+      bufinfo.params = {
+        user_input: {
+          title: title,
+        },
+      };
+      await renderBuffer(denops, bufinfo);
     },
 
     async openProjectWikiPreview(): Promise<void> {
@@ -377,62 +752,45 @@ export function main(denops: Denops): void {
         helper.echo(denops, "This node is not a wiki.");
         return;
       }
-      const nodes = node.createProjectWikiContentNodes(currentNode.resource);
-      await fn.execute(denops, "new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "project_wiki", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-        filetype: "markdown",
-      });
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("wiki_preview"));
     },
 
     async openEditProjectWikiBuf(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { instance } = ctx;
       const currentNode = await getCurrentNode(denops, ctx);
       if (!(client.isWiki(currentNode.resource))) {
         helper.echo(denops, "This node is not a wiki.");
         return;
       }
-      const nodes = node.createProjectWikiContentNodes(currentNode.resource);
-      await fn.execute(denops, "new");
-      const bufname = await fn.tempname(denops);
-      const bufnr = await fn.bufadd(denops, bufname);
-      await fn.bufload(denops, bufnr);
-      await fn.execute(denops, `buffer ${bufnr}`);
-      await setNodesOnBuf(denops, nodes, bufnr);
-      await vars.b.set(denops, "gitlaber_nodes", nodes);
-      await vars.b.set(denops, "gitlaber_project_id", instance.project.id);
-      await vars.b.set(
-        denops,
-        "gitlaber_wiki_title",
-        currentNode.resource.title,
-      );
-      await vars.b.set(
-        denops,
-        "gitlaber_wiki_slug",
-        currentNode.resource.slug,
-      );
-      await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
-        helper.remove("BufWritePost");
-        helper.define(
-          "BufWritePost",
-          bufname,
-          "call gitlaber#denops#edit_wiki()",
-        );
-      });
-      await keymap.setMapping(denops, "base");
-      await setFileType(denops, bufnr);
-      await denops.cmd("redraw");
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      const title = currentNode.resource.title;
+      const slug = currentNode.resource.slug;
+      const bufinfo = selectBufferInfo("wiki_edit");
+      bufinfo.autocmd = async (params) => {
+        const bufname = params?.bufname;
+        if (!bufname) {
+          helper.echoerr(denops, "bufname is not set");
+          return;
+        }
+        if (!u.isString(bufname)) {
+          helper.echoerr(denops, "bufname is not string");
+          return;
+        }
+        await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
+          helper.remove("BufWritePost");
+          helper.define(
+            "BufWritePost",
+            bufname,
+            "call gitlaber#denops#edit_wiki()",
+          );
+        });
+      };
+      bufinfo.params = {
+        user_input: {
+          title: title,
+          slug: slug,
+        },
+      };
+      await renderBuffer(denops, bufinfo);
     },
 
     async openProjectIssuePreview(): Promise<void> {
@@ -446,61 +804,48 @@ export function main(denops: Denops): void {
         helper.echo(denops, "This issue does not have a description.");
         return;
       }
-      const nodes = await node.createPreviewNodes(denops, ctx);
-      await fn.execute(denops, "new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "issue_preview", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-        filetype: "markdown",
-      });
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("issue_preview"));
     },
 
     async openProjectIssueEditBuf(): Promise<void> {
       const ctx = await getCtx(denops);
-      const { instance } = ctx;
       const currentNode = await getCurrentNode(denops, ctx);
       if (!(client.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
-      await fn.execute(denops, "new");
-      const nodes = node.createProjectIssueDescriptionNodes(
-        currentNode.resource,
-      );
-      const bufname = await fn.tempname(denops);
-      const bufnr = await fn.bufadd(denops, bufname);
-      await fn.bufload(denops, bufnr);
-      await fn.execute(denops, `buffer ${bufnr}`);
-      await setNodesOnBuf(denops, nodes, bufnr);
-      await vars.b.set(denops, "gitlaber_nodes", nodes);
-      await vars.b.set(denops, "gitlaber_project_id", instance.project.id);
-      await vars.b.set(denops, "gitlaber_issue_iid", currentNode.resource.iid);
-      await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
-        helper.remove("BufWritePost");
-        helper.define(
-          "BufWritePost",
-          bufname,
-          "call gitlaber#denops#edit_issue()",
-        );
-      });
-      await keymap.setMapping(denops, "base");
-      await setFileType(denops, bufnr);
-      await denops.cmd("redraw");
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      const iid = currentNode.resource.iid;
+      const bufinfo = selectBufferInfo("issue_edit");
+      bufinfo.autocmd = async (params) => {
+        const bufname = params?.bufname;
+        if (!bufname) {
+          helper.echoerr(denops, "bufname is not set");
+          return;
+        }
+        if (!u.isString(bufname)) {
+          helper.echoerr(denops, "bufname is not string");
+          return;
+        }
+        await autocmd.group(denops, "gitlaber_autocmd", (helper) => {
+          helper.remove("BufWritePost");
+          helper.define(
+            "BufWritePost",
+            bufname,
+            "call gitlaber#denops#edit_issue()",
+          );
+        });
+      };
+      bufinfo.params = {
+        user_input: {
+          iid: iid,
+        },
+      };
+      await renderBuffer(denops, bufinfo);
     },
 
     async openProjectMergeRequestPreview(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
-      const nodes = await node.createPreviewNodes(denops, ctx);
       if (!(client.isMergeRequest(currentNode.resource))) {
         helper.echo(denops, "This node is not a merge request.");
         return;
@@ -509,17 +854,7 @@ export function main(denops: Denops): void {
         helper.echo(denops, "This merge request does not have a description.");
         return;
       }
-      await fn.execute(denops, "new");
-      const bufnr = await fn.bufnr(denops);
-      await drawBuffer(denops, nodes, "merge_request_preview", bufnr, {
-        nofile: true,
-        nomodifiable: true,
-        filetype: "markdown",
-      });
-      await setCtx(denops, {
-        ...ctx,
-        nodes: nodes,
-      }, bufnr);
+      await renderBuffer(denops, selectBufferInfo("merge_request_preview"));
     },
 
     async reloadBuffer(bufnr: unknown): Promise<void> {
@@ -534,6 +869,9 @@ export function main(denops: Denops): void {
       const recentInstance = gitlaberVar.recent_instance_index;
       const instance = gitlaberVar.instances[recentInstance];
       const recentResource = instance.recent_resource;
+      if (!recentResource) {
+        return;
+      }
       const targetBuffers = instance.buffers.filter((buffer) =>
         buffer.resource_kind === recentResource
       );

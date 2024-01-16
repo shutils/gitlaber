@@ -1,8 +1,9 @@
-import { Denops, fn, helper, unknownutil, vars } from "../../deps.ts";
+import { Denops, fn, helper, unknownutil } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
 import { getCtx, getCurrentNode } from "../../core.ts";
 import { executeRequest } from "./main.ts";
+import { getBufferInfo } from "../buffer/main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -63,11 +64,12 @@ export function main(denops: Denops): void {
     async editProjectIssue(): Promise<void> {
       const ctx = await getCtx(denops);
       const { project, url, token } = ctx.instance;
+      const bufinfo = await getBufferInfo(denops);
       const description = await util.flattenBuffer(
         denops,
         await fn.bufname(denops),
       );
-      const issue_iid = await vars.b.get(denops, "gitlaber_issue_iid");
+      const issue_iid = bufinfo.params?.user_input?.iid;
       if (!unknownutil.isNumber(issue_iid)) {
         return;
       }

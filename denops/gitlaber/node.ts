@@ -1,14 +1,16 @@
 import { Denops, unknownutil as u } from "./deps.ts";
-import { Ctx, GitlaberInstance, Node, NodeKind, Resource } from "./types.ts";
+import { Ctx, Node, NodeKind, Resource } from "./types.ts";
 import * as client from "./client/index.ts";
 
-import { Issue, Project, Wiki } from "./client/index.ts";
-import { getCurrentNode } from "./core.ts";
+import { Issue, Wiki } from "./client/index.ts";
+import { getCurrentGitlaberInstance, getCurrentNode } from "./core.ts";
 
-export const createMainPanelNodes = (
-  gitlaberInstance: GitlaberInstance,
-  project: Project,
+export const createMainPanelNodes = async (
+  denops: Denops,
+  _ctx?: Ctx,
 ) => {
+  const gitlaberInstance = await getCurrentGitlaberInstance(denops);
+  const project = gitlaberInstance.project;
   const nodes: Array<Node> = [];
   nodes.push({
     display: "Hint: Type g? to display the keymap for each panel.",
@@ -54,12 +56,12 @@ export const createMainPanelNodes = (
     display: `open_issues_count: ${project.open_issues_count}`,
     kind: "other",
   });
-  return nodes;
+  return await Promise.resolve(nodes);
 };
 
 export const createProjectIssuePanelNodes = async (
   _denops: Denops,
-  _ctx: Ctx,
+  _ctx?: Ctx,
 ) => {
   const nodes: Array<Node> = [];
   nodes.push({
@@ -71,8 +73,11 @@ export const createProjectIssuePanelNodes = async (
 
 export const createProjectIssuesNodes = async (
   _denops: Denops,
-  ctx: Ctx,
+  ctx?: Ctx,
 ) => {
+  if (ctx === undefined) {
+    return Promise.resolve([]);
+  }
   const { project, url, token } = ctx.instance;
   const projectIssues = await client.getProjectIssues(
     url,
@@ -88,7 +93,7 @@ export const createProjectIssuesNodes = async (
 
 export const createProjectBranchPanelNodes = async (
   _denops: Denops,
-  _ctx: Ctx,
+  _ctx?: Ctx,
 ) => {
   const nodes: Array<Node> = [];
   nodes.push({
@@ -100,8 +105,11 @@ export const createProjectBranchPanelNodes = async (
 
 export const createProjectBranchesNodes = async (
   _denops: Denops,
-  ctx: Ctx,
+  ctx?: Ctx,
 ) => {
+  if (ctx === undefined) {
+    return Promise.resolve([]);
+  }
   const { project, url, token } = ctx.instance;
   const projectBranches = await client.getProjectBranches(url, token, {
     id: project.id,
@@ -113,8 +121,11 @@ export const createProjectBranchesNodes = async (
 
 export const createProjectWikiNodes = async (
   _denops: Denops,
-  ctx: Ctx,
+  ctx?: Ctx,
 ) => {
+  if (ctx === undefined) {
+    return Promise.resolve([]);
+  }
   const { project, url, token } = ctx.instance;
   const projectWikis = await client.getProjectWikis(url, token, {
     id: project.id,
@@ -143,8 +154,11 @@ export const createProjectIssueDescriptionNodes = (
 
 export const createPreviewNodes = async (
   denops: Denops,
-  ctx: Ctx,
+  ctx?: Ctx,
 ) => {
+  if (ctx === undefined) {
+    return Promise.resolve([]);
+  }
   const nodes: Array<Node> = [];
   const currentNode = await getCurrentNode(denops, ctx);
   if (
@@ -173,9 +187,15 @@ export const createProjectWikiPanelNodes = async () => {
   return await Promise.resolve(nodes);
 };
 
-export const createProjectWikiContentNodes = (
-  wiki: Wiki,
+export const createProjectWikiContentNodes = async (
+  denops: Denops,
+  ctx?: Ctx,
 ) => {
+  if (ctx === undefined) {
+    return Promise.resolve([]);
+  }
+  const currentNode = await getCurrentNode(denops, ctx);
+  const wiki = currentNode.resource as Wiki;
   const lines = wiki.content.split("\n");
   const nodes: Array<Node> = [];
   lines.map((line) => {
@@ -189,7 +209,7 @@ export const createProjectWikiContentNodes = (
 
 export const createProjectMergeRequestPanelNodes = async (
   _denops: Denops,
-  _ctx: Ctx,
+  _ctx?: Ctx,
 ) => {
   const nodes: Array<Node> = [];
   nodes.push({
@@ -201,8 +221,11 @@ export const createProjectMergeRequestPanelNodes = async (
 
 export const createProjectMergeRequestsNodes = async (
   _denops: Denops,
-  ctx: Ctx,
+  ctx?: Ctx,
 ) => {
+  if (ctx === undefined) {
+    return Promise.resolve([]);
+  }
   const { project, url, token } = ctx.instance;
   const projectMergeRequests = await client.getProjectMergeRequestsGraphQL(
     url,
