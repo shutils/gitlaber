@@ -6,7 +6,7 @@ import {
   getCurrentNode,
   updateGitlaberInstanceRecentResource,
 } from "../../core.ts";
-import { executeRequest } from "./main.ts";
+import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
 
 export function main(denops: Denops): void {

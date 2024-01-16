@@ -2,7 +2,7 @@ import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
 import { getCurrentNode } from "../../core.ts";
-import { executeRequest } from "./main.ts";
+import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
 import { getBufferInfo } from "../../command/buffer/helper.ts";
 
