@@ -13,7 +13,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, _ctx) => {
         await fn.call(denops, "denops#notify", [
           "gitlaber",
-          "openCreateNewProjectWikiBuf",
+          "command:buffer:open:resource:wiki:new",
           [],
         ]);
       });
@@ -53,7 +53,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, _ctx) => {
         await fn.call(denops, "denops#notify", [
           "gitlaber",
-          "openProjectWikiPreview",
+          "command:buffer:open:resource:wiki:prev",
           [],
         ]);
       });
@@ -63,7 +63,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, _ctx) => {
         await fn.call(denops, "denops#notify", [
           "gitlaber",
-          "openEditProjectWikiBuf",
+          "command:buffer:open:resource:wiki:edit",
           [],
         ]);
       });

@@ -1,4 +1,4 @@
-import { autocmd, Denops, helper } from "../../deps.ts";
+import { autocmd, Denops, fn, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
 import {
@@ -164,6 +164,16 @@ export function main(denops: Denops): void {
           "Successfully merge a merge request.",
           "merge_request",
         );
+      });
+    },
+
+    "action:resource:mr:prev": () => {
+      doAction(denops, async (denops, _ctx) => {
+        await fn.call(denops, "denops#notify", [
+          "gitlaber",
+          "command:buffer:open:resource:mr:prev",
+          [],
+        ]);
       });
     },
   };

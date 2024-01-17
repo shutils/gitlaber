@@ -226,7 +226,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, _ctx) => {
         await fn.call(denops, "denops#notify", [
           "gitlaber",
-          "openProjectIssuePreview",
+          "command:buffer:open:resource:issue:prev",
           [],
         ]);
       });
@@ -236,7 +236,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, _ctx) => {
         await fn.call(denops, "denops#notify", [
           "gitlaber",
-          "openProjectIssueEditBuf",
+          "command:buffer:open:resource:issue:edit",
           [],
         ]);
       });

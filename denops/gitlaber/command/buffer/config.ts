@@ -56,28 +56,28 @@ const MAIN_BUFFER_INFO: types.BufferInfo = {
     {
       lhs: "i",
       rhs:
-        "<Cmd>call denops#notify('gitlaber', 'openProjectIssuePanel', [])<CR>",
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:open:popup:issue', [])<CR>",
       option: MAP_OPTION,
       description: "Open issue panel",
     },
     {
       lhs: "w",
       rhs:
-        "<Cmd>call denops#notify('gitlaber', 'openProjectWikiPanel', [])<CR>",
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:open:popup:wiki', [])<CR>",
       option: MAP_OPTION,
       description: "Open wiki panel",
     },
     {
       lhs: "b",
       rhs:
-        "<Cmd>call denops#notify('gitlaber', 'openProjectBranchPanel', [])<CR>",
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:open:popup:branch', [])<CR>",
       option: MAP_OPTION,
       description: "Open branch panel",
     },
     {
       lhs: "m",
       rhs:
-        "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestPanel', [])<CR>",
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:open:popup:mr', [])<CR>",
       option: MAP_OPTION,
       description: "Open merge request panel",
     },
@@ -100,7 +100,7 @@ const PROJECT_ISSUE_BUFFER_INFO: types.BufferInfo = {
     {
       lhs: "l",
       rhs:
-        "<Cmd>call denops#notify('gitlaber', 'openProjectIssuesPanel', [])<CR>",
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:open:resource:issues', [])<CR>",
       option: MAP_OPTION,
       description: "Open issues panel",
     },
@@ -136,7 +136,8 @@ const PROJECT_ISSUES_BUFFER_INFO: types.BufferInfo = {
     },
     {
       lhs: "R",
-      rhs: "<Cmd>call denops#notify('gitlaber', 'reloadBuffer', [bufnr()])<CR>",
+      rhs:
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:reload', [bufnr()])<CR>",
       option: MAP_OPTION,
       description: "Reload issues",
     },
@@ -214,7 +215,7 @@ const PROJECT_BRANCH_BUFFER_INFO: types.BufferInfo = {
     {
       lhs: "l",
       rhs:
-        "<Cmd>call denops#notify('gitlaber', 'openProjectBranchesPanel', [])<CR>",
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:open:resource:branches', [])<CR>",
       option: MAP_OPTION,
       description: "Open branches panel",
     },
@@ -266,7 +267,7 @@ const PROJECT_WIKI_BUFFER_INFO: types.BufferInfo = {
     {
       lhs: "l",
       rhs:
-        "<Cmd>call denops#notify('gitlaber', 'openProjectWikisPanel', [])<CR>",
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:open:resource:wikis', [])<CR>",
       option: MAP_OPTION,
       description: "Open wikis panel",
     },
@@ -302,7 +303,8 @@ const PROJECT_WIKIS_BUFFER_INFO: types.BufferInfo = {
     },
     {
       lhs: "R",
-      rhs: "<Cmd>call denops#notify('gitlaber', 'reloadBuffer', [bufnr()])<CR>",
+      rhs:
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:reload', [bufnr()])<CR>",
       option: MAP_OPTION,
       description: "Reload wikis",
     },
@@ -346,7 +348,7 @@ const PROJECT_MERGE_REQUEST_BUFFER_INFO: types.BufferInfo = {
     {
       lhs: "l",
       rhs:
-        "<Cmd>call denops#notify('gitlaber', 'openProjectMergeRequestsPanel', [])<CR>",
+        "<Cmd>call denops#notify('gitlaber', 'command:buffer:open:resource:mrs', [])<CR>",
       option: MAP_OPTION,
       description: "Open merge requests panel",
     },

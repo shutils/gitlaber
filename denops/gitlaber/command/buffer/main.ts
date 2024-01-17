@@ -16,7 +16,7 @@ import { renderBuffer, reRenderBuffer } from "./core.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    async openGitlaber(): Promise<void> {
+    async "command:buffer:open:popup:main"(): Promise<void> {
       const cwd = await fn.getcwd(denops);
       const url = client.getGitlabUrl(cwd);
       const token = client.getGitlabToken(cwd);
@@ -43,39 +43,39 @@ export function main(denops: Denops): void {
       await renderBuffer(denops, selectBufferInfo("main"));
     },
 
-    async openProjectIssuePanel(): Promise<void> {
+    async "command:buffer:open:popup:issue"(): Promise<void> {
       await renderBuffer(denops, selectBufferInfo("project_issue"));
     },
 
-    async openProjectIssuesPanel(): Promise<void> {
+    async "command:buffer:open:resource:issues"(): Promise<void> {
       await renderBuffer(denops, selectBufferInfo("project_issues"));
     },
 
-    async openProjectBranchPanel(): Promise<void> {
+    async "command:buffer:open:popup:branch"(): Promise<void> {
       await renderBuffer(denops, selectBufferInfo("project_branch"));
     },
 
-    async openProjectBranchesPanel(): Promise<void> {
+    async "command:buffer:open:resource:branches"(): Promise<void> {
       await renderBuffer(denops, selectBufferInfo("project_branches"));
     },
 
-    async openProjectWikiPanel(): Promise<void> {
+    async "command:buffer:open:popup:wiki"(): Promise<void> {
       await renderBuffer(denops, selectBufferInfo("project_wiki"));
     },
 
-    async openProjectWikisPanel(): Promise<void> {
+    async "command:buffer:open:resource:wikis"(): Promise<void> {
       await renderBuffer(denops, selectBufferInfo("project_wikis"));
     },
 
-    async openProjectMergeRequestPanel(): Promise<void> {
+    async "command:buffer:open:popup:mr"(): Promise<void> {
       await renderBuffer(denops, selectBufferInfo("project_merge_request"));
     },
 
-    async openProjectMergeRequestsPanel(): Promise<void> {
+    async "command:buffer:open:resource:mrs"(): Promise<void> {
       await renderBuffer(denops, selectBufferInfo("project_merge_requests"));
     },
 
-    async openCreateNewProjectWikiBuf(): Promise<void> {
+    async "command:buffer:open:resource:wiki:new"(): Promise<void> {
       const title = await helper.input(denops, {
         prompt: "New wiki title: ",
       });
@@ -110,7 +110,7 @@ export function main(denops: Denops): void {
       await renderBuffer(denops, bufinfo);
     },
 
-    async openProjectWikiPreview(): Promise<void> {
+    async "command:buffer:open:resource:wiki:prev"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
       if (!(client.isWiki(currentNode.resource))) {
@@ -120,7 +120,7 @@ export function main(denops: Denops): void {
       await renderBuffer(denops, selectBufferInfo("wiki_preview"));
     },
 
-    async openEditProjectWikiBuf(): Promise<void> {
+    async "command:buffer:open:resource:wiki:edit"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
       if (!(client.isWiki(currentNode.resource))) {
@@ -158,7 +158,7 @@ export function main(denops: Denops): void {
       await renderBuffer(denops, bufinfo);
     },
 
-    async openProjectIssuePreview(): Promise<void> {
+    async "command:buffer:open:resource:issue:prev"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
       if (!(client.isIssue(currentNode.resource))) {
@@ -172,7 +172,7 @@ export function main(denops: Denops): void {
       await renderBuffer(denops, selectBufferInfo("issue_preview"));
     },
 
-    async openProjectIssueEditBuf(): Promise<void> {
+    async "command:buffer:open:resource:issue:edit"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
       if (!(client.isIssue(currentNode.resource))) {
@@ -208,7 +208,7 @@ export function main(denops: Denops): void {
       await renderBuffer(denops, bufinfo);
     },
 
-    async openProjectMergeRequestPreview(): Promise<void> {
+    async "command:buffer:open:resource:mr:prev"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
       if (!(client.isMergeRequest(currentNode.resource))) {
@@ -222,14 +222,14 @@ export function main(denops: Denops): void {
       await renderBuffer(denops, selectBufferInfo("merge_request_preview"));
     },
 
-    async reloadBuffer(bufnr: unknown): Promise<void> {
+    async "command:buffer:reload"(bufnr: unknown): Promise<void> {
       if (!u.isNumber(bufnr)) {
         return;
       }
       await reRenderBuffer(denops, bufnr);
     },
 
-    async updateResourceBuffer(): Promise<void> {
+    async "command:buffer:autoreload"(): Promise<void> {
       const gitlaberVar = await getGitlaberVar(denops);
       const recentInstance = gitlaberVar.recent_instance_index;
       const instance = gitlaberVar.instances[recentInstance];

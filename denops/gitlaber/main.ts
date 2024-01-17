@@ -9,7 +9,7 @@ export async function main(denops: Denops) {
     helper.define(
       "User",
       "GitlaberRecourceUpdate",
-      "call denops#notify('gitlaber', 'updateResourceBuffer', [])",
+      "call denops#notify('gitlaber', 'command:buffer:autoreload', [])",
     );
   });
   mainBuffer(denops);
