@@ -24,3 +24,20 @@ export function getUrlEncodedPath(path: string) {
     throw new Error("Failed to encode repository URL.");
   }
 }
+
+export function objectToURLSearchParams(params: { [key: string]: unknown }) {
+  // NOTE: If the object property is an array, convert the array elements as bar[]=1&bar[]=2
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((v) => {
+        searchParams.append(`${key}[]`, v.toString());
+      });
+    } else if (typeof value === "number") {
+      searchParams.append(key, value.toString());
+    } else if (typeof value === "string") {
+      searchParams.append(key, value);
+    }
+  });
+  return searchParams;
+}

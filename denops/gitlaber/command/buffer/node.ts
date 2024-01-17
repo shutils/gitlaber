@@ -2,8 +2,9 @@ import { Denops, unknownutil as u } from "../../deps.ts";
 import { Ctx, Node, NodeKind, Resource } from "../../types.ts";
 import * as client from "../../client/index.ts";
 
-import { Issue, Wiki } from "../../types.ts";
+import { isIssueGetAttributes, Issue, Wiki } from "../../types.ts";
 import { getCurrentGitlaberInstance, getCurrentNode } from "../../helper.ts";
+import { getKv } from "../../kv.ts";
 
 export const createMainPanelNodes = async (
   denops: Denops,
@@ -79,10 +80,20 @@ export const createProjectIssuesNodes = async (
     return Promise.resolve([]);
   }
   const { project, url, token } = ctx.instance;
+  const extraAttrs = await getKv(ctx.instance.cwd, "issue");
+  let attrs = {
+    id: project.id,
+  };
+  if (isIssueGetAttributes(extraAttrs.value)) {
+    attrs = {
+      ...attrs,
+      ...extraAttrs.value,
+    };
+  }
   const projectIssues = await client.getProjectIssues(
     url,
     token,
-    project.id,
+    attrs,
   );
   return Promise.resolve(createNodes(
     projectIssues,

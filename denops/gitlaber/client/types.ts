@@ -47,6 +47,24 @@ export const isCommit = u.isObjectOf({
 
 export type Commit = u.PredicateType<typeof isCommit>;
 
+const ISSUE_STATE_KINDS = [
+  "opened",
+  "closed",
+  "merged",
+  "locked",
+  "all",
+] as const;
+
+const ISSUE_SCOPE_KINDS = ["created_at", "assigned_to_me", "all"] as const;
+
+export const isIssueGetAttributes = u.isObjectOf({
+  state: u.isOptionalOf(u.isLiteralOneOf(ISSUE_STATE_KINDS)),
+  scope: u.isOptionalOf(u.isLiteralOneOf(ISSUE_SCOPE_KINDS)),
+  labels: u.isOptionalOf(u.isString),
+});
+
+export type IssueGetAttributes = u.PredicateType<typeof isIssueGetAttributes>;
+
 const isIssueState = u.isLiteralOneOf(["opened", "closed"] as const);
 
 export type IssueState = u.PredicateType<typeof isIssueState>;

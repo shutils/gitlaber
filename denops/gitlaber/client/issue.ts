@@ -1,14 +1,19 @@
 import { unknownutil as u } from "../deps.ts";
 import { request } from "./core.ts";
-import { isIssue, Issue } from "./types.ts";
+import { isIssue, Issue, IssueGetAttributes } from "./types.ts";
+import { objectToURLSearchParams } from "./helper.ts";
 
 export async function getProjectIssues(
   url: string,
   token: string,
-  projectId: number,
+  attrs: {
+    id: number | string;
+  } & IssueGetAttributes,
 ): Promise<Issue[]> {
-  const gitlabApiPath = url + "/api/v4/projects/" + projectId +
-    "/issues?state=opened";
+  const baseApiPath = `${url}/api/v4/projects/${attrs.id}/issues`;
+
+  const queryPrams = objectToURLSearchParams(attrs);
+  const gitlabApiPath = baseApiPath + "?" + queryPrams;
   const res = await request(gitlabApiPath, token, "GET");
   const issues = await res.json();
   if (!u.isArrayOf(isIssue)(issues)) {
