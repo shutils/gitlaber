@@ -9,3 +9,4 @@ export * as option from "https://deno.land/x/denops_std@v5.2.0/option/mod.ts";
 export * as vars from "https://deno.land/x/denops_std@v5.2.0/variable/mod.ts";
 
 export * as unknownutil from "https://deno.land/x/unknownutil@v3.13.0/mod.ts";
+export * as fs from "https://deno.land/std@0.212.0/fs/mod.ts";
