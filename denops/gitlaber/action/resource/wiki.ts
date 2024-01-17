@@ -1,6 +1,7 @@
 import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
+import { isWiki } from "../../types.ts";
 import { getCurrentNode } from "../../helper.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
@@ -117,7 +118,7 @@ export function main(denops: Denops): void {
         if (!("wiki" in currentNode)) {
           return;
         }
-        if (!(client.isWiki(currentNode.resource))) {
+        if (!(isWiki(currentNode.resource))) {
           helper.echo(denops, "This node is not a wiki.");
           return;
         }

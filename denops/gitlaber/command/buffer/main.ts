@@ -12,14 +12,15 @@ import {
 } from "../../helper.ts";
 import { selectBufferInfo } from "./config.ts";
 import { renderBuffer, reRenderBuffer } from "./core.ts";
+import { getGitlabToken, getGitlabUrl } from "../../helper.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     async "command:buffer:open:popup:main"(): Promise<void> {
       const cwd = await fn.getcwd(denops);
-      const url = client.getGitlabUrl(cwd);
-      const token = client.getGitlabToken(cwd);
+      const url = getGitlabUrl(cwd);
+      const token = getGitlabToken(cwd);
       const singleProject = await client.getSingleProject(url, token, cwd);
       const gitlaberVar = await getGitlaberVar(denops);
       const bufnr = await fn.bufnr(denops);
@@ -113,7 +114,7 @@ export function main(denops: Denops): void {
     async "command:buffer:open:resource:wiki:prev"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
-      if (!(client.isWiki(currentNode.resource))) {
+      if (!(types.isWiki(currentNode.resource))) {
         helper.echo(denops, "This node is not a wiki.");
         return;
       }
@@ -123,7 +124,7 @@ export function main(denops: Denops): void {
     async "command:buffer:open:resource:wiki:edit"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
-      if (!(client.isWiki(currentNode.resource))) {
+      if (!(types.isWiki(currentNode.resource))) {
         helper.echo(denops, "This node is not a wiki.");
         return;
       }
@@ -161,7 +162,7 @@ export function main(denops: Denops): void {
     async "command:buffer:open:resource:issue:prev"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
-      if (!(client.isIssue(currentNode.resource))) {
+      if (!(types.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
@@ -175,7 +176,7 @@ export function main(denops: Denops): void {
     async "command:buffer:open:resource:issue:edit"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
-      if (!(client.isIssue(currentNode.resource))) {
+      if (!(types.isIssue(currentNode.resource))) {
         helper.echo(denops, "This node is not an issue.");
         return;
       }
@@ -211,7 +212,7 @@ export function main(denops: Denops): void {
     async "command:buffer:open:resource:mr:prev"(): Promise<void> {
       const ctx = await getCtx(denops);
       const currentNode = await getCurrentNode(denops, ctx);
-      if (!(client.isMergeRequest(currentNode.resource))) {
+      if (!(types.isMergeRequest(currentNode.resource))) {
         helper.echo(denops, "This node is not a merge request.");
         return;
       }

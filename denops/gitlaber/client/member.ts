@@ -1,14 +1,6 @@
 import { unknownutil as u } from "../deps.ts";
-import { request } from "./util.ts";
-
-export const isMember = u.isObjectOf({
-  id: u.isNumber,
-  username: u.isString,
-  name: u.isString,
-  ...u.isUnknown,
-});
-
-export type Member = u.PredicateType<typeof isMember>;
+import { request } from "./core.ts";
+import { isMember } from "./types.ts";
 
 export async function requestGetProjectMembers(
   url: string,

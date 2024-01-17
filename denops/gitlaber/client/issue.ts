@@ -1,31 +1,6 @@
 import { unknownutil as u } from "../deps.ts";
-import { request } from "./util.ts";
-
-const isIssueState = u.isLiteralOneOf(["opened", "closed"] as const);
-
-export type IssueState = u.PredicateType<typeof isIssueState>;
-
-export const isIssue = u.isObjectOf({
-  id: u.isNumber,
-  iid: u.isNumber,
-  description: u.isOneOf([u.isString, u.isNull]),
-  state: isIssueState,
-  labels: u.isArrayOf(u.isString),
-  title: u.isString,
-  created_at: u.isString,
-  updated_at: u.isString,
-  web_url: u.isString,
-  _links: u.isObjectOf({
-    self: u.isString,
-    notes: u.isString,
-    award_emoji: u.isString,
-    project: u.isString,
-    ...u.isUnknown,
-  }),
-  ...u.isUnknown,
-});
-
-export type Issue = u.PredicateType<typeof isIssue>;
+import { request } from "./core.ts";
+import { isIssue, Issue } from "./types.ts";
 
 export async function getProjectIssues(
   url: string,

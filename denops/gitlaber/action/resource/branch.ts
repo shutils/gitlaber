@@ -1,5 +1,6 @@
 import { Denops, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
+import { isIssue } from "../../types.ts";
 import { getCurrentNode } from "../../helper.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
@@ -11,7 +12,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, ctx) => {
         const { instance } = ctx;
         const currentNode = await getCurrentNode(denops, ctx);
-        if (!(client.isIssue(currentNode.resource))) {
+        if (!(isIssue(currentNode.resource))) {
           helper.echo(denops, "This node is not an issue.");
           return;
         }

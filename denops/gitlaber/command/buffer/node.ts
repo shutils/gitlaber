@@ -2,7 +2,7 @@ import { Denops, unknownutil as u } from "../../deps.ts";
 import { Ctx, Node, NodeKind, Resource } from "../../types.ts";
 import * as client from "../../client/index.ts";
 
-import { Issue, Wiki } from "../../client/index.ts";
+import { Issue, Wiki } from "../../types.ts";
 import { getCurrentGitlaberInstance, getCurrentNode } from "../../helper.ts";
 
 export const createMainPanelNodes = async (

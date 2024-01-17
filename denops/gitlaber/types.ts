@@ -5,7 +5,8 @@ import {
   isMergeRequest,
   isProject,
   isWiki,
-} from "./client/index.ts";
+} from "./client/types.ts";
+export * from "./client/types.ts";
 
 const isGitlaberState = u.isObjectOf({
   has_main_panel: u.isBoolean,

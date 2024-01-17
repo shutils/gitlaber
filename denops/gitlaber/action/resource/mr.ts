@@ -1,5 +1,6 @@
 import { autocmd, Denops, fn, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
+import { isBranch, isMergeRequest } from "../../types.ts";
 import * as util from "../../util.ts";
 import {
   getCtx,
@@ -16,7 +17,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, ctx) => {
         const { instance } = ctx;
         const currentNode = await getCurrentNode(denops, ctx);
-        if (!(client.isBranch(currentNode.resource))) {
+        if (!(isBranch(currentNode.resource))) {
           helper.echo(denops, "This node is not a branch.");
           return;
         }
@@ -86,7 +87,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, ctx) => {
         const { instance } = ctx;
         const currentNode = await getCurrentNode(denops, ctx);
-        if (!(client.isMergeRequest(currentNode.resource))) {
+        if (!(isMergeRequest(currentNode.resource))) {
           helper.echo(denops, "This node is not a merge request.");
           return;
         }
@@ -117,7 +118,7 @@ export function main(denops: Denops): void {
       doAction(denops, async (denops, ctx) => {
         const { instance } = ctx;
         const currentNode = await getCurrentNode(denops, ctx);
-        if (!(client.isMergeRequest(currentNode.resource))) {
+        if (!(isMergeRequest(currentNode.resource))) {
           helper.echo(denops, "This node is not a merge request.");
           return;
         }
@@ -186,7 +187,7 @@ async function assignMergeRequestMember(
   const ctx = await getCtx(denops);
   const { instance } = ctx;
   const currentNode = await getCurrentNode(denops, ctx);
-  if (!(client.isMergeRequest(currentNode.resource))) {
+  if (!(isMergeRequest(currentNode.resource))) {
     helper.echo(denops, "This node is not a merge request.");
     return;
   }

@@ -6,7 +6,7 @@ import {
   isIssue,
   isMergeRequest,
   isWiki,
-} from "../../client/index.ts";
+} from "../../types.ts";
 import { openWithBrowser } from "./core.ts";
 
 export function main(denops: Denops): void {

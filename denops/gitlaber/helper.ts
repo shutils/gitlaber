@@ -1,4 +1,5 @@
 import { Denops, fn, unknownutil as u, vars } from "./deps.ts";
+import { GITLAB_DEFAULT_URL } from "./constant.ts";
 
 import {
   Ctx,
@@ -99,3 +100,47 @@ export const updateGitlaberInstanceRecentResource = async (
   gitlaberVar.instances[index].recent_resource = kind;
   await setGitlaberVar(denops, gitlaberVar);
 };
+
+export function getGitlabUrl(cwd?: string) {
+  try {
+    return exec("git", ["config", "--get", "gitlab.url"], cwd);
+  } catch {
+    const url = Deno.env.get("GITLAB_URL");
+    if (url) {
+      return url;
+    } else {
+      return GITLAB_DEFAULT_URL;
+    }
+  }
+}
+
+export function getGitlabToken(cwd?: string) {
+  try {
+    return exec("git", ["config", "--get", "gitlab.token"], cwd);
+  } catch {
+    const token = Deno.env.get("GITLAB_TOKEN");
+    if (token) {
+      return token;
+    } else {
+      throw new Error("Unable to get GitLab token");
+    }
+  }
+}
+
+export function exec(cmd: string, args: string[], cwd?: string) {
+  const result = new Deno.Command(cmd, {
+    args: args,
+    cwd: cwd,
+  });
+  const { success, stdout, stderr } = result.outputSync();
+  if (success === true) {
+    const std = new TextDecoder().decode(stdout).replace(/\n/g, "");
+    return std;
+  } else {
+    throw new Error(
+      `An error occurred while executing the command (${cmd}). reason: ${
+        new TextDecoder().decode(stderr)
+      }`,
+    );
+  }
+}

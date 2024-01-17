@@ -7,4 +7,4 @@ export * from "./wiki.ts";
 export * from "./member.ts";
 export * from "./label.ts";
 
-export * from "./util.ts";
+export * from "./helper.ts";
