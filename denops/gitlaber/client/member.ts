@@ -2,7 +2,7 @@ import { unknownutil as u } from "../deps.ts";
 import { request } from "./core.ts";
 import { isMember } from "./types.ts";
 
-export async function requestGetProjectMembers(
+export async function getProjectMembers(
   url: string,
   token: string,
   attrs: {

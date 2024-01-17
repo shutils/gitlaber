@@ -2,7 +2,7 @@ import { unknownutil as u } from "../deps.ts";
 import { request } from "./core.ts";
 import { isMergeRequest, MergeRequest } from "./types.ts";
 
-export async function requestCreateMergeRequest(
+export async function createProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
@@ -49,7 +49,7 @@ export async function getProjectMergeRequests(
   return mrs;
 }
 
-export async function requestEditMergeRequest(
+export async function editProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
@@ -82,7 +82,7 @@ export async function requestEditMergeRequest(
   }
 }
 
-export async function requestApproveMergeRequest(
+export async function approveProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
@@ -105,7 +105,7 @@ export async function requestApproveMergeRequest(
   }
 }
 
-export async function requestMergeMergeRequest(
+export async function mergeProjectMergeRequest(
   url: string,
   token: string,
   attrs: {

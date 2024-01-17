@@ -17,7 +17,7 @@ export async function getProjectIssues(
   return issues;
 }
 
-export async function requestCreateNewProjectIssue(
+export async function createProjectIssue(
   url: string,
   token: string,
   attributes: {
@@ -39,7 +39,7 @@ export async function requestCreateNewProjectIssue(
   }
 }
 
-export async function requestDeleteIssue(
+export async function deleteProjectIssue(
   url: string,
   token: string,
   attrs: {
@@ -55,7 +55,7 @@ export async function requestDeleteIssue(
   }
 }
 
-export async function requestEditIssue(
+export async function editProjectIssue(
   url: string,
   token: string,
   attrs: {

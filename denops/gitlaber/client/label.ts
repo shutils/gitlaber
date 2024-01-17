@@ -2,7 +2,7 @@ import { unknownutil as u } from "../deps.ts";
 import { request } from "./core.ts";
 import { isProjectLabel } from "./types.ts";
 
-export async function requestGetProjectLabels(
+export async function getProjectLabels(
   url: string,
   token: string,
   attrs: {

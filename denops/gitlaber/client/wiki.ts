@@ -1,45 +1,15 @@
-import { unknownutil as u } from "../deps.ts";
 import { request } from "./core.ts";
 import { Wiki } from "./types.ts";
-
-const isWikiGetAttributes = u.isObjectOf({
-  id: u.isNumber,
-  slug: u.isString,
-  render_html: u.isOptionalOf(u.isBoolean),
-  version: u.isOptionalOf(u.isString),
-  ...u.isUnknown,
-});
-
-export type WikiGetAttributes = u.PredicateType<typeof isWikiGetAttributes>;
-
-const isWikiGetPageAttributes = u.isObjectOf({
-  id: u.isNumber,
-  with_content: u.isOptionalOf(u.isBoolean),
-  ...u.isUnknown,
-});
-
-export type WikisGetAttributes = u.PredicateType<
-  typeof isWikiGetPageAttributes
->;
-
-const isWikiCreateAttributes = u.isObjectOf({
-  id: u.isNumber,
-  content: u.isString,
-  title: u.isString,
-  format: u.isOptionalOf(
-    u.isLiteralOneOf(["markdown", "rdoc", "asciidoc", "org"] as const),
-  ),
-  ...u.isUnknown,
-});
-
-export type WikiCreateAttributes = u.PredicateType<
-  typeof isWikiCreateAttributes
->;
 
 export async function requestCreateNewProjectWiki(
   url: string,
   token: string,
-  attrs: WikiCreateAttributes,
+  attrs: {
+    id: number;
+    content: string;
+    title: string;
+    format?: "markdown" | "rdoc" | "asciidoc" | "org";
+  },
 ): Promise<void> {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/wikis`;
   const res = await request(
@@ -56,7 +26,10 @@ export async function requestCreateNewProjectWiki(
 export async function getProjectWikis(
   url: string,
   token: string,
-  attrs: WikisGetAttributes,
+  attrs: {
+    id: number;
+    with_content?: boolean;
+  },
 ): Promise<Wiki[]> {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis?with_content=1`;
@@ -64,7 +37,7 @@ export async function getProjectWikis(
   return res.json();
 }
 
-export async function requestEditWiki(
+export async function editProjectWiki(
   url: string,
   token: string,
   attrs: {
@@ -84,7 +57,7 @@ export async function requestEditWiki(
   }
 }
 
-export async function requestDeleteWiki(
+export async function deleteProjectWiki(
   url: string,
   token: string,
   attrs: {

@@ -21,7 +21,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestCreateNewProjectIssue,
+          client.createProjectIssue,
           url,
           token,
           {
@@ -52,7 +52,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestDeleteIssue,
+          client.deleteProjectIssue,
           instance.url,
           instance.token,
           {
@@ -80,7 +80,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestEditIssue,
+          client.editProjectIssue,
           instance.url,
           instance.token,
           {
@@ -102,7 +102,7 @@ export function main(denops: Denops): void {
           helper.echo(denops, "This node is not an issue.");
           return;
         }
-        const members = await client.requestGetProjectMembers(
+        const members = await client.getProjectMembers(
           instance.url,
           instance.token,
           {
@@ -125,7 +125,7 @@ export function main(denops: Denops): void {
         const { iid } = currentNode.resource;
         await executeRequest(
           denops,
-          client.requestEditIssue,
+          client.editProjectIssue,
           instance.url,
           instance.token,
           {
@@ -147,7 +147,7 @@ export function main(denops: Denops): void {
           helper.echo(denops, "This node is not an issue.");
           return;
         }
-        const labels = await client.requestGetProjectLabels(
+        const labels = await client.getProjectLabels(
           instance.url,
           instance.token,
           {
@@ -170,7 +170,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestEditIssue,
+          client.editProjectIssue,
           instance.url,
           instance.token,
           {
@@ -209,7 +209,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestEditIssue,
+          client.editProjectIssue,
           instance.url,
           instance.token,
           {
@@ -257,7 +257,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestEditIssue,
+          client.editProjectIssue,
           url,
           token,
           {

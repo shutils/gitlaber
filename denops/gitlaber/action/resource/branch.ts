@@ -35,7 +35,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestCreateIssueBranch,
+          client.createProjectBranch,
           instance.url,
           instance.token,
           {

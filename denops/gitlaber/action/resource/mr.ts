@@ -23,7 +23,7 @@ export function main(denops: Denops): void {
         }
         const currentBranch = currentNode.resource.name;
         const commitId = currentNode.resource.commit.short_id;
-        const commit = await client.requestGetCommit(
+        const commit = await client.getProjectCommit(
           instance.url,
           instance.token,
           {
@@ -56,7 +56,7 @@ export function main(denops: Denops): void {
         }
         executeRequest(
           denops,
-          client.requestCreateMergeRequest,
+          client.createProjectMergeRequest,
           instance.url,
           instance.token,
           {
@@ -99,7 +99,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestApproveMergeRequest,
+          client.approveProjectMergeRequest,
           instance.url,
           instance.token,
           {
@@ -152,7 +152,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestMergeMergeRequest,
+          client.mergeProjectMergeRequest,
           instance.url,
           instance.token,
           {
@@ -191,7 +191,7 @@ async function assignMergeRequestMember(
     helper.echo(denops, "This node is not a merge request.");
     return;
   }
-  const members = await client.requestGetProjectMembers(
+  const members = await client.getProjectMembers(
     instance.url,
     instance.token,
     {
@@ -224,7 +224,7 @@ async function assignMergeRequestMember(
   }
   await executeRequest(
     denops,
-    client.requestEditMergeRequest,
+    client.editProjectMergeRequest,
     instance.url,
     instance.token,
     {

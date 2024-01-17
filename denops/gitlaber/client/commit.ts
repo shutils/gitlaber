@@ -1,7 +1,7 @@
 import { request } from "./core.ts";
 import { isCommit } from "./types.ts";
 
-export async function requestGetCommit(
+export async function getProjectCommit(
   url: string,
   token: string,
   attrs: {

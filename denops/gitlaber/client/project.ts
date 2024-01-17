@@ -2,7 +2,7 @@ import { request } from "./core.ts";
 import { getRemoteUrl, getUrlEncodedPath } from "./helper.ts";
 import { isProject, Project } from "./types.ts";
 
-export async function getSingleProject(
+export async function getProject(
   url: string,
   token: string,
   cwd?: string,

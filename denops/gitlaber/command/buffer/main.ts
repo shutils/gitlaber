@@ -21,7 +21,7 @@ export function main(denops: Denops): void {
       const cwd = await fn.getcwd(denops);
       const url = getGitlabUrl(cwd);
       const token = getGitlabToken(cwd);
-      const singleProject = await client.getSingleProject(url, token, cwd);
+      const singleProject = await client.getProject(url, token, cwd);
       const gitlaberVar = await getGitlaberVar(denops);
       const bufnr = await fn.bufnr(denops);
       try {

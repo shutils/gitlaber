@@ -95,7 +95,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestEditWiki,
+          client.editProjectWiki,
           url,
           token,
           {
@@ -132,7 +132,7 @@ export function main(denops: Denops): void {
         }
         await executeRequest(
           denops,
-          client.requestDeleteWiki,
+          client.deleteProjectWiki,
           instance.url,
           instance.token,
           {

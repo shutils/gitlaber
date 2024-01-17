@@ -39,7 +39,7 @@ export async function getProjectBranches(
   return branches;
 }
 
-export async function requestCreateIssueBranch(
+export async function createProjectBranch(
   url: string,
   token: string,
   attrs: {
