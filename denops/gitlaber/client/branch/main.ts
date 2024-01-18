@@ -1,5 +1,5 @@
-import { unknownutil as u } from "../deps.ts";
-import { request } from "./core.ts";
+import { unknownutil as u } from "../../deps.ts";
+import { request } from "../core.ts";
 import { Branch, isBranch } from "./types.ts";
 
 export async function getProjectBranch(

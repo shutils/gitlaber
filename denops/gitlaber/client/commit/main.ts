@@ -1,4 +1,4 @@
-import { request } from "./core.ts";
+import { request } from "../core.ts";
 import { isCommit } from "./types.ts";
 
 export async function getProjectCommit(

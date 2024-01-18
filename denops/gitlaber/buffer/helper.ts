@@ -1,5 +1,4 @@
 import { Denops, fn, unknownutil as u } from "../../deps.ts";
-import { BufferInfo } from "../../types.ts";
 
 export const setNofile = async (denops: Denops, bufnr: number) => {
   await fn.setbufvar(

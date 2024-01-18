@@ -1,7 +1,7 @@
-import { unknownutil as u } from "../deps.ts";
-import { request } from "./core.ts";
+import { unknownutil as u } from "../../deps.ts";
+import { request } from "../core.ts";
 import { isIssue, Issue, IssueGetAttributes } from "./types.ts";
-import { objectToURLSearchParams } from "./helper.ts";
+import { objectToURLSearchParams } from "../helper.ts";
 
 export async function getProjectIssues(
   url: string,

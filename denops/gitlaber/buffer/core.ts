@@ -97,7 +97,7 @@ async function drawBuffer(
   denops: Denops,
   nodes: types.Node[],
   bufnr: number,
-  keymaps: types.Mapping[],
+  keymaps: types.Keymap[],
   option?: types.BufferOptions,
 ) {
   await setModifiable(denops, bufnr);
