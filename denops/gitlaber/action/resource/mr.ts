@@ -1,31 +1,33 @@
-import { autocmd, Denops, fn, helper } from "../../deps.ts";
+import { Denops, fn, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import { isBranch, isMergeRequest } from "../../types.ts";
-import * as util from "../../util.ts";
 import {
-  getCtx,
-  getCurrentNode,
-  updateGitlaberInstanceRecentResource,
-} from "../../helper.ts";
+  Branch,
+  Context,
+  isBranch,
+  isMergeRequest,
+  MergeRequest,
+  Node,
+} from "../../types.ts";
+import * as util from "../../util.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
+import { validateNodeParams } from "../../node/helper.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "action:resource:mr:new:relate:branch": () => {
-      doAction(denops, async (denops, ctx) => {
-        const { instance } = ctx;
-        const currentNode = await getCurrentNode(denops, ctx);
-        if (!(isBranch(currentNode.resource))) {
-          helper.echo(denops, "This node is not a branch.");
+      doAction(denops, async (args) => {
+        const { instance, node, url, token } = args;
+        const branch = node.params;
+        if (!validateNodeParams<Branch>(branch, isBranch)) {
           return;
         }
-        const currentBranch = currentNode.resource.name;
-        const commitId = currentNode.resource.commit.short_id;
+        const currentBranch = branch.name;
+        const commitId = branch.commit.short_id;
         const commit = await client.getProjectCommit(
-          instance.url,
-          instance.token,
+          url,
+          token,
           {
             id: instance.project.id,
             sha: commitId,
@@ -57,8 +59,8 @@ export function main(denops: Denops): void {
         executeRequest(
           denops,
           client.createProjectMergeRequest,
-          instance.url,
-          instance.token,
+          url,
+          token,
           {
             id: instance.project.id,
             title: title,
@@ -66,29 +68,27 @@ export function main(denops: Denops): void {
             target_branch: terget,
           },
           "Successfully created a new merge request.",
-          "merge_request",
         );
       });
     },
 
     "action:resource:mr:assign:assignee": () => {
-      doAction(denops, async (denops, _ctx) => {
-        await assignMergeRequestMember(denops, "assignee");
+      doAction(denops, async (args) => {
+        await assignMergeRequestMember(args, "assignee");
       });
     },
 
     "action:resource:mr:assign:reviewer": () => {
-      doAction(denops, async (denops, _ctx) => {
-        await assignMergeRequestMember(denops, "reviewer");
+      doAction(denops, async (args) => {
+        await assignMergeRequestMember(args, "reviewer");
       });
     },
 
     "action:resource:mr:approve": () => {
-      doAction(denops, async (denops, ctx) => {
-        const { instance } = ctx;
-        const currentNode = await getCurrentNode(denops, ctx);
-        if (!(isMergeRequest(currentNode.resource))) {
-          helper.echo(denops, "This node is not a merge request.");
+      doAction(denops, async (args) => {
+        const { instance, node, url, token } = args;
+        const mr = node.params;
+        if (!validateNodeParams<MergeRequest>(mr, isMergeRequest)) {
           return;
         }
         const confirm = await helper.input(denops, {
@@ -100,26 +100,22 @@ export function main(denops: Denops): void {
         await executeRequest(
           denops,
           client.approveProjectMergeRequest,
-          instance.url,
-          instance.token,
+          url,
+          token,
           {
             id: instance.project.id,
-            merge_request_iid: currentNode.resource.iid,
+            merge_request_iid: mr.iid,
           },
           "Successfully approve a merge request.",
-          "merge_request",
         );
-        await updateGitlaberInstanceRecentResource(denops, "merge_request");
-        autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
       });
     },
 
     "action:resource:mr:merge": () => {
-      doAction(denops, async (denops, ctx) => {
-        const { instance } = ctx;
-        const currentNode = await getCurrentNode(denops, ctx);
-        if (!(isMergeRequest(currentNode.resource))) {
-          helper.echo(denops, "This node is not a merge request.");
+      doAction(denops, async (args) => {
+        const { instance, node, url, token } = args;
+        const mr = node.params;
+        if (!validateNodeParams<MergeRequest>(mr, isMergeRequest)) {
           return;
         }
         const confirm = await helper.input(denops, {
@@ -137,11 +133,11 @@ export function main(denops: Denops): void {
         let squash_commit_message: string | undefined;
         if (squash === "y") {
           const branch = await client.getProjectBranch(
-            instance.url,
-            instance.token,
+            url,
+            token,
             {
               id: instance.project.id,
-              branch: currentNode.resource.source_branch,
+              branch: mr.source_branch,
             },
           );
           const input = await helper.input(denops, {
@@ -153,23 +149,23 @@ export function main(denops: Denops): void {
         await executeRequest(
           denops,
           client.mergeProjectMergeRequest,
-          instance.url,
-          instance.token,
+          url,
+          token,
           {
             id: instance.project.id,
-            merge_request_iid: currentNode.resource.iid,
+            merge_request_iid: mr.iid,
             should_remove_source_branch: remove_source_branch === "y",
             squash: squash === "y",
             squash_commit_message: squash_commit_message,
           },
           "Successfully merge a merge request.",
-          "merge_request",
         );
       });
     },
 
     "action:resource:mr:prev": () => {
-      doAction(denops, async (denops, _ctx) => {
+      doAction(denops, async (args) => {
+        const { denops } = args;
         await fn.call(denops, "denops#notify", [
           "gitlaber",
           "command:buffer:open:resource:mr:prev",
@@ -181,19 +177,17 @@ export function main(denops: Denops): void {
 }
 
 async function assignMergeRequestMember(
-  denops: Denops,
+  args: Context & { node: Node },
   role: "assignee" | "reviewer",
 ) {
-  const ctx = await getCtx(denops);
-  const { instance } = ctx;
-  const currentNode = await getCurrentNode(denops, ctx);
-  if (!(isMergeRequest(currentNode.resource))) {
-    helper.echo(denops, "This node is not a merge request.");
+  const { denops, instance, node, url, token } = args;
+  const mr = node.params;
+  if (!validateNodeParams<MergeRequest>(mr, isMergeRequest)) {
     return;
   }
   const members = await client.getProjectMembers(
-    instance.url,
-    instance.token,
+    url,
+    token,
     {
       id: instance.project.id,
     },
@@ -211,7 +205,6 @@ async function assignMergeRequestMember(
   if (!labelIndex) {
     return;
   }
-  const { iid } = currentNode.resource;
   let extraAttrs: object;
   if (role === "assignee") {
     extraAttrs = {
@@ -225,14 +218,13 @@ async function assignMergeRequestMember(
   await executeRequest(
     denops,
     client.editProjectMergeRequest,
-    instance.url,
-    instance.token,
+    url,
+    token,
     {
       id: instance.project.id,
-      merge_request_iid: iid,
+      merge_request_iid: mr.iid,
       ...extraAttrs,
     },
     "Successfully assine a member.",
-    "merge_request",
   );
 }

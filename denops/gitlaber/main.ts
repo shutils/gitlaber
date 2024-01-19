@@ -1,6 +1,6 @@
 import { autocmd, Denops } from "./deps.ts";
 
-import { main as mainBuffer } from "./command/buffer/main.ts";
+import { main as mainBuffer } from "./buffer/main.ts";
 import { main as mainAction } from "./action/main.ts";
 import { initKv } from "./kv.ts";
 

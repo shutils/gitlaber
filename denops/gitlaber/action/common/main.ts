@@ -1,20 +1,29 @@
 import { Denops, helper } from "../../deps.ts";
+
+import { getBuffer } from "../../helper.ts";
+import { getBufferConfig } from "../../buffer/helper.ts";
 import { doAction } from "../main.ts";
-import { getBufferInfo } from "../../command/buffer/helper.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "action:common:echo:node": () => {
-      doAction(denops, async (denops, ctx) => {
-        await helper.echo(denops, Deno.inspect(ctx, { depth: Infinity }));
+      doAction(denops, async (args) => {
+        const { denops, node } = args;
+        await helper.echo(denops, Deno.inspect(node, { depth: Infinity }));
       });
     },
 
     "action:common:echo:keymaps": () => {
-      doAction(denops, async (denops, _ctx) => {
-        const info = await getBufferInfo(denops);
-        const keymaps = info.keymaps;
+      doAction(denops, async (args) => {
+        const { denops } = args;
+        const buffer = await getBuffer(denops);
+        const config = getBufferConfig(buffer.kind);
+        const keymaps = config.keymaps;
+        if (!keymaps) {
+          helper.echo(denops, "This buffer has no keymaps.");
+          return;
+        }
         const rows: string[] = [];
         const keyColumn = "Key(s)";
         const commandColumn = "Command";

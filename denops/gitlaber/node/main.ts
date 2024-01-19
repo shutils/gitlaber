@@ -1,37 +1,27 @@
 import { Denops, unknownutil as u } from "../deps.ts";
 import * as client from "../client/index.ts";
 
-import { Instance, Node, NodeParam } from "../types.ts";
-import {
-  getCurrentInstance,
-  getCurrentNode,
-  getGitlabToken,
-  getGitlabUrl,
-} from "../helper.ts";
+import { Context, Node, NodeParam } from "../types.ts";
+import { getContext, getCurrentNode } from "../helper.ts";
 // import { getKv } from "../../kv.ts";
 
 async function makeNode(
   denops: Denops,
   callback: (
-    args: {
-      denops: Denops;
-      instance: Instance;
-      node: Node;
-      url: string;
-      token: string;
-    },
+    args: Context & { node?: Node },
   ) => Promise<Node[]>,
 ) {
-  const instance = await getCurrentInstance(denops);
-  const node = await getCurrentNode(denops);
-  const url = getGitlabUrl(instance.cwd);
-  const token = getGitlabToken(instance.cwd);
+  const ctx = await getContext(denops);
+
+  let node: Node | undefined;
+  try {
+    node = await getCurrentNode(denops);
+  } catch {
+    node = undefined;
+  }
   return callback({
-    denops,
-    instance,
-    node,
-    url,
-    token,
+    ...ctx,
+    node: node,
   });
 }
 
@@ -152,22 +142,58 @@ export const createProjectWikiNodes = async (
 
 export const createDescriptionNodes = async (
   denops: Denops,
+  seed?: Node,
 ) => {
-  return await makeNode(denops, async (args) => {
-    const { node } = args;
+  return await makeNode(denops, async (_args) => {
     if (
       !u.isObjectOf({
         description: u.isString,
         ...u.isUnknown,
-      })(node.params)
+      })(seed?.params)
     ) {
       throw new Error("This node has not description.");
     }
     const nodes: Array<Node> = [];
-    if (node.params.description === null) {
+    if (seed.params.description === null) {
       return nodes;
     }
-    const lines = node.params.description.split("\n");
+    const lines = seed.params.description.split("\n");
+    lines.map((line) => {
+      nodes.push({
+        display: line,
+      });
+    });
+    return await Promise.resolve(nodes);
+  });
+};
+
+export const createDescriptionEditNodes = async (
+  denops: Denops,
+  seed?: Node,
+) => {
+  return await makeNode(denops, async (_args) => {
+    let params: {
+      description: string;
+    }
+    if (
+      !u.isObjectOf({
+        description: u.isString,
+        ...u.isUnknown,
+      })(seed?.params)
+    ) {
+      params = {
+        description: "",
+      };
+    } else {
+      params = {
+        description: seed.params.description,
+      };
+    }
+    const nodes: Array<Node> = [];
+    if (params.description === null) {
+      return nodes;
+    }
+    const lines = params.description.split("\n");
     lines.map((line) => {
       nodes.push({
         display: line,
@@ -191,22 +217,22 @@ export const createProjectWikiPanelNodes = async (
 
 export const createContentNodes = async (
   denops: Denops,
+  seed?: Node,
 ) => {
-  return await makeNode(denops, async (args) => {
-    const { node } = args;
+  return await makeNode(denops, async (_args) => {
     if (
       !u.isObjectOf({
         content: u.isString,
         ...u.isUnknown,
-      })(node.params)
+      })(seed?.params)
     ) {
       throw new Error("This node has not content.");
     }
-    const nodes: Array<Node> = [];
-    if (node.params.content === null) {
+    const nodes: Node[] = [];
+    if (seed.params.content === null) {
       return nodes;
     }
-    const lines = node.params.content.split("\n");
+    const lines = seed.params.content.split("\n");
     lines.map((line) => {
       nodes.push({
         display: line,
@@ -262,6 +288,9 @@ export const createNodes = (
   columns.forEach((column) => {
     maxColumnWidths[column] = Math.max(column.length, 1);
     resources.forEach((resource) => {
+      if (!resource) {
+        return;
+      }
       const prop = resource[column as keyof typeof resource];
       if (u.isObjectOf({ ...u.isUnknown })(prop)) {
         throw new Error(
@@ -296,6 +325,9 @@ export const createNodes = (
   resources.forEach((resource: NodeParam) => {
     let display = "";
     columns.forEach((column, index) => {
+      if (!resource) {
+        return;
+      }
       let value: string;
       const prop = resource[column as keyof typeof resource];
       if (

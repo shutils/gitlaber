@@ -1,4 +1,6 @@
 import { unknownutil as u } from "../deps.ts";
+
+import { isWiki } from "../client/types.ts";
 import {
   isBranch,
   isCommit,
@@ -7,7 +9,6 @@ import {
   isMergeRequest,
   isProject,
   isProjectLabel,
-  isWiki,
 } from "../types.ts";
 
 export const isNodeParam = u.isOptionalOf(u.isOneOf([

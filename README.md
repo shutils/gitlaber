@@ -80,39 +80,41 @@ Each panel has a default keymap.
 | Function                 | Key map | Implemented        |
 | ------------------------ | ------- | ------------------ |
 | Open issue list          | l       | :white_check_mark: |
-| Create new project issue | n       | :white_check_mark: |
+| Create new project issue | N       | :white_check_mark: |
 | Quit                     | q       | :white_check_mark: |
 
 #### Issue list panel
 
-| Function              | Key map | Implemented        |
-| --------------------- | ------- | ------------------ |
-| Preview project issue | p       | :white_check_mark: |
-| Edit project issue    | e       | :white_check_mark: |
-| Delete project issue  | d       | :white_check_mark: |
-| Reload project issue  | R       | :white_check_mark: |
-| Quit                  | q       | :white_check_mark: |
-| Create issue branch   | b       | :white_check_mark: |
-| Open in browser       | o       | :white_check_mark: |
+| Function                 | Key map | Implemented        |
+| ------------------------ | ------- | ------------------ |
+| Preview project issue    | p       | :white_check_mark: |
+| Edit project issue       | e       | :white_check_mark: |
+| Delete project issue     | d       | :white_check_mark: |
+| Reload project issue     | R       | :white_check_mark: |
+| Quit                     | q       | :white_check_mark: |
+| Create issue branch      | b       | :white_check_mark: |
+| Open in browser          | o       | :white_check_mark: |
+| Create new project issue | N       | :white_check_mark: |
 
 #### Wiki panel
 
 | Function                | Key map | Implemented        |
 | ----------------------- | ------- | ------------------ |
 | Open wiki list          | l       | :white_check_mark: |
-| Create new project wiki | n       | :white_check_mark: |
+| Create new project wiki | N       | :white_check_mark: |
 | Quit                    | q       | :white_check_mark: |
 
 #### Wiki list panel
 
-| Function             | Key map | Implemented        |
-| -------------------- | ------- | ------------------ |
-| Preview project wiki | p       | :white_check_mark: |
-| Edit project wiki    | e       | :white_check_mark: |
-| Delete project wiki  | d       | :white_check_mark: |
-| Reload project wiki  | R       | :white_check_mark: |
-| Quit                 | q       | :white_check_mark: |
-| Open in browser      | o       | :white_check_mark: |
+| Function                | Key map | Implemented        |
+| ----------------------- | ------- | ------------------ |
+| Preview project wiki    | p       | :white_check_mark: |
+| Edit project wiki       | e       | :white_check_mark: |
+| Delete project wiki     | d       | :white_check_mark: |
+| Reload project wiki     | R       | :white_check_mark: |
+| Quit                    | q       | :white_check_mark: |
+| Open in browser         | o       | :white_check_mark: |
+| Create new project wiki | N       | :white_check_mark: |
 
 #### Branch panel
 

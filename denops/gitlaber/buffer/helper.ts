@@ -1,4 +1,7 @@
-import { Denops, fn, unknownutil as u } from "../../deps.ts";
+import { Denops, fn } from "../deps.ts";
+
+import { BUFFER_CONFIGS } from "./config.ts";
+import { BufferKind, BufferOptions } from "./types.ts";
 
 export const setNofile = async (denops: Denops, bufnr: number) => {
   await fn.setbufvar(
@@ -36,33 +39,20 @@ export const setNoModifiable = async (denops: Denops, bufnr: number) => {
   );
 };
 
-export async function setBufferInfo(
+export function setOptions(
   denops: Denops,
-  bufferInfo: BufferInfo,
-  bufnr?: number,
+  options: BufferOptions,
+  bufnr: number,
 ) {
-  if (!bufnr) {
-    bufnr = await fn.bufnr(denops);
-  }
-  await fn.setbufvar(denops, bufnr, "gitlaber_buffer_info", bufferInfo);
+  Object.entries(options).map(async ([key, value]) => {
+    await fn.setbufvar(denops, bufnr, "&" + key, value);
+  });
 }
 
-export async function getBufferInfo(
-  denops: Denops,
-  bufnr?: number,
-): Promise<BufferInfo> {
-  if (!bufnr) {
-    bufnr = await fn.bufnr(denops);
+export function getBufferConfig(kind: BufferKind) {
+  const config = BUFFER_CONFIGS.find((config) => config.kind === kind);
+  if (!config) {
+    throw new Error(`Buffer config is not found: ${kind}`);
   }
-  const bufferInfo = await fn.getbufvar(denops, bufnr, "gitlaber_buffer_info");
-  if (
-    u.isObjectOf({
-      buffer_kind: u.isString,
-      ...u.isUnknown,
-    })
-  ) {
-    return (bufferInfo as BufferInfo);
-  } else {
-    throw new Error("buffer info is not set");
-  }
+  return config;
 }

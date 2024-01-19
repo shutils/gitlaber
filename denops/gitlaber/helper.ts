@@ -1,17 +1,27 @@
 import { Denops, fn, vars } from "./deps.ts";
 import { GITLAB_DEFAULT_URL } from "./constant.ts";
 
-import { GitlaberVar, isGitlaberVar } from "./types.ts";
+import {
+  BufferKind,
+  Context,
+  GitlaberVar,
+  Instance,
+  isGitlaberVar,
+  Node,
+} from "./types.ts";
+import { getProject } from "./client/index.ts";
 
 export const getCurrentNode = async (
   denops: Denops,
-) => {
+): Promise<Node> => {
   const gitlabVar = await getGitlaberVar(denops);
   const bufnr = await fn.bufnr(denops);
   const buffers = gitlabVar.buffers;
   const currentBuffer = buffers.find((buffer) => buffer.bufnr === bufnr);
   if (!currentBuffer) {
-    throw new Error("Failed to get current buffer.");
+    return {
+      display: "",
+    };
   }
   const nodes = currentBuffer.nodes;
   const index = await fn.line(denops, ".") - 1;
@@ -21,7 +31,10 @@ export const getCurrentNode = async (
 export const getGitlaberVar = async (denops: Denops): Promise<GitlaberVar> => {
   const gitlaberVar = await vars.g.get(denops, "gitlaber_var");
   if (!isGitlaberVar(gitlaberVar)) {
-    throw new Error("Failed to get gitlaber var.");
+    return {
+      instances: [],
+      buffers: [],
+    };
   }
   return gitlaberVar;
 };
@@ -45,22 +58,97 @@ export async function getCurrentInstance(denops: Denops) {
   return instance;
 }
 
-// export const updateGitlaberInstanceRecentResource = async (
-//   denops: Denops,
-//   kind: ResourceKind,
-// ) => {
-//   const gitlaberVar = await getGitlaberVar(denops);
-//   const index = getCurrentGitlaberInstanceIndex(
-//     gitlaberVar,
-//     await fn.getcwd(denops),
-//   );
-//   if (index === -1) {
-//     throw new Error("Not found current gitlaber instance");
-//   }
-//   gitlaberVar.instances[index].recent_resource = kind;
-//   await setGitlaberVar(denops, gitlaberVar);
-// };
-//
+export async function getContext(denops: Denops): Promise<Context> {
+  const instance = await getCurrentInstance(denops);
+  const url = getGitlabUrl(instance.cwd);
+  const token = getGitlabToken(instance.cwd);
+  return {
+    denops: denops,
+    instance: instance,
+    url: url,
+    token: token,
+  };
+}
+
+export async function checkInstanceExists(denops: Denops) {
+  const cwd = await fn.getcwd(denops);
+  const gitlaberVar = await getGitlaberVar(denops);
+  const instance = gitlaberVar.instances.find((instance) =>
+    instance.cwd === cwd
+  );
+  return instance !== undefined;
+}
+
+export async function addInstance(denops: Denops) {
+  const gitlaberVar = await getGitlaberVar(denops);
+  const cwd = await fn.getcwd(denops);
+  const url = getGitlabUrl(cwd);
+  const token = getGitlabToken(cwd);
+  const id = gitlaberVar.instances.length + 1;
+  const instance: Instance = {
+    cwd: cwd,
+    bufnrs: [],
+    project: await getProject(url, token, cwd),
+    id: id,
+  };
+  gitlaberVar.instances.push(instance);
+  await setGitlaberVar(denops, gitlaberVar);
+}
+
+export async function addBuffer(
+  denops: Denops,
+  kind: BufferKind,
+  bufnr: number,
+  nodes: Node[],
+) {
+  const gitlaberVar = await getGitlaberVar(denops);
+  const cwd = await fn.getcwd(denops);
+  const instance = gitlaberVar.instances.find((instance) =>
+    instance.cwd === cwd
+  );
+  if (!instance) {
+    throw new Error("Failed to get gitlaber instance.");
+  }
+  instance.bufnrs.push(bufnr);
+  gitlaberVar.buffers.push({
+    bufnr: bufnr,
+    nodes: nodes,
+    kind: kind,
+  });
+  await setGitlaberVar(denops, gitlaberVar);
+}
+
+export async function getBuffer(denops: Denops, bufnr?: number) {
+  if (!bufnr) {
+    bufnr = await fn.bufnr(denops);
+  }
+  const gitlaberVar = await getGitlaberVar(denops);
+  const buffer = gitlaberVar.buffers.find((buffer) => buffer.bufnr === bufnr);
+  if (!buffer) {
+    throw new Error("Failed to get buffer.");
+  }
+  return buffer;
+}
+
+export async function updateBuffer(
+  denops: Denops,
+  bufnr: number,
+  nodes: Node[],
+  params?: object,
+) {
+  const gitlaberVar = await getGitlaberVar(denops);
+  const buffer = gitlaberVar.buffers.find((buffer) => buffer.bufnr === bufnr);
+  if (!buffer) {
+    throw new Error("Failed to get buffer.");
+  }
+  buffer.nodes = nodes;
+  buffer.params = {
+    ...buffer.params,
+    ...params,
+  };
+  await setGitlaberVar(denops, gitlaberVar);
+}
+
 export function getGitlabUrl(cwd?: string) {
   try {
     return exec("git", ["config", "--get", "gitlab.url"], cwd);
@@ -103,4 +191,8 @@ export function exec(cmd: string, args: string[], cwd?: string) {
       }`,
     );
   }
+}
+
+export function getParentInstanceFromBufnr(denops: Denops, bufnr: number) {
+  return denops.call("gitlaber#helper#get_parent_instance_from_bufnr", bufnr);
 }
