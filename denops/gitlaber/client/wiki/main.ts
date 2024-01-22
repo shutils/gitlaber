@@ -1,5 +1,6 @@
+import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
-import { Wiki } from "./types.ts";
+import { isWiki } from "./types.ts";
 
 export async function requestCreateNewProjectWiki(
   url: string,
@@ -10,31 +11,22 @@ export async function requestCreateNewProjectWiki(
     title: string;
     format?: "markdown" | "rdoc" | "asciidoc" | "org";
   },
-): Promise<void> {
+) {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/wikis`;
-  const res = await request(
-    gitlabApiPath,
-    token,
-    "POST",
-    JSON.stringify(attrs),
-  );
-  if (!(res.status == 201)) {
-    throw new Error("Failed to create a new wiki.");
-  }
+  await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
 }
 
 export async function getProjectWikis(
   url: string,
   token: string,
-  attrs: {
-    id: number;
-    with_content?: boolean;
-  },
-): Promise<Wiki[]> {
+  attrs: { id: number; with_content?: boolean },
+) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis?with_content=1`;
-  const res = await request(gitlabApiPath, token, "GET");
-  return res.json();
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    u.isArrayOf(isWiki),
+  );
 }
 
 export async function editProjectWiki(
@@ -48,27 +40,18 @@ export async function editProjectWiki(
     format?: "markdown" | "rdoc" | "asciidoc" | "org";
     message?: string;
   },
-): Promise<void> {
+) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
-  const res = await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
-  if (!(res.status == 200 || res.status == 201)) {
-    throw new Error("Failed to edit wiki.");
-  }
+  await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
 }
 
 export async function deleteProjectWiki(
   url: string,
   token: string,
-  attrs: {
-    id: number;
-    slug: string;
-  },
-): Promise<void> {
+  attrs: { id: number; slug: string },
+) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
-  const res = await request(gitlabApiPath, token, "DELETE");
-  if (res.status != 204) {
-    throw new Error("Failed to delete a wiki.");
-  }
+  await request(gitlabApiPath, token, "DELETE");
 }

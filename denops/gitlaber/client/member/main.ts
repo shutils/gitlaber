@@ -14,13 +14,8 @@ export async function getProjectMembers(
   },
 ) {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/members/all`;
-  const res = await request(gitlabApiPath, token, "GET");
-  if (!(res.status == 200)) {
-    throw new Error("Failed to get project members.");
-  }
-  const members = await res.json();
-  if (!u.isArrayOf(isMember)(members)) {
-    throw new Error(`Failed to get project members.`);
-  }
-  return members;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    u.isArrayOf(isMember),
+  );
 }

@@ -13,13 +13,8 @@ export async function getProjectLabels(
   },
 ) {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/labels`;
-  const res = await request(gitlabApiPath, token, "GET");
-  if (!(res.status == 200)) {
-    throw new Error("Failed to get project labels.");
-  }
-  const labels = await res.json();
-  if (!u.isArrayOf(isProjectLabel)(labels)) {
-    throw new Error(`Failed to get project labels.`);
-  }
-  return labels;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    u.isArrayOf(isProjectLabel),
+  );
 }

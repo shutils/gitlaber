@@ -1,20 +1,14 @@
+import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
 import { getRemoteUrl, getUrlEncodedPath } from "../helper.ts";
-import { isProject, Project } from "./types.ts";
+import { isProject } from "./types.ts";
 
 export async function getProject(
   url: string,
   token: string,
   cwd?: string,
-): Promise<
-  Project
-> {
+) {
   const projectPath = getUrlEncodedPath(getRemoteUrl(cwd));
   const gitlabApiPath = url + "/api/v4/projects/" + projectPath;
-  const res = await request(gitlabApiPath, token, "GET");
-  const project = await res.json();
-  if (!isProject(project)) {
-    throw new Error("Failed to get project.");
-  }
-  return project;
+  return u.ensure(await request(gitlabApiPath, token, "GET"), isProject);
 }

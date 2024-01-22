@@ -15,17 +15,9 @@ export async function createProjectMergeRequest(
     remove_source_branch?: boolean;
     squash?: boolean;
   },
-): Promise<void> {
+) {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/merge_requests`;
-  const res = await request(
-    gitlabApiPath,
-    token,
-    "POST",
-    JSON.stringify(attrs),
-  );
-  if (!(res.status == 201)) {
-    throw new Error("Failed to create a new merge request.");
-  }
+  await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
 }
 
 export async function getProjectMergeRequests(
@@ -39,14 +31,12 @@ export async function getProjectMergeRequests(
     author_username?: string;
     labels?: string;
   },
-): Promise<MergeRequest[]> {
+) {
   const gitlabApiPath = `${url}/api/v4/projects/${attrs.id}/merge_requests`;
-  const res = await request(gitlabApiPath, token, "GET");
-  const mrs = await res.json();
-  if (!u.isArrayOf(isMergeRequest)(mrs)) {
-    throw new Error(`Failed to get merge requests. reason: ${mrs}`);
-  }
-  return mrs;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    u.isArrayOf(isMergeRequest),
+  );
 }
 
 export async function editProjectMergeRequest(
@@ -68,18 +58,10 @@ export async function editProjectMergeRequest(
     target_branch?: string;
     title?: string;
   },
-): Promise<void> {
+) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}`;
-  const res = await request(
-    gitlabApiPath,
-    token,
-    "PUT",
-    JSON.stringify(attrs),
-  );
-  if (!(res.status == 200 || res.status == 201)) {
-    throw new Error("Failed to edit a merge request.");
-  }
+  await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
 }
 
 export async function approveProjectMergeRequest(
@@ -91,18 +73,10 @@ export async function approveProjectMergeRequest(
     approval_password?: string;
     sha?: string;
   },
-): Promise<void> {
+) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/approve`;
-  const res = await request(
-    gitlabApiPath,
-    token,
-    "POST",
-    JSON.stringify(attrs),
-  );
-  if (![200, 201].includes(res.status)) {
-    throw new Error("Failed to approve a merge request.");
-  }
+  await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
 }
 
 export async function mergeProjectMergeRequest(
@@ -118,13 +92,10 @@ export async function mergeProjectMergeRequest(
     squash_commit_message?: string;
     squash?: boolean;
   },
-): Promise<void> {
+) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/merge`;
-  const res = await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
-  if (![200, 201].includes(res.status)) {
-    throw new Error("Failed to merge a merge request.");
-  }
+  await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
 }
 
 export async function getProjectMergeRequestsGraphQL(
@@ -132,7 +103,7 @@ export async function getProjectMergeRequestsGraphQL(
   token: string,
   fullPath: string,
   projetId: number,
-): Promise<MergeRequest[]> {
+) {
   const query = `
     query getMergeRequests($fullPath: ID!){
       project(fullPath: $fullPath) {
@@ -175,13 +146,12 @@ export async function getProjectMergeRequestsGraphQL(
     }
   `;
   const variables = { fullPath };
-  const res = await request(
+  const json = await request(
     `${url}/api/graphql`,
     token,
     "POST",
     JSON.stringify({ query, variables }),
   );
-  const json = await res.json();
   const mrs = json.data.project.mergeRequests.nodes;
   const convertedMrs: MergeRequest[] = mrs.map((mr: {
     id: string;
@@ -239,12 +209,5 @@ export async function getProjectMergeRequestsGraphQL(
       }),
     };
   });
-  if (!u.isArrayOf(isMergeRequest)(convertedMrs)) {
-    throw new Error(
-      `Failed to get merge requests. reason: ${
-        Deno.inspect(convertedMrs, { depth: Infinity })
-      }`,
-    );
-  }
-  return convertedMrs;
+  return u.ensure(convertedMrs, u.isArrayOf(isMergeRequest));
 }
