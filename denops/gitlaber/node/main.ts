@@ -29,8 +29,8 @@ export const createMainPanelNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (args) => {
-    const { instance, url, token } = args;
-    const project = await client.getProject(url, token);
+    const { instance } = args;
+    const project = instance.project;
     const nodes: Array<Node> = [];
     nodes.push({
       display: "Hint: Type g? to display the keymap for each panel.",
@@ -174,7 +174,7 @@ export const createDescriptionEditNodes = async (
   return await makeNode(denops, async (_args) => {
     let params: {
       description: string;
-    }
+    };
     if (
       !u.isObjectOf({
         description: u.isString,
