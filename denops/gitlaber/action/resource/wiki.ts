@@ -1,17 +1,23 @@
 import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
+
 import * as client from "../../client/index.ts";
-import * as util from "../../util.ts";
 import { isWiki } from "../../types.ts";
-import { getCurrentNode } from "../../helper.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
-import { getBufferInfo } from "../../command/buffer/helper.ts";
+import { flattenBuffer } from "../../util.ts";
+import {
+  getBuffer,
+  getCurrentInstance,
+  getGitlabToken,
+  getGitlabUrl,
+} from "../../helper.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "action:resource:wiki:new": () => {
-      doAction(denops, async (denops, _ctx) => {
+      doAction(denops, async (args) => {
+        const { denops } = args;
         await fn.call(denops, "denops#notify", [
           "gitlaber",
           "command:buffer:open:resource:wiki:new",
@@ -20,38 +26,43 @@ export function main(denops: Denops): void {
       });
     },
 
-    "action:resource:wiki:_new": () => {
-      doAction(denops, async (denops, ctx) => {
-        const { url, token, project } = ctx.instance;
-        const bufinfo = await getBufferInfo(denops);
-        const content = await util.flattenBuffer(
-          denops,
-          await fn.bufname(denops),
-        );
+    "action:resource:wiki:_new": async () => {
+      const instance = await getCurrentInstance(denops);
+      const url = getGitlabUrl(instance.cwd);
+      const token = getGitlabToken(instance.cwd);
+      const content = await flattenBuffer(
+        denops,
+        await fn.bufname(denops),
+      );
+      const buffer = await getBuffer(denops, await fn.bufnr(denops));
+      const params = buffer?.params;
+      if (
+        !u.isObjectOf({
+          title: u.isString,
+        })(params)
+      ) {
+        helper.echo(denops, "Title has not been set.");
+        return;
+      }
 
-        const title = bufinfo.params?.user_input?.title;
-        if (!u.isString(title)) {
-          helper.echo(denops, "Title has not been set.");
-          return;
-        }
-        await executeRequest(
-          denops,
-          client.requestCreateNewProjectWiki,
-          url,
-          token,
-          {
-            id: project.id,
-            title: title,
-            content: content,
-          },
-          "Successfully created a new wiki.",
-          "wiki",
-        );
-      });
+      const title = params.title;
+      await executeRequest(
+        denops,
+        client.requestCreateNewProjectWiki,
+        url,
+        token,
+        {
+          id: instance.project.id,
+          title: title,
+          content: content,
+        },
+        "Successfully created a new wiki.",
+      );
     },
 
     "action:resource:wiki:prev": () => {
-      doAction(denops, async (denops, _ctx) => {
+      doAction(denops, async (args) => {
+        const { denops } = args;
         await fn.call(denops, "denops#notify", [
           "gitlaber",
           "command:buffer:open:resource:wiki:prev",
@@ -61,7 +72,8 @@ export function main(denops: Denops): void {
     },
 
     "action:resource:wiki:edit": () => {
-      doAction(denops, async (denops, _ctx) => {
+      doAction(denops, async (args) => {
+        const { denops } = args;
         await fn.call(denops, "denops#notify", [
           "gitlaber",
           "command:buffer:open:resource:wiki:edit",
@@ -70,60 +82,62 @@ export function main(denops: Denops): void {
       });
     },
 
-    "action:resource:wiki:_edit": () => {
-      doAction(denops, async (denops, ctx) => {
-        const { url, token, project } = ctx.instance;
-        const content = await util.flattenBuffer(
-          denops,
-          await fn.bufname(denops),
-        );
-        const bufinfo = await getBufferInfo(denops);
-        const title = bufinfo.params?.user_input?.title;
-        const slug = bufinfo.params?.user_input?.slug;
-        if (!u.isString(title)) {
-          return;
-        }
-        if (!u.isString(slug)) {
-          return;
-        }
-        let commitMessage = await helper.input(denops, {
-          prompt: `Please enter your commit message: `,
-          text: `Update ${title}`,
-        });
-        if (!u.isString(commitMessage)) {
-          commitMessage = "";
-        }
-        await executeRequest(
-          denops,
-          client.editProjectWiki,
-          url,
-          token,
-          {
-            id: project.id,
-            title: title,
-            content: content,
-            slug: slug,
-            message: commitMessage,
-          },
-          "Successfully edit a wiki.",
-          "wiki",
-        );
+    "action:resource:wiki:_edit": async () => {
+      const instance = await getCurrentInstance(denops);
+      const url = getGitlabUrl(instance.cwd);
+      const token = getGitlabToken(instance.cwd);
+      const content = await flattenBuffer(
+        denops,
+        await fn.bufname(denops),
+      );
+      const buffer = await getBuffer(denops, await fn.bufnr(denops));
+      const params = buffer?.params;
+      if (
+        !u.isObjectOf({
+          title: u.isString,
+          slug: u.isString,
+        })(params)
+      ) {
+        helper.echo(denops, "Title has not been set.");
+        return;
+      }
+      const title = params.title;
+      const slug = params.slug;
+      if (!u.isString(title)) {
+        return;
+      }
+      if (!u.isString(slug)) {
+        return;
+      }
+      let commitMessage = await helper.input(denops, {
+        prompt: `Please enter your commit message: `,
+        text: `Update ${title}`,
       });
+      if (!u.isString(commitMessage)) {
+        commitMessage = "";
+      }
+      await executeRequest(
+        denops,
+        client.editProjectWiki,
+        url,
+        token,
+        {
+          id: instance.project.id,
+          title: title,
+          content: content,
+          slug: slug,
+          message: commitMessage,
+        },
+        "Successfully edit a wiki.",
+      );
     },
 
     "action:resource:wiki:delete": () => {
-      doAction(denops, async (denops, ctx) => {
-        const { instance } = ctx;
-        const currentNode = await getCurrentNode(denops, ctx);
-        if (!("wiki" in currentNode)) {
-          return;
-        }
-        if (!(isWiki(currentNode.resource))) {
-          helper.echo(denops, "This node is not a wiki.");
-          return;
-        }
-        const slug = currentNode.resource.slug;
-        const title = currentNode.resource.title;
+      doAction(denops, async (args) => {
+        const { instance, node, url, token } = args;
+        const wiki = u.ensure(node.params, isWiki);
+        const slug = wiki.slug;
+        const title = wiki.title;
         const confirm = await helper.input(denops, {
           prompt: `Are you sure you want to delete the wiki(${title})? y/N: `,
         });
@@ -133,14 +147,13 @@ export function main(denops: Denops): void {
         await executeRequest(
           denops,
           client.deleteProjectWiki,
-          instance.url,
-          instance.token,
+          url,
+          token,
           {
             id: instance.project.id,
             slug: slug,
           },
           "Successfully delete a wiki.",
-          "wiki",
         );
       });
     },

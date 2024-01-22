@@ -1,63 +1,40 @@
-import { unknownutil as u } from "../deps.ts";
-import { request } from "./core.ts";
-import { isIssue, Issue, IssueGetAttributes } from "./types.ts";
-import { objectToURLSearchParams } from "./helper.ts";
+import { unknownutil as u } from "../../deps.ts";
+import { request } from "../core.ts";
+import { isIssue, IssueGetAttributes } from "./types.ts";
+import { objectToURLSearchParams } from "../helper.ts";
 
 export async function getProjectIssues(
   url: string,
   token: string,
-  attrs: {
-    id: number | string;
-  } & IssueGetAttributes,
-): Promise<Issue[]> {
+  attrs: { id: number | string } & IssueGetAttributes,
+) {
   const baseApiPath = `${url}/api/v4/projects/${attrs.id}/issues`;
 
   const queryPrams = objectToURLSearchParams(attrs);
   const gitlabApiPath = baseApiPath + "?" + queryPrams;
-  const res = await request(gitlabApiPath, token, "GET");
-  const issues = await res.json();
-  if (!u.isArrayOf(isIssue)(issues)) {
-    throw new Error("Failed to get issues.");
-  }
-  return issues;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    u.isArrayOf(isIssue),
+  );
 }
 
 export async function createProjectIssue(
   url: string,
   token: string,
-  attributes: {
-    id: number;
-    iid?: number;
-    title: string;
-    description?: string;
-  },
-): Promise<void> {
+  attributes: { id: number; iid?: number; title: string; description?: string },
+) {
   const gitlabApiPath = url + "/api/v4/projects/" + attributes.id + "/issues";
-  const res = await request(
-    gitlabApiPath,
-    token,
-    "POST",
-    JSON.stringify(attributes),
-  );
-  if (res.status != 201) {
-    throw new Error("Failed to create new issue.");
-  }
+  await request(gitlabApiPath, token, "POST", JSON.stringify(attributes));
 }
 
 export async function deleteProjectIssue(
   url: string,
   token: string,
-  attrs: {
-    id: number;
-    issue_iid: number;
-  },
-): Promise<void> {
+  attrs: { id: number; issue_iid: number },
+) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/issues/${attrs.issue_iid}`;
-  const res = await request(gitlabApiPath, token, "DELETE");
-  if (res.status != 204) {
-    throw new Error("Failed to delete issue.");
-  }
+  await request(gitlabApiPath, token, "DELETE");
 }
 
 export async function editProjectIssue(
@@ -83,11 +60,8 @@ export async function editProjectIssue(
     updated_at?: string;
     weight?: number;
   },
-): Promise<void> {
+) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/issues/${attrs.issue_iid}`;
-  const res = await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
-  if (!(res.status == 200 || res.status == 201)) {
-    throw new Error("Failed to edit issue.");
-  }
+  await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
 }
