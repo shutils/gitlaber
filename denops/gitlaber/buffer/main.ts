@@ -1,4 +1,4 @@
-import { autocmd, Denops, fn, helper } from "../deps.ts";
+import { autocmd, Denops, fn, helper, unknownutil as u } from "../deps.ts";
 
 import { createBuffer, reRenderBuffer } from "./core.ts";
 import {
@@ -8,8 +8,7 @@ import {
   getCurrentNode,
   updateBuffer,
 } from "../helper.ts";
-import { validateNodeParams } from "../node/helper.ts";
-import { isIssue, Issue, isWiki, Wiki } from "../types.ts";
+import { isIssue, isWiki } from "../types.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -86,10 +85,7 @@ export function main(denops: Denops): void {
 
     async "buffer:open:resource:wiki:edit"(): Promise<void> {
       const node = await getCurrentNode(denops);
-      const wiki = node.params;
-      if (!validateNodeParams<Wiki>(wiki, isWiki)) {
-        return;
-      }
+      const wiki = u.ensure(node.params, isWiki);
       const title = wiki.title;
       const slug = wiki.slug;
       const bufnr = await createBuffer(denops, "GitlaberEditWiki");
@@ -119,10 +115,7 @@ export function main(denops: Denops): void {
 
     async "buffer:open:resource:issue:edit"(): Promise<void> {
       const node = await getCurrentNode(denops);
-      const issue = node.params;
-      if (!validateNodeParams<Issue>(issue, isIssue)) {
-        return;
-      }
+      const issue = u.ensure(node.params, isIssue);
       const iid = issue.iid;
       const bufnr = await createBuffer(denops, "GitlaberEditIssue");
       if (!bufnr) {

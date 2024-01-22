@@ -2,11 +2,10 @@ import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
-import { isIssue, Issue } from "../../types.ts";
+import { isIssue } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
 import { flattenBuffer } from "../../util.ts";
-import { validateNodeParams } from "../../node/helper.ts";
 import {
   getBuffer,
   getCurrentInstance,
@@ -44,10 +43,7 @@ export function main(denops: Denops): void {
     "action:resource:issue:delete": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const issue = node.params;
-        if (!validateNodeParams<Issue>(issue, isIssue)) {
-          return;
-        }
+        const issue = u.ensure(node.params, isIssue);
         const confirm = await helper.input(denops, {
           prompt:
             `Are you sure you want to delete the issue(${issue.iid})? y/N: `,
@@ -72,10 +68,7 @@ export function main(denops: Denops): void {
     "action:resource:issue:state:toggle": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const issue = node.params;
-        if (!validateNodeParams<Issue>(issue, isIssue)) {
-          return;
-        }
+        const issue = u.ensure(node.params, isIssue);
         let stateEvent: "close" | "reopen" = "close";
         if (issue.state === "closed") {
           stateEvent = "reopen";
@@ -98,10 +91,7 @@ export function main(denops: Denops): void {
     "action:resource:issue:assign": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const issue = node.params;
-        if (!validateNodeParams<Issue>(issue, isIssue)) {
-          return;
-        }
+        const issue = u.ensure(node.params, isIssue);
         const members = await client.getProjectMembers(
           url,
           token,
@@ -140,10 +130,7 @@ export function main(denops: Denops): void {
     "action:resource:issue:label:add": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const issue = node.params;
-        if (!validateNodeParams<Issue>(issue, isIssue)) {
-          return;
-        }
+        const issue = u.ensure(node.params, isIssue);
         const labels = await client.getProjectLabels(
           url,
           token,
@@ -182,10 +169,7 @@ export function main(denops: Denops): void {
     "action:resource:issue:label:remove": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const issue = node.params;
-        if (!validateNodeParams<Issue>(issue, isIssue)) {
-          return;
-        }
+        const issue = u.ensure(node.params, isIssue);
         const labels = issue.labels;
         if (labels.length === 0) {
           helper.echo(denops, "This issue has not labels.");

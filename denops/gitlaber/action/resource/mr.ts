@@ -1,17 +1,14 @@
-import { Denops, fn, helper } from "../../deps.ts";
+import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import {
-  Branch,
   Context,
   isBranch,
   isMergeRequest,
-  MergeRequest,
   Node,
 } from "../../types.ts";
 import * as util from "../../util.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
-import { validateNodeParams } from "../../node/helper.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -19,10 +16,7 @@ export function main(denops: Denops): void {
     "action:resource:mr:new:relate:branch": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const branch = node.params;
-        if (!validateNodeParams<Branch>(branch, isBranch)) {
-          return;
-        }
+        const branch = u.ensure(node.params, isBranch);
         const currentBranch = branch.name;
         const commitId = branch.commit.short_id;
         const commit = await client.getProjectCommit(
@@ -87,10 +81,7 @@ export function main(denops: Denops): void {
     "action:resource:mr:approve": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const mr = node.params;
-        if (!validateNodeParams<MergeRequest>(mr, isMergeRequest)) {
-          return;
-        }
+        const mr = u.ensure(node.params, isMergeRequest);
         const confirm = await helper.input(denops, {
           prompt: `Are you sure you want to approve a merge request? y/N: `,
         });
@@ -114,10 +105,7 @@ export function main(denops: Denops): void {
     "action:resource:mr:merge": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const mr = node.params;
-        if (!validateNodeParams<MergeRequest>(mr, isMergeRequest)) {
-          return;
-        }
+        const mr = u.ensure(node.params, isMergeRequest);
         const confirm = await helper.input(denops, {
           prompt: `Are you sure you want to merge a merge request? y/N: `,
         });
@@ -181,17 +169,10 @@ async function assignMergeRequestMember(
   role: "assignee" | "reviewer",
 ) {
   const { denops, instance, node, url, token } = args;
-  const mr = node.params;
-  if (!validateNodeParams<MergeRequest>(mr, isMergeRequest)) {
-    return;
-  }
-  const members = await client.getProjectMembers(
-    url,
-    token,
-    {
-      id: instance.project.id,
-    },
-  );
+  const mr = u.ensure(node.params, isMergeRequest);
+  const members = await client.getProjectMembers(url, token, {
+    id: instance.project.id,
+  });
   if (members.length === 0) {
     helper.echo(denops, "Project has not members.");
     return;

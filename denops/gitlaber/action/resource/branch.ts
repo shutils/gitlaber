@@ -1,9 +1,8 @@
-import { Denops, helper } from "../../deps.ts";
+import { Denops, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import { isIssue, Issue } from "../../types.ts";
+import { isIssue } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
-import { validateNodeParams } from "../../node/helper.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -11,10 +10,7 @@ export function main(denops: Denops): void {
     "action:resource:branch:new:relate:issue": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const issue = node.params;
-        if (!validateNodeParams<Issue>(issue, isIssue)) {
-          return;
-        }
+        const issue = u.ensure(node.params, isIssue);
         const defaultBranch = instance.project.default_branch;
         const title = issue.title;
         const issue_iid = issue.iid;
@@ -32,18 +28,11 @@ export function main(denops: Denops): void {
         if (!ref) {
           return;
         }
-        await executeRequest(
-          denops,
-          client.createProjectBranch,
-          url,
-          token,
-          {
-            id: instance.project.id,
-            branch: branch,
-            ref: ref,
-          },
-          "Successfully create a new branch.",
-        );
+        await executeRequest(denops, client.createProjectBranch, url, token, {
+          id: instance.project.id,
+          branch: branch,
+          ref: ref,
+        }, "Successfully create a new branch.");
       });
     },
   };

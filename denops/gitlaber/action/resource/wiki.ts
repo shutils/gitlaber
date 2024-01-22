@@ -1,11 +1,10 @@
 import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 
 import * as client from "../../client/index.ts";
-import { isWiki, Wiki } from "../../types.ts";
+import { isWiki } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { doAction } from "../main.ts";
 import { flattenBuffer } from "../../util.ts";
-import { validateNodeParams } from "../../node/helper.ts";
 import {
   getBuffer,
   getCurrentInstance,
@@ -136,10 +135,7 @@ export function main(denops: Denops): void {
     "action:resource:wiki:delete": () => {
       doAction(denops, async (args) => {
         const { instance, node, url, token } = args;
-        const wiki = node.params;
-        if (!validateNodeParams<Wiki>(wiki, isWiki)) {
-          return;
-        }
+        const wiki = u.ensure(node.params, isWiki);
         const slug = wiki.slug;
         const title = wiki.title;
         const confirm = await helper.input(denops, {
