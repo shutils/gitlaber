@@ -22,11 +22,12 @@ export async function request(
   });
   switch (res.status) {
     case http.Status.OK:
+      return await res.json();
     case http.Status.Created:
+      return;
     case http.Status.NoContent:
-      break;
+      return;
     default:
       throw new Error(`HTTP request failed. status: ${res.status}`);
   }
-  return await res.json()
 }

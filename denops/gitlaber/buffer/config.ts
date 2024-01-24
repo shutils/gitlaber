@@ -1,7 +1,6 @@
 import { BufferConfig } from "./types.ts";
 import * as node from "../node/main.ts";
 import {
-  BASE_MAPPINGS,
   MAIN_MAPPINGS,
   POPUP_BRANCH_MAPPINGS,
   POPUP_ISSUE_MAPPINGS,
@@ -15,7 +14,7 @@ import {
 
 export const BUFFER_CONFIGS: BufferConfig[] = [
   {
-    kind: "GitlaberMain",
+    kind: "GitlaberProjectStatus",
     direction: "tab",
     nodeMaker: node.createMainPanelNodes,
     options: {
@@ -25,7 +24,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: MAIN_MAPPINGS,
   },
   {
-    kind: "GitlaberPopupIssue",
+    kind: "GitlaberIssueConfig",
     direction: "botright",
     nodeMaker: node.createProjectIssuePanelNodes,
     options: {
@@ -35,7 +34,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: POPUP_ISSUE_MAPPINGS,
   },
   {
-    kind: "GitlaberPopupWiki",
+    kind: "GitlaberWikiConfig",
     direction: "botright",
     nodeMaker: node.createProjectWikiPanelNodes,
     options: {
@@ -45,7 +44,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: POPUP_WIKI_MAPPINGS,
   },
   {
-    kind: "GitlaberPopupBranch",
+    kind: "GitlaberBranchConfig",
     direction: "botright",
     nodeMaker: node.createProjectBranchPanelNodes,
     options: {
@@ -55,7 +54,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: POPUP_BRANCH_MAPPINGS,
   },
   {
-    kind: "GitlaberPopupMr",
+    kind: "GitlaberMrConfig",
     direction: "botright",
     nodeMaker: node.createProjectMergeRequestPanelNodes,
     options: {
@@ -65,7 +64,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: POPUP_MR_MAPPINGS,
   },
   {
-    kind: "GitlaberResourceIssues",
+    kind: "GitlaberIssueList",
     direction: "vertical botright",
     nodeMaker: node.createProjectIssuesNodes,
     options: {
@@ -75,7 +74,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: RESOURCE_ISSUES_MAPPINGS,
   },
   {
-    kind: "GitlaberResourceWikis",
+    kind: "GitlaberWikiList",
     direction: "vertical botright",
     nodeMaker: node.createProjectWikiNodes,
     options: {
@@ -85,7 +84,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: RESOURCE_WIKIS_MAPPINGS,
   },
   {
-    kind: "GitlaberResourceBranches",
+    kind: "GitlaberBranchList",
     direction: "vertical botright",
     nodeMaker: node.createProjectBranchesNodes,
     options: {
@@ -95,7 +94,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: RESOURCE_BRANCHES_MAPPINGS,
   },
   {
-    kind: "GitlaberResourceMrs",
+    kind: "GitlaberMrList",
     direction: "vertical botright",
     nodeMaker: node.createProjectMergeRequestsNodes,
     options: {
@@ -103,71 +102,5 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       modifiable: false,
     },
     keymaps: RESOURCE_Mrs_MAPPINGS,
-  },
-  {
-    kind: "GitlaberPreviewIssue",
-    direction: "aboveleft",
-    nodeMaker: node.createDescriptionNodes,
-    options: {
-      buftype: "nofile",
-      modifiable: false,
-      filetype: "markdown",
-    },
-    keymaps: BASE_MAPPINGS,
-  },
-  {
-    kind: "GitlaberPreviewWiki",
-    direction: "aboveleft",
-    nodeMaker: node.createContentNodes,
-    options: {
-      buftype: "nofile",
-      modifiable: false,
-      filetype: "markdown",
-    },
-    keymaps: BASE_MAPPINGS,
-  },
-  {
-    kind: "GitlaberPreviewMr",
-    direction: "aboveleft",
-    nodeMaker: node.createDescriptionNodes,
-    options: {
-      buftype: "nofile",
-      modifiable: false,
-      filetype: "markdown",
-    },
-    keymaps: BASE_MAPPINGS,
-  },
-  {
-    kind: "GitlaberEditIssue",
-    direction: "aboveleft",
-    nodeMaker: node.createDescriptionEditNodes,
-    options: {
-      modifiable: true,
-      filetype: "markdown",
-    },
-    keymaps: BASE_MAPPINGS,
-    tmp: true,
-  },
-  {
-    kind: "GitlaberEditWiki",
-    direction: "aboveleft",
-    nodeMaker: node.createContentNodes,
-    options: {
-      modifiable: true,
-      filetype: "markdown",
-    },
-    keymaps: BASE_MAPPINGS,
-    tmp: true,
-  },
-  {
-    kind: "GitlaberCreateWiki",
-    direction: "vertical botright",
-    nodeMaker: node.createEmptyNodes,
-    options: {
-      modifiable: true,
-      filetype: "markdown",
-    },
-    keymaps: BASE_MAPPINGS,
-    tmp: true,
   },
 ];

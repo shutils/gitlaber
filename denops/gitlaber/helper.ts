@@ -13,15 +13,13 @@ import { getProject } from "./client/index.ts";
 
 export const getCurrentNode = async (
   denops: Denops,
-): Promise<Node> => {
+) => {
   const gitlabVar = await getGitlaberVar(denops);
   const bufnr = await fn.bufnr(denops);
   const buffers = gitlabVar.buffers;
   const currentBuffer = buffers.find((buffer) => buffer.bufnr === bufnr);
   if (!currentBuffer) {
-    return {
-      display: "",
-    };
+    return;
   }
   const nodes = currentBuffer.nodes;
   const index = await fn.line(denops, ".") - 1;

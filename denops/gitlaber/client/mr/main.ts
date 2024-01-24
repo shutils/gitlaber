@@ -20,6 +20,22 @@ export async function createProjectMergeRequest(
   await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
 }
 
+export async function getProjectMergeRequest(
+  url: string,
+  token: string,
+  attrs: {
+    id: number;
+    merge_request_iid: number;
+  },
+) {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}`;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    isMergeRequest,
+  );
+}
+
 export async function getProjectMergeRequests(
   url: string,
   token: string,
@@ -79,6 +95,19 @@ export async function approveProjectMergeRequest(
   await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
 }
 
+export async function unapproveProjectMergeRequest(
+  url: string,
+  token: string,
+  attrs: {
+    id: number;
+    merge_request_iid: number;
+  },
+) {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/unapprove`;
+  await request(gitlabApiPath, token, "POST");
+}
+
 export async function mergeProjectMergeRequest(
   url: string,
   token: string,
@@ -96,6 +125,19 @@ export async function mergeProjectMergeRequest(
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/merge`;
   await request(gitlabApiPath, token, "PUT", JSON.stringify(attrs));
+}
+
+export async function deleteProjectMergeRequest(
+  url: string,
+  token: string,
+  attrs: {
+    id: number;
+    merge_request_iid: number;
+  },
+) {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}`;
+  await request(gitlabApiPath, token, "DELETE");
 }
 
 export async function getProjectMergeRequestsGraphQL(

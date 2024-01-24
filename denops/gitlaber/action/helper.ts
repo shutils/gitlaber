@@ -1,4 +1,4 @@
-import { autocmd, Denops, helper } from "../../deps.ts";
+import { autocmd, Denops, helper } from "../deps.ts";
 
 export async function executeRequest<T>(
   denops: Denops,
@@ -7,10 +7,12 @@ export async function executeRequest<T>(
   token: string,
   attrs: T,
   success_msg: string,
+  // kind: ResourceKind,
 ) {
   try {
     await callback(url, token, attrs);
     helper.echo(denops, success_msg);
+    // await updateGitlaberInstanceRecentResource(denops, kind);
     autocmd.emit(denops, "User", "GitlaberRecourceUpdate");
   } catch (e) {
     helper.echoerr(denops, e.message);

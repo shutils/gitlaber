@@ -4,22 +4,15 @@ import { isNode } from "../node/types.ts";
 import { Keymap, Node } from "../types.ts";
 
 export const BUFFER_KINDS = [
-  "GitlaberMain",
-  "GitlaberPopupIssue",
-  "GitlaberPopupBranch",
-  "GitlaberPopupWiki",
-  "GitlaberPopupMr",
-  "GitlaberResourceIssues",
-  "GitlaberResourceBranches",
-  "GitlaberResourceWikis",
-  "GitlaberResourceMrs",
-  "GitlaberPreviewIssue",
-  "GitlaberPreviewWiki",
-  "GitlaberPreviewMr",
-  "GitlaberEditIssue",
-  "GitlaberEditWiki",
-  "GitlaberEditMr",
-  "GitlaberCreateWiki",
+  "GitlaberProjectStatus",
+  "GitlaberIssueConfig",
+  "GitlaberBranchConfig",
+  "GitlaberWikiConfig",
+  "GitlaberMrConfig",
+  "GitlaberIssueList",
+  "GitlaberBranchList",
+  "GitlaberWikiList",
+  "GitlaberMrList",
 ] as const;
 
 export const isBufferKind = u.isLiteralOneOf(BUFFER_KINDS);

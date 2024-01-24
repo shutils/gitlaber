@@ -33,13 +33,7 @@ export const createMainPanelNodes = async (
     const project = instance.project;
     const nodes: Array<Node> = [];
     nodes.push({
-      display: "Hint: Type g? to display the keymap for each panel.",
-    });
-    nodes.push({
-      display: "",
-    });
-    nodes.push({
-      display: "Main Panel",
+      display: "Project Status",
     });
     nodes.push({
       display: "",
@@ -75,7 +69,7 @@ export const createProjectIssuePanelNodes = async (
   return await makeNode(denops, async (_args) => {
     const nodes: Array<Node> = [];
     nodes.push({
-      display: "Project issue Panel",
+      display: "Issue Config",
     });
     return await Promise.resolve(nodes);
   });
@@ -106,7 +100,7 @@ export const createProjectBranchPanelNodes = async (
   return await makeNode(denops, async (_args) => {
     const nodes: Array<Node> = [];
     nodes.push({
-      display: "Project branch Panel",
+      display: "Branch Config",
     });
     return await Promise.resolve(nodes);
   });
@@ -209,7 +203,7 @@ export const createProjectWikiPanelNodes = async (
   return await makeNode(denops, async (_args) => {
     const nodes: Array<Node> = [];
     nodes.push({
-      display: "Project wiki Panel",
+      display: "Wiki Config",
     });
     return await Promise.resolve(nodes);
   });
@@ -248,7 +242,7 @@ export const createProjectMergeRequestPanelNodes = async (
   return await makeNode(denops, async (_args) => {
     const nodes: Array<Node> = [];
     nodes.push({
-      display: "Project merge request Panel",
+      display: "Merge Request Config",
     });
     return await Promise.resolve(nodes);
   });

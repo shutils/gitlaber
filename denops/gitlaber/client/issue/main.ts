@@ -3,6 +3,22 @@ import { request } from "../core.ts";
 import { isIssue, IssueGetAttributes } from "./types.ts";
 import { objectToURLSearchParams } from "../helper.ts";
 
+export async function getProjectIssue(
+  url: string,
+  token: string,
+  attrs: {
+    id: number | string;
+    issue_iid: number;
+  },
+) {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/issues/${attrs.issue_iid}`;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    isIssue,
+  );
+}
+
 export async function getProjectIssues(
   url: string,
   token: string,

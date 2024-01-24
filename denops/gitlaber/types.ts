@@ -30,3 +30,4 @@ export * from "./client/types.ts";
 export * from "./node/types.ts";
 export * from "./keymap/types.ts";
 export * from "./buffer/types.ts";
+export * from "./action/types.ts";

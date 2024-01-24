@@ -1,4 +1,6 @@
-import { mapping } from "../deps.ts";
+import { Denops, mapping } from "../deps.ts";
+
+import { actionNames } from "../action/types.ts";
 
 const MAP_OPTION: mapping.MapOptions = {
   mode: "n",
@@ -16,17 +18,9 @@ export const BASE_MAPPINGS = [
   },
   {
     lhs: "I",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:common:echo:node', [])<CR>",
+    rhs: "<Plug>(gitlaber:util:echo:node)",
     option: MAP_OPTION,
     description: "Show current node",
-  },
-  {
-    lhs: "g?",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:common:echo:keymaps', [])<CR>",
-    option: MAP_OPTION,
-    description: "Show keymaps",
   },
 ];
 
@@ -34,34 +28,31 @@ export const MAIN_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "i",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:popup:issue', [])<CR>",
+    rhs: "<Plug>(gitlaber:issue:config)",
     option: MAP_OPTION,
     description: "Open popup issue buffer",
   },
   {
     lhs: "w",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:popup:wiki', [])<CR>",
+    rhs: "<Plug>(gitlaber:wiki:config)",
     option: MAP_OPTION,
     description: "Open popup wiki buffer",
   },
   {
     lhs: "b",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:popup:branch', [])<CR>",
+    rhs: "<Plug>(gitlaber:branch:config)",
     option: MAP_OPTION,
     description: "Open popup branch buffer",
   },
   {
     lhs: "m",
-    rhs: "<Cmd>call denops#notify('gitlaber', 'buffer:open:popup:mr', [])<CR>",
+    rhs: "<Plug>(gitlaber:mr:config)",
     option: MAP_OPTION,
     description: "Open popup merge request buffer",
   },
   {
     lhs: "o",
-    rhs: "<Cmd>call denops#notify('gitlaber', 'action:browse:project', [])<CR>",
+    rhs: "<Plug>(gitlaber:project:browse)",
     option: MAP_OPTION,
     description: "Open project with browser",
   },
@@ -71,15 +62,13 @@ export const POPUP_ISSUE_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "l",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:issues', [])<CR>",
+    rhs: "<Plug>(gitlaber:issue:list)",
     option: MAP_OPTION,
     description: "Open issues buffer",
   },
   {
     lhs: "N",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:new', [])<CR>",
+    rhs: "<Plug>(gitlaber:issue:new)",
     option: MAP_OPTION,
     description: "Open create issue",
   },
@@ -89,8 +78,7 @@ export const POPUP_MR_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "l",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:mrs', [])<CR>",
+    rhs: "<Plug>(gitlaber:mr:list)",
     option: MAP_OPTION,
     description: "Open merge requests buffer",
   },
@@ -100,17 +88,9 @@ export const POPUP_WIKI_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "l",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:wikis', [])<CR>",
+    rhs: "<Plug>(gitlaber:wiki:list)",
     option: MAP_OPTION,
     description: "Open wikis buffer",
-  },
-  {
-    lhs: "N",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:wiki:new', [])<CR>",
-    option: MAP_OPTION,
-    description: "Open create wiki buffer",
   },
 ];
 
@@ -118,8 +98,7 @@ export const POPUP_BRANCH_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "l",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:branches', [])<CR>",
+    rhs: "<Plug>(gitlaber:branch:list)",
     option: MAP_OPTION,
     description: "Open branches buffer",
   },
@@ -129,70 +108,49 @@ export const RESOURCE_ISSUES_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "o",
-    rhs: "<Cmd>call denops#notify('gitlaber', 'action:browse:node', [])<CR>",
+    rhs: "<Plug>(gitlaber:issue:browse)",
     option: MAP_OPTION,
     description: "Open issue with browser",
   },
   {
-    lhs: "p",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:issue:prev', [])<CR>",
-    option: MAP_OPTION,
-    description: "Open issue preview",
-  },
-  {
-    lhs: "e",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:issue:edit', [])<CR>",
-    option: MAP_OPTION,
-    description: "Edit issue",
-  },
-  {
     lhs: "N",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:new', [])<CR>",
+    rhs: "<Plug>(gitlaber:issue:new)",
     option: MAP_OPTION,
     description: "Create new issue",
   },
   {
     lhs: "d",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:delete', [])<CR>",
+    rhs: "<Plug>(gitlaber:issue:delete)",
     option: MAP_OPTION,
     description: "Delete issue",
   },
   {
-    lhs: "t",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:state:toggle', [])<CR>",
+    lhs: "C",
+    rhs: "<Plug>(gitlaber:issue:close)",
     option: MAP_OPTION,
     description: "Toggle issue state",
   },
   {
-    lhs: "a",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:assign', [])<CR>",
+    lhs: "O",
+    rhs: "<Plug>(gitlaber:issue:reopen)",
     option: MAP_OPTION,
     description: "Assign issue assignee",
   },
   {
     lhs: "la",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:label:add', [])<CR>",
+    rhs: "<Plug>(gitlaber:issue:label)",
     option: MAP_OPTION,
     description: "Add label to issue",
   },
   {
     lhs: "lr",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:issue:label:remove', [])<CR>",
+    rhs: "<Plug>(gitlaber:issue:unlabel)",
     option: MAP_OPTION,
     description: "Remove label from issue",
   },
   {
     lhs: "b",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:branch:new:relate:issue', [])<CR>",
+    rhs: "<Plug>(gitlaber:branch:new)",
     option: MAP_OPTION,
     description: "Create a branch related to the issue",
   },
@@ -201,14 +159,13 @@ export const RESOURCE_BRANCHES_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "o",
-    rhs: "<Cmd>call denops#notify('gitlaber', 'action:browse:node', [])<CR>",
+    rhs: "<Plug>(gitlaber:branch:browse)",
     option: MAP_OPTION,
     description: "Open branch with browser",
   },
   {
     lhs: "M",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:new:relate:branch', [])<CR>",
+    rhs: "<Plug>(gitlaber:mr:new)",
     option: MAP_OPTION,
     description: "Create a merge request related to the branch",
   },
@@ -217,80 +174,69 @@ export const RESOURCE_WIKIS_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "o",
-    rhs: "<Cmd>call denops#notify('gitlaber', 'action:browse:node', [])<CR>",
+    rhs: "<Plug>(gitlaber:wiki:browse)",
     option: MAP_OPTION,
     description: "Open wiki with browser",
   },
   {
-    lhs: "p",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:wiki:prev', [])<CR>",
-    option: MAP_OPTION,
-    description: "Open wiki preview",
-  },
-  {
-    lhs: "e",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:wiki:edit', [])<CR>",
-    option: MAP_OPTION,
-    description: "Open wiki edit",
-  },
-  {
     lhs: "d",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:wiki:delete', [])<CR>",
+    rhs: "<Plug>(gitlaber:wiki:delete)",
     option: MAP_OPTION,
     description: "Delete wiki",
-  },
-  {
-    lhs: "N",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:wiki:new', [])<CR>",
-    option: MAP_OPTION,
-    description: "Open create wiki buffer",
   },
 ];
 export const RESOURCE_Mrs_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "o",
-    rhs: "<Cmd>call denops#notify('gitlaber', 'action:browse:node', [])<CR>",
+    rhs: "<Plug>(gitlaber:mr:browse)",
     option: MAP_OPTION,
     description: "Open merge request with browser",
   },
   {
-    lhs: "p",
-    rhs:
-      "<Cmd>call denops#notify('gitlaber', 'buffer:open:resource:mr:prev', [])<CR>",
-    option: MAP_OPTION,
-    description: "Open merge request preview",
-  },
-  {
     lhs: "a",
     rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:assign:assignee', [])<CR>",
+      "<Plug>(gitlaber:mr:assign:assignee)",
     option: MAP_OPTION,
     description: "Assign merge request assignee",
   },
   {
     lhs: "r",
     rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:assign:reviewer', [])<CR>",
+      "<Plug>(gitlaber:mr:assign:reviewer)",
     option: MAP_OPTION,
     description: "Assign merge request reviewer",
   },
   {
     lhs: "A",
     rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:approve', [])<CR>",
+      "<Plug>(gitlaber:mr:approve)",
     option: MAP_OPTION,
     description: "Approve merge request",
   },
   {
+    lhs: "U",
+    rhs:
+      "<Plug>(gitlaber:mr:unapprove)",
+    option: MAP_OPTION,
+    description: "Unapprove merge request",
+  },
+  {
     lhs: "M",
     rhs:
-      "<Cmd>call denops#notify('gitlaber', 'action:resource:mr:merge', [])<CR>",
+      "<Plug>(gitlaber:mr:merge)",
     option: MAP_OPTION,
     description: "Merge merge request",
   },
 ];
+
+export function registPlugMap(denops: Denops) {
+  actionNames.map(async (actionName) => {
+    await mapping.map(
+      denops,
+      `<Plug>(gitlaber:${actionName})`,
+      `<Cmd>call denops#notify('gitlaber', 'doAction', ['${actionName}'])<CR>`,
+      { noremap: true, silent: true },
+    );
+  });
+}
