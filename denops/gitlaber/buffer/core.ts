@@ -1,30 +1,21 @@
-import { Denops, fn, helper, mapping } from "../deps.ts";
+import { Denops, fn,  mapping } from "../deps.ts";
 
 import {} from "./config.ts";
-import { BufferKind, Node } from "../types.ts";
+import { BufferConfig,  Node } from "../types.ts";
 import {
   addBuffer,
   getBuffer,
   getCurrentInstance,
-  getCurrentNode,
   updateBuffer,
 } from "../helper.ts";
 import { getBufferConfig, setModifiable, setOptions } from "./helper.ts";
 
 export async function createBuffer(
   denops: Denops,
-  kind: BufferKind,
+  config: BufferConfig,
+  nodes: Node[],
 ) {
-  const config = getBufferConfig(kind);
   const instance = await getCurrentInstance(denops);
-  const seedNode = await getCurrentNode(denops);
-  let nodes: Node[];
-  try {
-    nodes = await config.nodeMaker(denops, seedNode);
-  } catch (e) {
-    helper.echo(denops, e.message);
-    return;
-  }
   let bufnr: number;
   let exists = false;
   let bufname: string;
@@ -32,9 +23,9 @@ export async function createBuffer(
     bufname = await fn.tempname(denops);
     bufnr = await fn.bufadd(denops, bufname);
   } else {
-    bufname = `${kind}\ [${instance.id}]`;
+    bufname = `${config.kind}\ [${instance.id}]`;
     exists = await fn.bufexists(denops, bufname);
-    bufnr = await fn.bufadd(denops, `${kind}\ [${instance.id}]`);
+    bufnr = await fn.bufadd(denops, `${config.kind}\ [${instance.id}]`);
   }
   await fn.bufload(denops, bufnr);
   await fn.execute(denops, `${config.direction} new ${bufname}`);
@@ -51,7 +42,7 @@ export async function createBuffer(
   if (exists) {
     await updateBuffer(denops, bufnr, nodes);
   } else {
-    await addBuffer(denops, kind, bufnr, nodes);
+    await addBuffer(denops, config.kind, bufnr, nodes);
   }
   return bufnr;
 }

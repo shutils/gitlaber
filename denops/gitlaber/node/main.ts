@@ -135,66 +135,22 @@ export const createProjectWikiNodes = async (
 };
 
 export const createDescriptionNodes = async (
-  denops: Denops,
-  seed?: Node,
+  seed: {
+    description: string | null;
+    [key: string]: unknown;
+  },
 ) => {
-  return await makeNode(denops, async (_args) => {
-    if (
-      !u.isObjectOf({
-        description: u.isString,
-        ...u.isUnknown,
-      })(seed?.params)
-    ) {
-      throw new Error("This node has not description.");
-    }
-    const nodes: Array<Node> = [];
-    if (seed.params.description === null) {
-      return nodes;
-    }
-    const lines = seed.params.description.split("\n");
-    lines.map((line) => {
-      nodes.push({
-        display: line,
-      });
-    });
+  const nodes: Node[] = [];
+  if (seed.description === null) {
     return await Promise.resolve(nodes);
-  });
-};
-
-export const createDescriptionEditNodes = async (
-  denops: Denops,
-  seed?: Node,
-) => {
-  return await makeNode(denops, async (_args) => {
-    let params: {
-      description: string;
-    };
-    if (
-      !u.isObjectOf({
-        description: u.isString,
-        ...u.isUnknown,
-      })(seed?.params)
-    ) {
-      params = {
-        description: "",
-      };
-    } else {
-      params = {
-        description: seed.params.description,
-      };
-    }
-    const nodes: Array<Node> = [];
-    if (params.description === null) {
-      return nodes;
-    }
-    const lines = params.description.split("\n");
-    lines.map((line) => {
-      nodes.push({
-        display: line,
-      });
+  }
+  const lines = seed.description.split("\n");
+  lines.map((line) => {
+    nodes.push({
+      display: line,
     });
-    return await Promise.resolve(nodes);
   });
+  return await Promise.resolve(nodes);
 };
 
 export const createProjectWikiPanelNodes = async (

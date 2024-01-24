@@ -1,8 +1,22 @@
-import { Denops } from "../deps.ts";
+import { Denops, helper } from "../deps.ts";
 
 import { createBuffer, reRenderBuffer } from "./core.ts";
 import { getCurrentInstance } from "../helper.ts";
+import {
+  createDescriptionNodes,
+  createMainPanelNodes,
+  createProjectBranchesNodes,
+  createProjectBranchPanelNodes,
+  createProjectIssuePanelNodes,
+  createProjectIssuesNodes,
+  createProjectMergeRequestPanelNodes,
+  createProjectMergeRequestsNodes,
+  createProjectWikiNodes,
+  createProjectWikiPanelNodes,
+} from "../node/main.ts";
+import { getBufferConfig } from "./helper.ts";
 import { ActionArgs } from "../types.ts";
+import { ensureIssue } from "../action/resource/issue.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -18,37 +32,69 @@ export function main(denops: Denops): void {
 }
 
 export async function openIssueList(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberIssueList");
+  const config = getBufferConfig("GitlaberIssueList");
+  const nodes = await createProjectIssuesNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
 }
 
 export async function openIssueConfig(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberIssueConfig");
+  const config = getBufferConfig("GitlaberIssueConfig");
+  const nodes = await createProjectIssuePanelNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
+}
+
+export async function openIssuePreview(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberIssuePreview");
+  const issue = await ensureIssue(args.denops, args);
+  if (!issue) {
+    return;
+  }
+  if (issue.description === null) {
+    await helper.echo(args.denops, "This issue has not description.");
+    return;
+  }
+  const nodes = await createDescriptionNodes(issue);
+  await createBuffer(args.denops, config, nodes);
 }
 
 export async function openBranchList(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberBranchList");
+  const config = getBufferConfig("GitlaberBranchList");
+  const nodes = await createProjectBranchesNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
 }
 
 export async function openBranchConfig(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberBranchConfig");
+  const config = getBufferConfig("GitlaberBranchConfig");
+  const nodes = await createProjectBranchPanelNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
 }
 
 export async function openWikiList(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberWikiList");
+  const config = getBufferConfig("GitlaberWikiList");
+  const nodes = await createProjectWikiNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
 }
 
 export async function openWikiConfig(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberWikiConfig");
+  const config = getBufferConfig("GitlaberWikiConfig");
+  const nodes = await createProjectWikiPanelNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
 }
 
 export async function openMrList(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberMrList");
+  const config = getBufferConfig("GitlaberMrList");
+  const nodes = await createProjectMergeRequestsNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
 }
 
 export async function openMrConfig(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberMrConfig");
+  const config = getBufferConfig("GitlaberMrConfig");
+  const nodes = await createProjectMergeRequestPanelNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
 }
 
 export async function openProjectStatus(args: ActionArgs): Promise<void> {
-  await createBuffer(args.denops, "GitlaberProjectStatus");
+  const config = getBufferConfig("GitlaberProjectStatus");
+  const nodes = await createMainPanelNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
 }

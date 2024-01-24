@@ -154,6 +154,12 @@ export const RESOURCE_ISSUES_MAPPINGS = [
     option: MAP_OPTION,
     description: "Create a branch related to the issue",
   },
+  {
+    lhs: "p",
+    rhs: "<Plug>(gitlaber:issue:preview)",
+    option: MAP_OPTION,
+    description: "Open issue preview",
+  },
 ];
 export const RESOURCE_BRANCHES_MAPPINGS = [
   ...BASE_MAPPINGS,
@@ -195,36 +201,31 @@ export const RESOURCE_Mrs_MAPPINGS = [
   },
   {
     lhs: "a",
-    rhs:
-      "<Plug>(gitlaber:mr:assign:assignee)",
+    rhs: "<Plug>(gitlaber:mr:assign:assignee)",
     option: MAP_OPTION,
     description: "Assign merge request assignee",
   },
   {
     lhs: "r",
-    rhs:
-      "<Plug>(gitlaber:mr:assign:reviewer)",
+    rhs: "<Plug>(gitlaber:mr:assign:reviewer)",
     option: MAP_OPTION,
     description: "Assign merge request reviewer",
   },
   {
     lhs: "A",
-    rhs:
-      "<Plug>(gitlaber:mr:approve)",
+    rhs: "<Plug>(gitlaber:mr:approve)",
     option: MAP_OPTION,
     description: "Approve merge request",
   },
   {
     lhs: "U",
-    rhs:
-      "<Plug>(gitlaber:mr:unapprove)",
+    rhs: "<Plug>(gitlaber:mr:unapprove)",
     option: MAP_OPTION,
     description: "Unapprove merge request",
   },
   {
     lhs: "M",
-    rhs:
-      "<Plug>(gitlaber:mr:merge)",
+    rhs: "<Plug>(gitlaber:mr:merge)",
     option: MAP_OPTION,
     description: "Merge merge request",
   },

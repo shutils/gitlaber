@@ -15,7 +15,7 @@ export const actionNames = [
   "issue:label",
   "issue:list",
   "issue:new",
-  // "issue:preview",
+  "issue:preview",
   "issue:reopen",
   "issue:unlabel",
   "mr:approve",

@@ -1,6 +1,7 @@
 import { BufferConfig } from "./types.ts";
 import * as node from "../node/main.ts";
 import {
+  BASE_MAPPINGS,
   MAIN_MAPPINGS,
   POPUP_BRANCH_MAPPINGS,
   POPUP_ISSUE_MAPPINGS,
@@ -102,5 +103,16 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       modifiable: false,
     },
     keymaps: RESOURCE_Mrs_MAPPINGS,
+  },
+  {
+    kind: "GitlaberIssuePreview",
+    direction: "aboveleft",
+    nodeMaker: node.createProjectMergeRequestsNodes,
+    options: {
+      buftype: "nofile",
+      modifiable: false,
+      filetype: "markdown",
+    },
+    keymaps: BASE_MAPPINGS,
   },
 ];
