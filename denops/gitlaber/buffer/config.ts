@@ -66,7 +66,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   },
   {
     kind: "GitlaberIssueList",
-    direction: "vertical botright",
+    direction: "tab",
     nodeMaker: node.createProjectIssuesNodes,
     options: {
       buftype: "nofile",
@@ -76,7 +76,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   },
   {
     kind: "GitlaberWikiList",
-    direction: "vertical botright",
+    direction: "tab",
     nodeMaker: node.createProjectWikiNodes,
     options: {
       buftype: "nofile",
@@ -86,7 +86,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   },
   {
     kind: "GitlaberBranchList",
-    direction: "vertical botright",
+    direction: "tab",
     nodeMaker: node.createProjectBranchesNodes,
     options: {
       buftype: "nofile",
@@ -96,7 +96,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   },
   {
     kind: "GitlaberMrList",
-    direction: "vertical botright",
+    direction: "tab",
     nodeMaker: node.createProjectMergeRequestsNodes,
     options: {
       buftype: "nofile",
@@ -106,7 +106,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   },
   {
     kind: "GitlaberIssuePreview",
-    direction: "aboveleft",
+    direction: "vertical botright",
     nodeMaker: node.createProjectMergeRequestsNodes,
     options: {
       buftype: "nofile",
