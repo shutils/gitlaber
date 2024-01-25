@@ -2,9 +2,10 @@ import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
-import { ActionArgs, isIssue } from "../../types.ts";
+import { ActionArgs, isIssue, Node } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
+import { openUiSelect } from "../../buffer/main.ts";
 
 export async function createIssue(args: ActionArgs): Promise<void> {
   const { denops, ctx } = args;
@@ -125,30 +126,49 @@ export async function reopenIssue(args: ActionArgs): Promise<void> {
 }
 
 export async function labelIssue(args: ActionArgs): Promise<void> {
-  const { denops, ctx } = args;
+  const { denops, ctx, params } = args;
   const { url, token, instance } = ctx;
-  const issue = await ensureIssue(denops, args);
-  if (!issue) {
-    return;
+  const ensuredParams = u.ensure(
+    params,
+    u.isOptionalOf(u.isObjectOf({
+      id: u.isOptionalOf(u.isNumber),
+      issue_iid: u.isOptionalOf(u.isNumber),
+      add_labels: u.isOptionalOf(u.isString),
+    })),
+  );
+  const id = instance.project.id;
+  let issue_iid = ensuredParams?.issue_iid;
+  const add_labels = ensuredParams?.add_labels;
+  if (!issue_iid) {
+    const issue = await ensureIssue(denops, args);
+    if (!issue) {
+      return;
+    }
+    issue_iid = issue.iid;
   }
   const labels = await client.getProjectLabels(
     url,
     token,
     {
-      id: instance.project.id,
+      id,
     },
   );
   if (labels.length === 0) {
     helper.echo(denops, "Project has not labels.");
     return;
   }
-  const description = "Select the label number you want to add.";
-  const textlist: string[] = [description];
-  for (let i = 0; i < labels.length; i++) {
-    textlist.unshift(`${i + 1}. ${labels[i].name}`);
-  }
-  const labelIndex = await fn.inputlist(denops, textlist.reverse());
-  if (!labelIndex) {
+  if (!add_labels) {
+    const nodes: Node[] = [];
+    labels.map((label) => {
+      nodes.push({
+        display: label.name,
+        params: {
+          name: "issue:label",
+          params: { ...params, id, issue_iid, add_labels: label.name },
+        },
+      });
+    });
+    await openUiSelect(args, nodes);
     return;
   }
   await executeRequest(
@@ -157,33 +177,51 @@ export async function labelIssue(args: ActionArgs): Promise<void> {
     url,
     token,
     {
-      id: instance.project.id,
-      issue_iid: issue.iid,
-      add_labels: labels[labelIndex - 1].name,
+      id,
+      issue_iid,
+      add_labels,
     },
     "Successfully add a label.",
   );
 }
 
 export async function unlabelIssue(args: ActionArgs): Promise<void> {
-  const { denops, ctx } = args;
+  const { denops, ctx, params } = args;
   const { url, token, instance } = ctx;
-  const issue = await ensureIssue(denops, args);
+  const ensuredParams = u.ensure(
+    params,
+    u.isOptionalOf(u.isObjectOf({
+      id: u.isOptionalOf(u.isNumber),
+      issue: u.isOptionalOf(isIssue),
+      remove_labels: u.isOptionalOf(u.isString),
+    })),
+  );
+  const id = instance.project.id;
+  let issue = ensuredParams?.issue;
+  const remove_labels = ensuredParams?.remove_labels;
   if (!issue) {
-    return;
+    issue = await ensureIssue(denops, args);
+    if (!issue) {
+      return;
+    }
   }
   const labels = issue.labels;
   if (labels.length === 0) {
     helper.echo(denops, "This issue has not labels.");
     return;
   }
-  const description = "Select the label number you want to remove.";
-  const textlist: string[] = [description];
-  for (let i = 0; i < labels.length; i++) {
-    textlist.unshift(`${i + 1}. ${labels[i]}`);
-  }
-  const labelIndex = await fn.inputlist(denops, textlist.reverse());
-  if (!labelIndex) {
+  if (!remove_labels) {
+    const nodes: Node[] = [];
+    labels.map((label) => {
+      nodes.push({
+        display: label,
+        params: {
+          name: "issue:unlabel",
+          params: { ...params, id, issue: issue, remove_labels: label },
+        },
+      });
+    });
+    await openUiSelect(args, nodes);
     return;
   }
   await executeRequest(
@@ -192,9 +230,9 @@ export async function unlabelIssue(args: ActionArgs): Promise<void> {
     url,
     token,
     {
-      id: instance.project.id,
+      id,
       issue_iid: issue.iid,
-      remove_labels: labels[labelIndex - 1],
+      remove_labels: remove_labels,
     },
     "Successfully remove a label.",
   );
@@ -210,11 +248,25 @@ export async function browseIssue(args: ActionArgs): Promise<void> {
 }
 
 export async function assignIssue(args: ActionArgs): Promise<void> {
-  const { denops, ctx } = args;
+  const { denops, ctx, params } = args;
   const { url, token, instance } = ctx;
-  const issue = await ensureIssue(denops, args);
-  if (!issue) {
-    return;
+  const ensuredParams = u.ensure(
+    params,
+    u.isOptionalOf(u.isObjectOf({
+      id: u.isOptionalOf(u.isNumber),
+      issue_iid: u.isOptionalOf(u.isNumber),
+      assignee_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
+    })),
+  );
+  const id = instance.project.id;
+  let issue_iid = ensuredParams?.issue_iid;
+  const assignee_ids = ensuredParams?.assignee_ids;
+  if (!issue_iid) {
+    const issue = await ensureIssue(denops, args);
+    if (!issue) {
+      return;
+    }
+    issue_iid = issue.iid;
   }
   const members = await client.getProjectMembers(url, token, {
     id: instance.project.id,
@@ -223,19 +275,24 @@ export async function assignIssue(args: ActionArgs): Promise<void> {
     helper.echo(denops, "Project has not members.");
     return;
   }
-  const description = "Select the member number you want to assign.";
-  const contents: string[] = [];
-  for (let i = 0; i < members.length; i++) {
-    contents.unshift(`${i + 1}. ${members[i].name}`);
-  }
-  const labelIndex = await util.select(denops, contents, description);
-  if (!labelIndex) {
+  if (!assignee_ids) {
+    const nodes: Node[] = [];
+    members.map((member) => {
+      nodes.push({
+        display: member.name,
+        params: {
+          name: "issue:assign",
+          params: { ...params, id, issue_iid, assignee_ids: [member.id] },
+        },
+      });
+    });
+    await openUiSelect(args, nodes);
     return;
   }
   await executeRequest(denops, client.editProjectIssue, url, token, {
-    id: instance.project.id,
-    issue_iid: issue.iid,
-    assignee_ids: [members[labelIndex - 1].id],
+    id,
+    issue_iid: issue_iid,
+    assignee_ids: assignee_ids,
   }, "Successfully assign a issue.");
 }
 

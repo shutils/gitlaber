@@ -53,6 +53,7 @@ import {
   openWikiList,
   openWikiNew,
   openWikiPreview,
+  uiSelect,
 } from "../buffer/main.ts";
 import { echoNode } from "./common/main.ts";
 
@@ -128,6 +129,7 @@ const actionStore: ActionStore = {
   "wiki:_edit": editWikiContent,
   "wiki:preview": openWikiPreview,
   "util:echo:node": echoNode,
+  "ui:select": uiSelect,
 };
 
 function verifyActionName(actionName: string): void {

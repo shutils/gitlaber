@@ -11,6 +11,7 @@ import {
   RESOURCE_ISSUES_MAPPINGS,
   RESOURCE_Mrs_MAPPINGS,
   RESOURCE_WIKIS_MAPPINGS,
+  UI_SELECT,
 } from "../keymap/main.ts";
 
 export const BUFFER_CONFIGS: BufferConfig[] = [
@@ -173,5 +174,14 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     },
     keymaps: BASE_MAPPINGS,
     tmp: true,
+  },
+  {
+    kind: "GitlaberUiSelect",
+    direction: "botright",
+    options: {
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: UI_SELECT,
   },
 ];

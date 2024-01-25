@@ -20,6 +20,7 @@ export const BUFFER_KINDS = [
   "GitlaberWikiPreview",
   "GitlaberWikiEdit",
   "GitlaberWikiNew",
+  "GitlaberUiSelect",
 ] as const;
 
 export const isBufferKind = u.isLiteralOneOf(BUFFER_KINDS);

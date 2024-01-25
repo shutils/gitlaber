@@ -1,4 +1,4 @@
-import { Denops } from "../deps.ts";
+import { Denops, unknownutil as u } from "../deps.ts";
 import { Context, Node } from "../types.ts";
 
 export const actionNames = [
@@ -48,6 +48,7 @@ export const actionNames = [
   "wiki:_new",
   "wiki:preview",
   "util:echo:node",
+  "ui:select",
 ] as const;
 
 export type ActionName = typeof actionNames[number];
@@ -64,3 +65,10 @@ export type ActionArgs = {
   node?: Node;
   params?: Record<string, unknown>;
 };
+
+export const isAction = u.isObjectOf({
+  name: u.isLiteralOneOf(actionNames),
+  params: u.isOptionalOf(u.isUnknown),
+});
+
+export type Action = u.PredicateType<typeof isAction>;

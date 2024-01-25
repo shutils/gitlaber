@@ -1,4 +1,4 @@
-import { Denops, fn, helper } from "../deps.ts";
+import { Denops, fn, helper, unknownutil as u } from "../deps.ts";
 
 import { createBuffer, reRenderBuffer } from "./core.ts";
 import { getCurrentInstance } from "../helper.ts";
@@ -16,7 +16,7 @@ import {
   createProjectWikiPanelNodes,
 } from "../node/main.ts";
 import { getBufferConfig } from "./helper.ts";
-import { ActionArgs } from "../types.ts";
+import { ActionArgs, isAction, Node } from "../types.ts";
 import { ensureIssue } from "../action/resource/issue.ts";
 import { ensureMergeRequest } from "../action/resource/mr.ts";
 import { ensureWiki } from "../action/resource/wiki.ts";
@@ -168,6 +168,35 @@ export async function openMrPreview(args: ActionArgs): Promise<void> {
   }
   const nodes = await createDescriptionNodes(mr);
   await createBuffer(args.denops, config, nodes);
+}
+
+export async function openUiSelect(
+  args: ActionArgs,
+  nodes: Node[],
+): Promise<void> {
+  const config = getBufferConfig("GitlaberUiSelect");
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
+}
+
+export async function uiSelect(
+  args: ActionArgs,
+): Promise<void> {
+  const { node, denops } = args;
+  const ensuredAction = u.ensure(node?.params, isAction);
+  const { name, params } = ensuredAction;
+  await fn.call(denops, "denops#notify", [
+    "gitlaber",
+    "doAction",
+    [{
+      name: name,
+      params: params,
+    }],
+  ]);
+  await fn.execute(denops, "bwipe")
 }
 
 export async function openMrEdit(args: ActionArgs): Promise<void> {

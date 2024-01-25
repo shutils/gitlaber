@@ -272,6 +272,15 @@ export const RESOURCE_Mrs_MAPPINGS = [
     description: "Open mr edit",
   },
 ];
+export const UI_SELECT = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "<CR>",
+    rhs: "<Plug>(gitlaber:ui:select)",
+    option: MAP_OPTION,
+    description: "Select current node",
+  },
+];
 
 export function registPlugMap(denops: Denops) {
   actionNames.map(async (actionName) => {
