@@ -11,7 +11,7 @@ export const actionNames = [
   "issue:close",
   "issue:config",
   "issue:delete",
-  // "issue:edit",
+  "issue:edit",
   "issue:label",
   "issue:list",
   "issue:new",

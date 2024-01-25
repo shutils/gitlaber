@@ -14,6 +14,7 @@ export const BUFFER_KINDS = [
   "GitlaberWikiList",
   "GitlaberMrList",
   "GitlaberIssuePreview",
+  "GitlaberIssueEdit",
 ] as const;
 
 export const isBufferKind = u.isLiteralOneOf(BUFFER_KINDS);

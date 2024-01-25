@@ -115,4 +115,15 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     },
     keymaps: BASE_MAPPINGS,
   },
+  {
+    kind: "GitlaberIssueEdit",
+    direction: "vertical botright",
+    nodeMaker: node.createProjectMergeRequestsNodes,
+    options: {
+      modifiable: true,
+      filetype: "markdown",
+    },
+    keymaps: BASE_MAPPINGS,
+    tmp: true,
+  },
 ];

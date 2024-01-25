@@ -56,3 +56,15 @@ export function getBufferConfig(kind: BufferKind) {
   }
   return config;
 }
+
+export async function setBufferPramas(
+  denops: Denops,
+  bufnr: number,
+  params: unknown,
+) {
+  await fn.setbufvar(denops, bufnr, "gitlaber_buffer_params", params);
+}
+
+export async function getBufferParams(denops: Denops, bufnr: number) {
+  return await fn.getbufvar(denops, bufnr, "gitlaber_buffer_params");
+}

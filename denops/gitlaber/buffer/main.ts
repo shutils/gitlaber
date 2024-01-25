@@ -1,4 +1,4 @@
-import { Denops, helper } from "../deps.ts";
+import { Denops, fn, helper } from "../deps.ts";
 
 import { createBuffer, reRenderBuffer } from "./core.ts";
 import { getCurrentInstance } from "../helper.ts";
@@ -14,7 +14,7 @@ import {
   createProjectWikiNodes,
   createProjectWikiPanelNodes,
 } from "../node/main.ts";
-import { getBufferConfig } from "./helper.ts";
+import { getBufferConfig, setBufferPramas } from "./helper.ts";
 import { ActionArgs } from "../types.ts";
 import { ensureIssue } from "../action/resource/issue.ts";
 
@@ -55,6 +55,24 @@ export async function openIssuePreview(args: ActionArgs): Promise<void> {
   }
   const nodes = await createDescriptionNodes(issue);
   await createBuffer(args.denops, config, nodes);
+}
+
+export async function openIssueEdit(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberIssueEdit");
+  const issue = await ensureIssue(args.denops, args);
+  if (!issue) {
+    return;
+  }
+  const nodes = await createDescriptionNodes(issue);
+  await createBuffer(args.denops, config, nodes);
+  await setBufferPramas(args.denops, await fn.bufnr(args.denops), {
+    id: args.ctx.instance.project.id,
+    issue_iid: issue.iid,
+  });
+  await fn.execute(
+    args.denops,
+    "autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'editIssue', [bufnr()])",
+  );
 }
 
 export async function openBranchList(args: ActionArgs): Promise<void> {

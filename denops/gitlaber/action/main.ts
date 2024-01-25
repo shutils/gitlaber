@@ -1,4 +1,4 @@
-import { Denops, unknownutil as u } from "../deps.ts";
+import { Denops, fn, unknownutil as u } from "../deps.ts";
 import { getContext, getCurrentNode } from "../helper.ts";
 import { ActionStore } from "./types.ts";
 import { addInstance, checkInstanceExists } from "../helper.ts";
@@ -33,6 +33,7 @@ import {
   openBranchConfig,
   openBranchList,
   openIssueConfig,
+  openIssueEdit,
   openIssueList,
   openIssuePreview,
   openMrConfig,
@@ -42,6 +43,10 @@ import {
   openWikiList,
 } from "../buffer/main.ts";
 import { echoNode } from "./common/main.ts";
+import { getBufferParams } from "../buffer/helper.ts";
+import { flattenBuffer } from "../util.ts";
+import { editProjectIssue } from "../client/index.ts";
+import { executeRequest } from "./resource/core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -56,6 +61,27 @@ export function main(denops: Denops): void {
       const ctx = await getContext(denops);
       const node = await getCurrentNode(denops);
       await action({ denops, ctx, node });
+    },
+
+    editIssue: async (args: unknown) => {
+      const bufnr = u.ensure(args, u.isNumber);
+      const params = u.ensure(
+        await getBufferParams(denops, bufnr),
+        u.isObjectOf({
+          id: u.isNumber,
+          issue_iid: u.isNumber,
+        }),
+      );
+      const lines = await flattenBuffer(
+        denops,
+        await fn.bufname(denops, bufnr),
+      );
+      const ctx = await getContext(denops);
+      await executeRequest(denops, editProjectIssue, ctx.url, ctx.token, {
+        id: params.id,
+        issue_iid: params.issue_iid,
+        description: lines,
+      }, "Successfully updated an issue.");
     },
   };
 }
@@ -76,6 +102,7 @@ const actionStore: ActionStore = {
   "issue:reopen": reopenIssue,
   "issue:unlabel": unlabelIssue,
   "issue:preview": openIssuePreview,
+  "issue:edit": openIssueEdit,
   "mr:approve": approveMergeRequest,
   "mr:assign:assignee": assignAssigneeMergeRequest,
   "mr:assign:reviewer": assignReviewerMergeRequest,

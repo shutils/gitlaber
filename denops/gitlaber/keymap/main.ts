@@ -160,6 +160,18 @@ export const RESOURCE_ISSUES_MAPPINGS = [
     option: MAP_OPTION,
     description: "Open issue preview",
   },
+  {
+    lhs: "A",
+    rhs: "<Plug>(gitlaber:issue:assign)",
+    option: MAP_OPTION,
+    description: "Assign assignee to issue",
+  },
+  {
+    lhs: "e",
+    rhs: "<Plug>(gitlaber:issue:edit)",
+    option: MAP_OPTION,
+    description: "Edit an issue description",
+  },
 ];
 export const RESOURCE_BRANCHES_MAPPINGS = [
   ...BASE_MAPPINGS,

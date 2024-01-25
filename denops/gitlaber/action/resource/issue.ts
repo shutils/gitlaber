@@ -215,6 +215,7 @@ export async function assignIssue(args: ActionArgs): Promise<void> {
     assignee_ids: [members[labelIndex - 1].id],
   }, "Successfully assign a issue.");
 }
+
 export async function ensureIssue(
   denops: Denops,
   args: ActionArgs,
