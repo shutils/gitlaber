@@ -1,9 +1,10 @@
-import { helper, unknownutil as u } from "../../deps.ts";
+import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 
 import * as client from "../../client/index.ts";
 import { ActionArgs, isWiki } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
+import * as util from "../../util.ts";
 
 export async function browseWiki(args: ActionArgs) {
   const { denops, ctx } = args;
@@ -33,4 +34,87 @@ export async function deleteWiki(args: ActionArgs) {
     },
     "Successfully delete a wiki.",
   );
+}
+
+export async function createWiki(args: ActionArgs) {
+  const { denops, ctx, params } = args;
+  const actionParams = u.ensure(
+    params,
+    u.isObjectOf({
+      bufnr: u.isNumber,
+      id: u.isNumber,
+      title: u.isString,
+    }),
+  );
+  const { bufnr, id, title } = actionParams;
+  const lines = await util.flattenBuffer(
+    denops,
+    await fn.bufname(denops, bufnr),
+  );
+  await executeRequest(
+    denops,
+    client.requestCreateNewProjectWiki,
+    ctx.url,
+    ctx.token,
+    {
+      id,
+      title,
+      content: lines,
+    },
+    "Successfully create a new wiki.",
+  );
+}
+
+export async function editWikiContent(args: ActionArgs) {
+  const { denops, params, ctx } = args;
+  const actionParams = u.ensure(
+    params,
+    u.isObjectOf({
+      bufnr: u.isNumber,
+      id: u.isNumber,
+      slug: u.isString,
+      title: u.isString,
+    }),
+  );
+  const { bufnr, id, slug, title } = actionParams;
+
+  const lines = await util.flattenBuffer(
+    denops,
+    await fn.bufname(denops, bufnr),
+  );
+  await executeRequest(
+    denops,
+    client.editProjectWiki,
+    ctx.url,
+    ctx.token,
+    {
+      id,
+      slug,
+      title,
+      content: lines,
+    },
+    "Successfully updated a wiki.",
+  );
+}
+
+export async function ensureWiki(
+  denops: Denops,
+  args: ActionArgs,
+) {
+  if (isWiki(args.node?.params)) {
+    return args.node.params;
+  }
+  const slug = await helper.input(denops, {
+    prompt: "Wiki slug: ",
+  });
+  if (!slug) {
+    return;
+  }
+  const { ctx } = args;
+  const { url, token, instance } = ctx;
+  const wiki = await client.getProjectWiki(url, token, {
+    id: instance.project.id,
+    slug: slug,
+  });
+  return wiki;
 }

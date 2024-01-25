@@ -8,14 +8,19 @@ import {
   closeIssue,
   createIssue,
   deleteIssue,
-  editIssue,
+  editIssueDescription,
   labelIssue,
   reopenIssue,
   unlabelIssue,
 } from "./resource/issue.ts";
 import { browseBranch, createBranch } from "./resource/branch.ts";
 import { browseProject } from "./resource/project.ts";
-import { browseWiki, deleteWiki } from "./resource/wiki.ts";
+import {
+  browseWiki,
+  createWiki,
+  deleteWiki,
+  editWikiContent,
+} from "./resource/wiki.ts";
 import {
   approveMergeRequest,
   assignAssigneeMergeRequest,
@@ -24,6 +29,7 @@ import {
   closeMergeRequest,
   createMergeRequest,
   deleteMergeRequest,
+  editMergeRequestDescription,
   labelMergeRequest,
   mergeMergeRequest,
   reopenMergeRequest,
@@ -38,10 +44,15 @@ import {
   openIssueList,
   openIssuePreview,
   openMrConfig,
+  openMrEdit,
   openMrList,
+  openMrPreview,
   openProjectStatus,
   openWikiConfig,
+  openWikiEdit,
   openWikiList,
+  openWikiNew,
+  openWikiPreview,
 } from "../buffer/main.ts";
 import { echoNode } from "./common/main.ts";
 
@@ -87,7 +98,7 @@ const actionStore: ActionStore = {
   "issue:unlabel": unlabelIssue,
   "issue:preview": openIssuePreview,
   "issue:edit": openIssueEdit,
-  "issue:_edit": editIssue,
+  "issue:_edit": editIssueDescription,
   "mr:approve": approveMergeRequest,
   "mr:assign:assignee": assignAssigneeMergeRequest,
   "mr:assign:reviewer": assignReviewerMergeRequest,
@@ -102,12 +113,20 @@ const actionStore: ActionStore = {
   "mr:reopen": reopenMergeRequest,
   "mr:unapprove": unapproveMergeRequest,
   "mr:unlabel": unlabelMergeRequest,
+  "mr:preview": openMrPreview,
+  "mr:edit": openMrEdit,
+  "mr:_edit": editMergeRequestDescription,
   "project:browse": browseProject,
   "project:status": openProjectStatus,
   "wiki:browse": browseWiki,
   "wiki:config": openWikiConfig,
   "wiki:delete": deleteWiki,
   "wiki:list": openWikiList,
+  "wiki:new": openWikiNew,
+  "wiki:_new": createWiki,
+  "wiki:edit": openWikiEdit,
+  "wiki:_edit": editWikiContent,
+  "wiki:preview": openWikiPreview,
   "util:echo:node": echoNode,
 };
 

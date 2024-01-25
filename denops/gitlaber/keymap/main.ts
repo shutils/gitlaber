@@ -202,6 +202,24 @@ export const RESOURCE_WIKIS_MAPPINGS = [
     option: MAP_OPTION,
     description: "Delete wiki",
   },
+  {
+    lhs: "p",
+    rhs: "<Plug>(gitlaber:wiki:preview)",
+    option: MAP_OPTION,
+    description: "Open wiki preview",
+  },
+  {
+    lhs: "e",
+    rhs: "<Plug>(gitlaber:wiki:edit)",
+    option: MAP_OPTION,
+    description: "Open wiki edit",
+  },
+  {
+    lhs: "N",
+    rhs: "<Plug>(gitlaber:wiki:new)",
+    option: MAP_OPTION,
+    description: "Open wiki new",
+  },
 ];
 export const RESOURCE_Mrs_MAPPINGS = [
   ...BASE_MAPPINGS,
@@ -240,6 +258,18 @@ export const RESOURCE_Mrs_MAPPINGS = [
     rhs: "<Plug>(gitlaber:mr:merge)",
     option: MAP_OPTION,
     description: "Merge merge request",
+  },
+  {
+    lhs: "p",
+    rhs: "<Plug>(gitlaber:mr:preview)",
+    option: MAP_OPTION,
+    description: "Open mr preview",
+  },
+  {
+    lhs: "e",
+    rhs: "<Plug>(gitlaber:mr:edit)",
+    option: MAP_OPTION,
+    description: "Open mr edit",
   },
 ];
 

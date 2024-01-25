@@ -29,7 +29,7 @@ export async function createIssue(args: ActionArgs): Promise<void> {
   );
 }
 
-export async function editIssue(args: ActionArgs): Promise<void> {
+export async function editIssueDescription(args: ActionArgs): Promise<void> {
   const { denops, params, ctx } = args;
   const actionParams = u.ensure(
     params,

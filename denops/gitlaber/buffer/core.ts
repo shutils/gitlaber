@@ -58,7 +58,7 @@ export async function reRenderBuffer(
 ) {
   const buffer = await getBuffer(denops, bufnr);
   const config = getBufferConfig(buffer.kind);
-  if (config.tmp) {
+  if (config.tmp || !config.nodeMaker) {
     return;
   }
   const nodes = await config.nodeMaker(denops);

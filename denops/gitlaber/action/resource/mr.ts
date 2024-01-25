@@ -1,4 +1,4 @@
-import { Denops, helper } from "../../deps.ts";
+import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import { ActionArgs, isBranch, isMergeRequest } from "../../types.ts";
 import * as util from "../../util.ts";
@@ -115,6 +115,35 @@ export async function createMergeRequest(args: ActionArgs) {
       target_branch: terget,
     },
     "Successfully created a new merge request.",
+  );
+}
+
+export async function editMergeRequestDescription(args: ActionArgs) {
+  const { denops, ctx, params } = args;
+  const actionParams = u.ensure(
+    params,
+    u.isObjectOf({
+      bufnr: u.isNumber,
+      id: u.isNumber,
+      merge_request_iid: u.isNumber,
+    }),
+  );
+  const { bufnr, id, merge_request_iid } = actionParams;
+  const lines = await util.flattenBuffer(
+    denops,
+    await fn.bufname(denops, bufnr),
+  );
+  await executeRequest(
+    denops,
+    client.editProjectMergeRequest,
+    ctx.url,
+    ctx.token,
+    {
+      id,
+      merge_request_iid,
+      description: lines,
+    },
+    "Successfully updated a merge request.",
   );
 }
 
@@ -394,7 +423,7 @@ export async function unapproveMergeRequest(args: ActionArgs) {
   );
 }
 
-async function ensureMergeRequest(
+export async function ensureMergeRequest(
   denops: Denops,
   args: ActionArgs,
 ) {

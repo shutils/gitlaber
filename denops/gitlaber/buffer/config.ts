@@ -107,7 +107,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberIssuePreview",
     direction: "vertical botright",
-    nodeMaker: node.createProjectMergeRequestsNodes,
     options: {
       buftype: "nofile",
       modifiable: false,
@@ -118,7 +117,56 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberIssueEdit",
     direction: "vertical botright",
-    nodeMaker: node.createProjectMergeRequestsNodes,
+    options: {
+      modifiable: true,
+      filetype: "markdown",
+    },
+    keymaps: BASE_MAPPINGS,
+    tmp: true,
+  },
+  {
+    kind: "GitlaberMrPreview",
+    direction: "vertical botright",
+    options: {
+      buftype: "nofile",
+      modifiable: false,
+      filetype: "markdown",
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
+    kind: "GitlaberMrEdit",
+    direction: "vertical botright",
+    options: {
+      modifiable: true,
+      filetype: "markdown",
+    },
+    keymaps: BASE_MAPPINGS,
+    tmp: true,
+  },
+  {
+    kind: "GitlaberWikiPreview",
+    direction: "vertical botright",
+    options: {
+      buftype: "nofile",
+      modifiable: false,
+      filetype: "markdown",
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
+    kind: "GitlaberWikiNew",
+    direction: "vertical botright",
+    options: {
+      modifiable: true,
+      filetype: "markdown",
+    },
+    keymaps: BASE_MAPPINGS,
+    tmp: true,
+  },
+  {
+    kind: "GitlaberWikiEdit",
+    direction: "vertical botright",
     options: {
       modifiable: true,
       filetype: "markdown",

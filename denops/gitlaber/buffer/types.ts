@@ -15,6 +15,11 @@ export const BUFFER_KINDS = [
   "GitlaberMrList",
   "GitlaberIssuePreview",
   "GitlaberIssueEdit",
+  "GitlaberMrPreview",
+  "GitlaberMrEdit",
+  "GitlaberWikiPreview",
+  "GitlaberWikiEdit",
+  "GitlaberWikiNew",
 ] as const;
 
 export const isBufferKind = u.isLiteralOneOf(BUFFER_KINDS);
@@ -35,7 +40,7 @@ export type Buffer = u.PredicateType<typeof isBuffer>;
 export type BufferConfig = {
   kind: BufferKind;
   direction: BufferDirection;
-  nodeMaker: (denops: Denops, seed?: Node) => Promise<Node[]>;
+  nodeMaker?: (denops: Denops, seed?: Node) => Promise<Node[]>;
   options?: BufferOptions;
   keymaps?: Keymap[];
   tmp?: boolean;

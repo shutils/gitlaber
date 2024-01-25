@@ -16,6 +16,19 @@ export async function requestCreateNewProjectWiki(
   await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
 }
 
+export async function getProjectWiki(
+  url: string,
+  token: string,
+  attrs: { id: number; slug: string; with_content?: boolean },
+) {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    isWiki,
+  );
+}
+
 export async function getProjectWikis(
   url: string,
   token: string,

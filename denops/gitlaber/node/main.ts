@@ -166,30 +166,19 @@ export const createProjectWikiPanelNodes = async (
 };
 
 export const createContentNodes = async (
-  denops: Denops,
-  seed?: Node,
+  seed: {
+    content: string;
+    [key: string]: unknown;
+  },
 ) => {
-  return await makeNode(denops, async (_args) => {
-    if (
-      !u.isObjectOf({
-        content: u.isString,
-        ...u.isUnknown,
-      })(seed?.params)
-    ) {
-      throw new Error("This node has not content.");
-    }
-    const nodes: Node[] = [];
-    if (seed.params.content === null) {
-      return nodes;
-    }
-    const lines = seed.params.content.split("\n");
-    lines.map((line) => {
-      nodes.push({
-        display: line,
-      });
+  const nodes: Node[] = [];
+  const lines = seed.content.split("\n");
+  lines.map((line) => {
+    nodes.push({
+      display: line,
     });
-    return await Promise.resolve(nodes);
   });
+  return await Promise.resolve(nodes);
 };
 
 export const createProjectMergeRequestPanelNodes = async (
