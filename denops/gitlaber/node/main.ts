@@ -250,9 +250,9 @@ export const createNodes = (
   columns.forEach((column, index) => {
     const width = maxColumnWidths[column];
     const paddedValue = column.padEnd(width);
-    const separatorLine = "-".repeat(width);
-    header += index === 0 ? paddedValue : ` | ${paddedValue}`;
-    separator += index === 0 ? separatorLine : ` | ${separatorLine}`;
+    const separatorLine = "─".repeat(width);
+    header += index === 0 ? paddedValue : ` │ ${paddedValue}`;
+    separator += index === 0 ? separatorLine : `─┼─${separatorLine}`;
   });
   nodes.push({
     display: `${header}`,
@@ -284,7 +284,7 @@ export const createNodes = (
       const paddedValue = value.padEnd(
         maxColumnWidths[column] - (width - value.length),
       );
-      display += index === 0 ? paddedValue : ` | ${paddedValue}`;
+      display += index === 0 ? paddedValue : ` │ ${paddedValue}`;
     });
 
     nodes.push({
