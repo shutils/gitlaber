@@ -1,7 +1,7 @@
-import { Denops, fn,  mapping } from "../deps.ts";
+import { Denops, fn, mapping } from "../deps.ts";
 
 import {} from "./config.ts";
-import { BufferConfig,  Node } from "../types.ts";
+import { BufferConfig, Node } from "../types.ts";
 import {
   addBuffer,
   getBuffer,
@@ -9,6 +9,7 @@ import {
   updateBuffer,
 } from "../helper.ts";
 import { getBufferConfig, setModifiable, setOptions } from "./helper.ts";
+import { getUserCustomBufferConfig } from "../config/main.ts";
 
 export async function createBuffer(
   denops: Denops,
@@ -16,6 +17,10 @@ export async function createBuffer(
   nodes: Node[],
 ) {
   const instance = await getCurrentInstance(denops);
+  const userConfig = await getUserCustomBufferConfig(denops, config.kind);
+  if (userConfig) {
+    config = { ...config, ...userConfig };
+  }
   let bufnr: number;
   let exists = false;
   let bufname: string;

@@ -46,4 +46,13 @@ export type BufferOptions = {
   filetype?: string;
 };
 
-type BufferDirection = "tab" | "botright" | "aboveleft" | "vertical botright";
+export const BufferDirections = [
+  "tab",
+  "botright",
+  "aboveleft",
+  "vertical botright",
+] as const;
+
+export const isBufferDirection = u.isLiteralOneOf(BufferDirections);
+
+export type BufferDirection = u.PredicateType<typeof isBufferDirection>;
