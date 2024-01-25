@@ -248,7 +248,7 @@ export function registPlugMap(denops: Denops) {
     await mapping.map(
       denops,
       `<Plug>(gitlaber:${actionName})`,
-      `<Cmd>call denops#notify('gitlaber', 'doAction', ['${actionName}'])<CR>`,
+      `<Cmd>call denops#notify('gitlaber', 'doAction', [{'name': '${actionName}'}])<CR>`,
       { noremap: true, silent: true },
     );
   });

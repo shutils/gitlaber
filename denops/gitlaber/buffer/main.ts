@@ -14,7 +14,7 @@ import {
   createProjectWikiNodes,
   createProjectWikiPanelNodes,
 } from "../node/main.ts";
-import { getBufferConfig, setBufferPramas } from "./helper.ts";
+import { getBufferConfig } from "./helper.ts";
 import { ActionArgs } from "../types.ts";
 import { ensureIssue } from "../action/resource/issue.ts";
 
@@ -64,14 +64,12 @@ export async function openIssueEdit(args: ActionArgs): Promise<void> {
     return;
   }
   const nodes = await createDescriptionNodes(issue);
+  const id = args.ctx.instance.project.id;
+  const issue_iid = issue.iid;
   await createBuffer(args.denops, config, nodes);
-  await setBufferPramas(args.denops, await fn.bufnr(args.denops), {
-    id: args.ctx.instance.project.id,
-    issue_iid: issue.iid,
-  });
   await fn.execute(
     args.denops,
-    "autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'editIssue', [bufnr()])",
+    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'issue:_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'issue_iid': ${issue_iid} }}])`,
   );
 }
 

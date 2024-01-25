@@ -1,4 +1,4 @@
-import { Denops, fn, unknownutil as u } from "../deps.ts";
+import { Denops, unknownutil as u } from "../deps.ts";
 import { getContext, getCurrentNode } from "../helper.ts";
 import { ActionStore } from "./types.ts";
 import { addInstance, checkInstanceExists } from "../helper.ts";
@@ -8,6 +8,7 @@ import {
   closeIssue,
   createIssue,
   deleteIssue,
+  editIssue,
   labelIssue,
   reopenIssue,
   unlabelIssue,
@@ -43,45 +44,28 @@ import {
   openWikiList,
 } from "../buffer/main.ts";
 import { echoNode } from "./common/main.ts";
-import { getBufferParams } from "../buffer/helper.ts";
-import { flattenBuffer } from "../util.ts";
-import { editProjectIssue } from "../client/index.ts";
-import { executeRequest } from "./resource/core.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     doAction: async (args: unknown) => {
-      const actionName = u.ensure(args, u.isString);
-      verifyActionName(actionName);
-      const action = actionStore[actionName as keyof ActionStore];
+      const ensuredArgs = u.ensure(
+        args,
+        u.isObjectOf({
+          name: u.isString,
+          params: u.isOptionalOf(u.isRecord),
+        }),
+      );
+      const name = ensuredArgs.name;
+      const params = ensuredArgs.params;
+      verifyActionName(name);
+      const action = actionStore[name as keyof ActionStore];
       if (!await checkInstanceExists(denops)) {
         await addInstance(denops);
       }
       const ctx = await getContext(denops);
       const node = await getCurrentNode(denops);
-      await action({ denops, ctx, node });
-    },
-
-    editIssue: async (args: unknown) => {
-      const bufnr = u.ensure(args, u.isNumber);
-      const params = u.ensure(
-        await getBufferParams(denops, bufnr),
-        u.isObjectOf({
-          id: u.isNumber,
-          issue_iid: u.isNumber,
-        }),
-      );
-      const lines = await flattenBuffer(
-        denops,
-        await fn.bufname(denops, bufnr),
-      );
-      const ctx = await getContext(denops);
-      await executeRequest(denops, editProjectIssue, ctx.url, ctx.token, {
-        id: params.id,
-        issue_iid: params.issue_iid,
-        description: lines,
-      }, "Successfully updated an issue.");
+      await action({ denops, ctx, node, params });
     },
   };
 }
@@ -103,6 +87,7 @@ const actionStore: ActionStore = {
   "issue:unlabel": unlabelIssue,
   "issue:preview": openIssuePreview,
   "issue:edit": openIssueEdit,
+  "issue:_edit": editIssue,
   "mr:approve": approveMergeRequest,
   "mr:assign:assignee": assignAssigneeMergeRequest,
   "mr:assign:reviewer": assignReviewerMergeRequest,

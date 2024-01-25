@@ -12,6 +12,7 @@ export const actionNames = [
   "issue:config",
   "issue:delete",
   "issue:edit",
+  "issue:_edit",
   "issue:label",
   "issue:list",
   "issue:new",
@@ -58,4 +59,5 @@ export type ActionArgs = {
   denops: Denops;
   ctx: Context;
   node?: Node;
+  params?: Record<string, unknown>;
 };

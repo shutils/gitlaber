@@ -1,4 +1,4 @@
-import { Denops, fn, helper } from "../../deps.ts";
+import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 
 import * as client from "../../client/index.ts";
 import * as util from "../../util.ts";
@@ -27,6 +27,29 @@ export async function createIssue(args: ActionArgs): Promise<void> {
     },
     "Successfully created an issue.",
   );
+}
+
+export async function editIssue(args: ActionArgs): Promise<void> {
+  const { denops, params, ctx } = args;
+  const actionParams = u.ensure(
+    params,
+    u.isObjectOf({
+      bufnr: u.isNumber,
+      id: u.isNumber,
+      issue_iid: u.isNumber,
+    }),
+  );
+  const { bufnr, id, issue_iid } = actionParams;
+
+  const lines = await util.flattenBuffer(
+    denops,
+    await fn.bufname(denops, bufnr),
+  );
+  await executeRequest(denops, client.editProjectIssue, ctx.url, ctx.token, {
+    id: id,
+    issue_iid: issue_iid,
+    description: lines,
+  }, "Successfully updated an issue.");
 }
 
 export async function deleteIssue(args: ActionArgs): Promise<void> {
