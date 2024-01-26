@@ -43,6 +43,7 @@ import {
   openIssueEdit,
   openIssueList,
   openIssuePreview,
+  openMergedYaml,
   openMrConfig,
   openMrEdit,
   openMrList,
@@ -130,6 +131,7 @@ const actionStore: ActionStore = {
   "wiki:preview": openWikiPreview,
   "util:echo:node": echoNode,
   "ui:select": uiSelect,
+  "ci:lint": openMergedYaml,
 };
 
 function verifyActionName(actionName: string): void {

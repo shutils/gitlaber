@@ -184,4 +184,14 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     },
     keymaps: UI_SELECT,
   },
+  {
+    kind: "GitlaberMergedYaml",
+    direction: "vertical botright",
+    options: {
+      filetype: "yaml",
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
 ];

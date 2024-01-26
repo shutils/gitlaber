@@ -28,6 +28,10 @@ export async function request(
     case http.Status.NoContent:
       return;
     default:
-      throw new Error(`HTTP request failed. status: ${res.status}`);
+      throw new Error(
+        `HTTP request failed. status: ${res.status} ${
+          Deno.inspect(await res.json(), { depth: Infinity })
+        }`,
+      );
   }
 }

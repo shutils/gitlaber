@@ -1,7 +1,7 @@
 import { Denops, unknownutil as u } from "../deps.ts";
 import * as client from "../client/index.ts";
 
-import { Context, Node, NodeParam } from "../types.ts";
+import { Context, Lint, Node, NodeParam } from "../types.ts";
 import { getContext, getCurrentNode } from "../helper.ts";
 // import { getKv } from "../../kv.ts";
 
@@ -173,6 +173,22 @@ export const createContentNodes = async (
 ) => {
   const nodes: Node[] = [];
   const lines = seed.content.split("\n");
+  lines.map((line) => {
+    nodes.push({
+      display: line,
+    });
+  });
+  return await Promise.resolve(nodes);
+};
+
+export const createMergedYamlNodes = async (
+  lint: Lint,
+) => {
+  if (lint.merged_yaml === null) {
+    return await Promise.resolve([]);
+  }
+  const nodes: Node[] = [];
+  const lines = lint.merged_yaml.split("\n");
   lines.map((line) => {
     nodes.push({
       display: line,

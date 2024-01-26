@@ -49,6 +49,7 @@ export const actionNames = [
   "wiki:preview",
   "util:echo:node",
   "ui:select",
+  "ci:lint",
 ] as const;
 
 export type ActionName = typeof actionNames[number];

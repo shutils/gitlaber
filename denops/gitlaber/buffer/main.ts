@@ -6,6 +6,7 @@ import {
   createContentNodes,
   createDescriptionNodes,
   createMainPanelNodes,
+  createMergedYamlNodes,
   createProjectBranchesNodes,
   createProjectBranchPanelNodes,
   createProjectIssuePanelNodes,
@@ -20,6 +21,8 @@ import { ActionArgs, isAction, Node } from "../types.ts";
 import { ensureIssue } from "../action/resource/issue.ts";
 import { ensureMergeRequest } from "../action/resource/mr.ts";
 import { ensureWiki } from "../action/resource/wiki.ts";
+import { getLint } from "../client/index.ts";
+import { flattenBuffer } from "../util.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -198,6 +201,27 @@ export async function openUiSelect(
   );
 }
 
+export async function openMergedYaml(args: ActionArgs): Promise<void> {
+  const { denops } = args;
+  const { url, token } = args.ctx;
+  const { id } = args.ctx.instance.project;
+  const content = await flattenBuffer(
+    denops,
+    await fn.bufname(denops, await fn.bufnr(denops)),
+  );
+  const config = getBufferConfig("GitlaberMergedYaml");
+  const lint = await getLint(url, token, { id, content });
+  if (!lint.valid) {
+    await helper.echoerr(
+      denops,
+      `Invalid yaml. \n\nmessage: ${lint.errors.join("\n")}`,
+    );
+    return;
+  }
+  const nodes = await createMergedYamlNodes(lint);
+  await createBuffer(args.denops, config, nodes);
+}
+
 export async function uiSelect(
   args: ActionArgs,
 ): Promise<void> {
@@ -212,7 +236,7 @@ export async function uiSelect(
       params: params,
     }],
   ]);
-  await fn.execute(denops, "bwipe")
+  await fn.execute(denops, "bwipe");
 }
 
 export async function openMrEdit(args: ActionArgs): Promise<void> {
