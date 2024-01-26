@@ -43,7 +43,11 @@ export async function openIssueList(args: ActionArgs): Promise<void> {
 export async function openIssueConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberIssueConfig");
   const nodes = await createProjectIssuePanelNodes(args.denops);
-  await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
 }
 
 export async function openIssuePreview(args: ActionArgs): Promise<void> {
@@ -85,7 +89,11 @@ export async function openBranchList(args: ActionArgs): Promise<void> {
 export async function openBranchConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberBranchConfig");
   const nodes = await createProjectBranchPanelNodes(args.denops);
-  await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
 }
 
 export async function openWikiList(args: ActionArgs): Promise<void> {
@@ -97,7 +105,11 @@ export async function openWikiList(args: ActionArgs): Promise<void> {
 export async function openWikiConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberWikiConfig");
   const nodes = await createProjectWikiPanelNodes(args.denops);
-  await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
 }
 
 export async function openWikiPreview(args: ActionArgs): Promise<void> {
@@ -153,7 +165,11 @@ export async function openMrList(args: ActionArgs): Promise<void> {
 export async function openMrConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrConfig");
   const nodes = await createProjectMergeRequestPanelNodes(args.denops);
-  await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
 }
 
 export async function openMrPreview(args: ActionArgs): Promise<void> {
