@@ -11,6 +11,7 @@ export const isMergeRequest = u.isObjectOf({
   web_url: u.isString,
   squash: u.isBoolean,
   approved: u.isBoolean,
+  labels: u.isArrayOf(u.isString),
   assignees: u.isArrayOf(
     u.isObjectOf({
       username: u.isString,

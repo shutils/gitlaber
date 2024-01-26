@@ -222,7 +222,7 @@ export const createProjectMergeRequestsNodes = async (
     );
     return await Promise.resolve(createNodes(
       projectMergeRequests,
-      ["iid", "title", "state", "assignees", "reviewers", "approved"],
+      ["iid", "title", "state", "assignees", "reviewers", "labels", "approved"],
     ));
   });
 };

@@ -52,7 +52,9 @@ export const actionNames = [
   "ci:lint",
 ] as const;
 
-export type ActionName = typeof actionNames[number];
+export const isActionName = u.isLiteralOneOf(actionNames);
+
+export type ActionName = u.PredicateType<typeof isActionName>;
 
 export type ActionStore = {
   [key in ActionName]: (
@@ -64,6 +66,7 @@ export type ActionArgs = {
   denops: Denops;
   ctx: Context;
   node?: Node;
+  name: ActionName;
   params?: Record<string, unknown>;
 };
 

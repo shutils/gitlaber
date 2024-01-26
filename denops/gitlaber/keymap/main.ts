@@ -271,6 +271,18 @@ export const RESOURCE_Mrs_MAPPINGS = [
     option: MAP_OPTION,
     description: "Open mr edit",
   },
+  {
+    lhs: "la",
+    rhs: "<Plug>(gitlaber:mr:label)",
+    option: MAP_OPTION,
+    description: "Label merge request",
+  },
+  {
+    lhs: "lr",
+    rhs: "<Plug>(gitlaber:mr:unlabel)",
+    option: MAP_OPTION,
+    description: "Unlable merge request",
+  },
 ];
 export const UI_SELECT = [
   ...BASE_MAPPINGS,

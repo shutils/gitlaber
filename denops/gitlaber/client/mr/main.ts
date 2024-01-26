@@ -182,6 +182,11 @@ export async function getProjectMergeRequestsGraphQL(
             draft
             webUrl
             squash
+            labels {
+              nodes {
+                title
+              }
+            }
           }
         }
       }
@@ -206,6 +211,11 @@ export async function getProjectMergeRequestsGraphQL(
     webUrl: string;
     squash: boolean;
     state: string;
+    labels: {
+      nodes: {
+        title: string;
+      }[];
+    };
     approvedBy: {
       nodes: {
         username: string;
@@ -236,6 +246,7 @@ export async function getProjectMergeRequestsGraphQL(
       web_url: mr.webUrl,
       squash: mr.squash,
       state: mr.state,
+      labels: mr.labels.nodes.map((label) => label.title),
       approved: mr.approvedBy.nodes.length > 0,
       assignees: mr.assignees.nodes.map((assignee) => {
         return {

@@ -1,6 +1,6 @@
 import { Denops, unknownutil as u } from "../deps.ts";
 import { getContext, getCurrentNode } from "../helper.ts";
-import { ActionStore } from "./types.ts";
+import { ActionStore, isActionName } from "./types.ts";
 import { addInstance, checkInstanceExists } from "../helper.ts";
 import {
   assignIssue,
@@ -65,7 +65,7 @@ export function main(denops: Denops): void {
       const ensuredArgs = u.ensure(
         args,
         u.isObjectOf({
-          name: u.isString,
+          name: isActionName,
           params: u.isOptionalOf(u.isRecord),
         }),
       );
@@ -78,7 +78,7 @@ export function main(denops: Denops): void {
       }
       const ctx = await getContext(denops);
       const node = await getCurrentNode(denops);
-      await action({ denops, ctx, node, params });
+      await action({ denops, ctx, node, params, name });
     },
   };
 }
