@@ -9,7 +9,7 @@ import {
   updateBuffer,
 } from "../helper.ts";
 import { getBufferConfig, setModifiable, setOptions } from "./helper.ts";
-import { getUserCustomBufferConfig } from "../config/main.ts";
+import { getUserCustomBufferConfig, loadConfig } from "../config/main.ts";
 
 export async function createBuffer(
   denops: Denops,
@@ -17,9 +17,10 @@ export async function createBuffer(
   nodes: Node[],
 ) {
   const instance = await getCurrentInstance(denops);
-  const userConfig = await getUserCustomBufferConfig(denops, config.kind);
-  if (userConfig) {
-    config = { ...config, ...userConfig };
+  const userConfig = await loadConfig(denops);
+  const userBufferConfig = await getUserCustomBufferConfig(denops, config.kind);
+  if (userBufferConfig) {
+    config = { ...config, ...userBufferConfig };
   }
   let bufnr: number;
   let exists = false;
@@ -39,7 +40,7 @@ export async function createBuffer(
   if (config.options) {
     setOptions(denops, config.options, bufnr);
   }
-  if (config.keymaps) {
+  if (config.keymaps && !userConfig?.default_keymap_disable === true) {
     config.keymaps.map(async (keymap) => {
       await mapping.map(denops, keymap.lhs, keymap.rhs, keymap.option);
     });

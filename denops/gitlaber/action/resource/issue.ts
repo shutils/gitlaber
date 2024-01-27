@@ -163,7 +163,7 @@ export async function labelIssue(args: ActionArgs): Promise<void> {
       nodes.push({
         display: label.name,
         params: {
-          name: "issue:label",
+          name: args.name,
           params: { ...params, id, issue_iid, add_labels: label.name },
         },
       });
@@ -216,7 +216,7 @@ export async function unlabelIssue(args: ActionArgs): Promise<void> {
       nodes.push({
         display: label,
         params: {
-          name: "issue:unlabel",
+          name: args.name,
           params: { ...params, id, issue: issue, remove_labels: label },
         },
       });
@@ -281,7 +281,7 @@ export async function assignIssue(args: ActionArgs): Promise<void> {
       nodes.push({
         display: member.name,
         params: {
-          name: "issue:assign",
+          name: args.name,
           params: { ...params, id, issue_iid, assignee_ids: [member.id] },
         },
       });

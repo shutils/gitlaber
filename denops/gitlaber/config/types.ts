@@ -3,6 +3,7 @@ import { unknownutil as u } from "../deps.ts";
 import { isBufferDirection, isBufferKind } from "../types.ts";
 
 export const isUserConfig = u.isOptionalOf(u.isObjectOf({
+  default_keymap_disable: u.isBoolean,
   custom_buffer_configs: u.isOptionalOf(
     u.isArrayOf(
       u.isObjectOf({

@@ -259,3 +259,7 @@ export async function openProjectStatus(args: ActionArgs): Promise<void> {
   const nodes = await createMainPanelNodes(args.denops);
   await createBuffer(args.denops, config, nodes);
 }
+
+export async function closeBuffer(args: ActionArgs): Promise<void> {
+  await fn.execute(args.denops, "bwipe");
+}

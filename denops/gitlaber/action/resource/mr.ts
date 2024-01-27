@@ -52,7 +52,7 @@ async function assignMergeRequestMember(
         nodes.push({
           display: `${member.name}`,
           params: {
-            name: "mr:assign:assignee",
+            name: args.name,
             params: { ...params, id, mr, assignee_id: member.id },
           },
         });
@@ -71,7 +71,7 @@ async function assignMergeRequestMember(
         nodes.push({
           display: `${member.name}`,
           params: {
-            name: "mr:assign:reviewer",
+            name: args.name,
             params: {
               ...params,
               id,
@@ -356,7 +356,7 @@ export async function labelMergeRequest(args: ActionArgs) {
       nodes.push({
         display: `${label.name}`,
         params: {
-          name: "mr:label",
+          name: args.name,
           params: { ...params, id, mr, add_labels: label.name },
         },
       });
@@ -414,7 +414,7 @@ export async function unlabelMergeRequest(args: ActionArgs) {
       nodes.push({
         display: `${label}`,
         params: {
-          name: "mr:unlabel",
+          name: args.name,
           params: { ...params, id, mr, remove_labels: label },
         },
       });

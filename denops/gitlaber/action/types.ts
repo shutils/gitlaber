@@ -50,6 +50,7 @@ export const actionNames = [
   "util-echo-node",
   "ui-select",
   "ci-lint",
+  "buffer-close",
 ] as const;
 
 export const isActionName = u.isLiteralOneOf(actionNames);

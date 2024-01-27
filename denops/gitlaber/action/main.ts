@@ -37,6 +37,7 @@ import {
   unlabelMergeRequest,
 } from "./resource/mr.ts";
 import {
+  closeBuffer,
   openBranchConfig,
   openBranchList,
   openIssueConfig,
@@ -101,6 +102,7 @@ const actionStore: ActionStore = {
   "issue-preview": openIssuePreview,
   "issue-edit": openIssueEdit,
   "issue-_edit": editIssueDescription,
+  "mr-_edit": editMergeRequestDescription,
   "mr-approve": approveMergeRequest,
   "mr-assign-assignee": assignAssigneeMergeRequest,
   "mr-assign-reviewer": assignReviewerMergeRequest,
@@ -108,16 +110,15 @@ const actionStore: ActionStore = {
   "mr-close": closeMergeRequest,
   "mr-config": openMrConfig,
   "mr-delete": deleteMergeRequest,
+  "mr-edit": openMrEdit,
   "mr-label": labelMergeRequest,
   "mr-list": openMrList,
   "mr-merge": mergeMergeRequest,
   "mr-new": createMergeRequest,
+  "mr-preview": openMrPreview,
   "mr-reopen": reopenMergeRequest,
   "mr-unapprove": unapproveMergeRequest,
   "mr-unlabel": unlabelMergeRequest,
-  "mr-preview": openMrPreview,
-  "mr-edit": openMrEdit,
-  "mr-_edit": editMergeRequestDescription,
   "project-browse": browseProject,
   "project-status": openProjectStatus,
   "wiki-browse": browseWiki,
@@ -132,6 +133,7 @@ const actionStore: ActionStore = {
   "util-echo-node": echoNode,
   "ui-select": uiSelect,
   "ci-lint": openMergedYaml,
+  "buffer-close": closeBuffer,
 };
 
 function verifyActionName(actionName: string): void {
