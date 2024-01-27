@@ -20,6 +20,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createMainPanelNodes,
     options: {
+      filetype: "gitlaber-project-status",
       buftype: "nofile",
       modifiable: false,
     },
@@ -30,6 +31,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "botright",
     nodeMaker: node.createProjectIssuePanelNodes,
     options: {
+      filetype: "gitlaber-issue-config",
       buftype: "nofile",
       modifiable: false,
     },
@@ -40,6 +42,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "botright",
     nodeMaker: node.createProjectWikiPanelNodes,
     options: {
+      filetype: "gitlaber-wiki-config",
       buftype: "nofile",
       modifiable: false,
     },
@@ -50,6 +53,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "botright",
     nodeMaker: node.createProjectBranchPanelNodes,
     options: {
+      filetype: "gitlaber-branch-config",
       buftype: "nofile",
       modifiable: false,
     },
@@ -60,6 +64,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "botright",
     nodeMaker: node.createProjectMergeRequestPanelNodes,
     options: {
+      filetype: "gitlaber-mr-config",
       buftype: "nofile",
       modifiable: false,
     },
@@ -70,6 +75,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createProjectIssuesNodes,
     options: {
+      filetype: "gitlaber-issue-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -80,6 +86,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createProjectWikiNodes,
     options: {
+      filetype: "gitlaber-wiki-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -90,6 +97,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createProjectBranchesNodes,
     options: {
+      filetype: "gitlaber-branch-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -100,6 +108,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createProjectMergeRequestsNodes,
     options: {
+      filetype: "gitlaber-mr-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -111,7 +120,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: false,
-      filetype: "markdown",
+      filetype: "markdown.gitlaber-issue-preview",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -120,7 +129,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "vertical botright",
     options: {
       modifiable: true,
-      filetype: "markdown",
+      filetype: "markdown.gitlaber-issue-edit",
     },
     keymaps: BASE_MAPPINGS,
     tmp: true,
@@ -131,7 +140,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: false,
-      filetype: "markdown",
+      filetype: "markdown.gitlaber-mr-preview",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -140,7 +149,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "vertical botright",
     options: {
       modifiable: true,
-      filetype: "markdown",
+      filetype: "markdown.gitlaber-mr-edit",
     },
     keymaps: BASE_MAPPINGS,
     tmp: true,
@@ -151,7 +160,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: false,
-      filetype: "markdown",
+      filetype: "markdown.gitlaber-wiki-preview",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -160,7 +169,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "vertical botright",
     options: {
       modifiable: true,
-      filetype: "markdown",
+      filetype: "markdown.gitlaber-wiki-new",
     },
     keymaps: BASE_MAPPINGS,
     tmp: true,
@@ -170,7 +179,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "vertical botright",
     options: {
       modifiable: true,
-      filetype: "markdown",
+      filetype: "markdown.gitlaber-wiki-edit",
     },
     keymaps: BASE_MAPPINGS,
     tmp: true,
@@ -181,6 +190,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: false,
+      filetype: "markdown.gitlaber-ui-select",
     },
     keymaps: UI_SELECT,
   },
@@ -188,7 +198,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberMergedYaml",
     direction: "vertical botright",
     options: {
-      filetype: "yaml",
+      filetype: "yaml.gitlaber-ci-lint",
       buftype: "nofile",
       modifiable: false,
     },
