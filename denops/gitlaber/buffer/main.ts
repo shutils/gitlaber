@@ -79,7 +79,7 @@ export async function openIssueEdit(args: ActionArgs): Promise<void> {
   await createBuffer(args.denops, config, nodes);
   await fn.execute(
     args.denops,
-    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'issue:_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'issue_iid': ${issue_iid} }}])`,
+    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'issue-_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'issue_iid': ${issue_iid} }}])`,
   );
 }
 
@@ -138,7 +138,7 @@ export async function openWikiEdit(args: ActionArgs): Promise<void> {
   await createBuffer(args.denops, config, nodes);
   await fn.execute(
     args.denops,
-    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'wiki:_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'slug': '${slug}', 'title': '${title}' }}])`,
+    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'wiki-_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'slug': '${slug}', 'title': '${title}' }}])`,
   );
 }
 
@@ -155,7 +155,7 @@ export async function openWikiNew(args: ActionArgs): Promise<void> {
   await createBuffer(args.denops, config, nodes);
   await fn.execute(
     args.denops,
-    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'wiki:_new', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'title': '${title}' }}])`,
+    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'wiki-_new', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'title': '${title}' }}])`,
   );
 }
 
@@ -250,7 +250,7 @@ export async function openMrEdit(args: ActionArgs): Promise<void> {
   await createBuffer(args.denops, config, nodes);
   await fn.execute(
     args.denops,
-    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'mr:_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'merge_request_iid': ${mr.iid} }}])`,
+    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'mr-_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'merge_request_iid': ${mr.iid} }}])`,
   );
 }
 
