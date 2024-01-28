@@ -1,6 +1,8 @@
 import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
 import { isBranch } from "./types.ts";
+import { objectToURLSearchParams } from "../helper.ts";
+import { PaginationAttributes } from "../types.ts";
 
 export async function getProjectBranch(
   url: string,
@@ -15,10 +17,11 @@ export async function getProjectBranch(
 export async function getProjectBranches(
   url: string,
   token: string,
-  attrs: { id: number; search?: string; regex?: string },
+  attrs: { id: number; search?: string; regex?: string } & PaginationAttributes,
 ) {
-  const gitlabApiPath =
-    `${url}/api/v4/projects/${attrs.id}/repository/branches`;
+  const baseApiPath = `${url}/api/v4/projects/${attrs.id}/repository/branches`;
+  const queryPrams = objectToURLSearchParams(attrs);
+  const gitlabApiPath = baseApiPath + "?" + queryPrams;
   return u.ensure(
     await request(gitlabApiPath, token, "GET"),
     u.isArrayOf(isBranch),

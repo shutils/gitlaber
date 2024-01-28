@@ -122,9 +122,15 @@ export const createProjectBranchesNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (args) => {
+    const buffer = await getBuffer(args.denops);
+    const pageAttrs = u.ensure(
+      buffer.params,
+      u.isOptionalOf(isPaginationAttributes),
+    );
     const { instance, url, token } = args;
     const projectBranches = await client.getProjectBranches(url, token, {
       id: instance.project.id,
+      ...pageAttrs,
     });
     return await Promise.resolve(
       createNodes(projectBranches, ["name", "merged"]),

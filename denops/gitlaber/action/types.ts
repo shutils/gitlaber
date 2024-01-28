@@ -5,6 +5,8 @@ export const actionNames = [
   "branch-browse",
   "branch-config",
   "branch-list",
+  "branch-list-next",
+  "branch-list-prev",
   "branch-new",
   "issue-assign",
   "issue-browse",
