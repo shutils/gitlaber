@@ -76,11 +76,8 @@ export async function openIssueEdit(args: ActionArgs): Promise<void> {
   const nodes = await createDescriptionNodes(issue);
   const id = args.ctx.instance.project.id;
   const issue_iid = issue.iid;
-  await createBuffer(args.denops, config, nodes);
-  await fn.execute(
-    args.denops,
-    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'issue-_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'issue_iid': ${issue_iid} }}])`,
-  );
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await updateBuffer(args.denops, bufnr, undefined, { id, issue_iid });
 }
 
 export async function openBranchList(args: ActionArgs): Promise<void> {
@@ -135,11 +132,8 @@ export async function openWikiEdit(args: ActionArgs): Promise<void> {
   const slug = wiki.slug;
   const title = wiki.title;
   const nodes = await createContentNodes(wiki);
-  await createBuffer(args.denops, config, nodes);
-  await fn.execute(
-    args.denops,
-    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'wiki-_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'slug': '${slug}', 'title': '${title}' }}])`,
-  );
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await updateBuffer(args.denops, bufnr, undefined, { id, slug, title });
 }
 
 export async function openWikiNew(args: ActionArgs): Promise<void> {
@@ -152,11 +146,8 @@ export async function openWikiNew(args: ActionArgs): Promise<void> {
     return;
   }
   const nodes = await createContentNodes({ title, content: "" });
-  await createBuffer(args.denops, config, nodes);
-  await fn.execute(
-    args.denops,
-    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'wiki-_new', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'title': '${title}' }}])`,
-  );
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await updateBuffer(args.denops, bufnr, undefined, { id, title });
 }
 
 export async function openMrList(args: ActionArgs): Promise<void> {
@@ -247,11 +238,11 @@ export async function openMrEdit(args: ActionArgs): Promise<void> {
   }
   const nodes = await createDescriptionNodes(mr);
   const id = args.ctx.instance.project.id;
-  await createBuffer(args.denops, config, nodes);
-  await fn.execute(
-    args.denops,
-    `autocmd BufWritePost <buffer> call denops#notify('gitlaber', 'doAction', [{'name': 'mr-_edit', 'params': { 'bufnr': bufnr(), 'id': ${id}, 'merge_request_iid': ${mr.iid} }}])`,
-  );
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await updateBuffer(args.denops, bufnr, undefined, {
+    id,
+    merge_request_iid: mr.iid,
+  });
 }
 
 export async function openProjectStatus(args: ActionArgs): Promise<void> {

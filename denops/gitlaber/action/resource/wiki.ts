@@ -5,6 +5,7 @@ import { ActionArgs, isWiki } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import * as util from "../../util.ts";
+import { getBuffer } from "../../helper.ts";
 
 export async function browseWiki(args: ActionArgs) {
   const { denops, ctx } = args;
@@ -37,16 +38,17 @@ export async function deleteWiki(args: ActionArgs) {
 }
 
 export async function createWiki(args: ActionArgs) {
-  const { denops, ctx, params } = args;
-  const actionParams = u.ensure(
-    params,
+  const { denops, ctx } = args;
+  const bufnr = await fn.bufnr(denops);
+  const buffer = await getBuffer(denops, bufnr);
+  const bufferParams = u.ensure(
+    buffer.params,
     u.isObjectOf({
-      bufnr: u.isNumber,
       id: u.isNumber,
       title: u.isString,
     }),
   );
-  const { bufnr, id, title } = actionParams;
+  const { id, title } = bufferParams;
   const lines = await util.flattenBuffer(
     denops,
     await fn.bufname(denops, bufnr),
@@ -66,17 +68,18 @@ export async function createWiki(args: ActionArgs) {
 }
 
 export async function editWikiContent(args: ActionArgs) {
-  const { denops, params, ctx } = args;
-  const actionParams = u.ensure(
-    params,
+  const { denops, ctx } = args;
+  const bufnr = await fn.bufnr(denops);
+  const buffer = await getBuffer(denops, bufnr);
+  const bufferParams = u.ensure(
+    buffer.params,
     u.isObjectOf({
-      bufnr: u.isNumber,
       id: u.isNumber,
       slug: u.isString,
       title: u.isString,
     }),
   );
-  const { bufnr, id, slug, title } = actionParams;
+  const { id, slug, title } = bufferParams;
 
   const lines = await util.flattenBuffer(
     denops,
@@ -87,12 +90,7 @@ export async function editWikiContent(args: ActionArgs) {
     client.editProjectWiki,
     ctx.url,
     ctx.token,
-    {
-      id,
-      slug,
-      title,
-      content: lines,
-    },
+    { id, slug, title, content: lines },
     "Successfully updated a wiki.",
   );
 }

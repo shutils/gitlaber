@@ -11,6 +11,7 @@ import * as util from "../../util.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { openUiSelect } from "../../buffer/main.ts";
+import { getBuffer } from "../../helper.ts";
 
 async function assignMergeRequestMember(
   args: ActionArgs,
@@ -168,16 +169,17 @@ export async function createMergeRequest(args: ActionArgs) {
 }
 
 export async function editMergeRequestDescription(args: ActionArgs) {
-  const { denops, ctx, params } = args;
-  const actionParams = u.ensure(
-    params,
+  const { denops, ctx } = args;
+  const bufnr = await fn.bufnr(denops);
+  const buffer = await getBuffer(denops, bufnr);
+  const bufferParams = u.ensure(
+    buffer.params,
     u.isObjectOf({
-      bufnr: u.isNumber,
       id: u.isNumber,
       merge_request_iid: u.isNumber,
     }),
   );
-  const { bufnr, id, merge_request_iid } = actionParams;
+  const { id, merge_request_iid } = bufferParams;
   const lines = await util.flattenBuffer(
     denops,
     await fn.bufname(denops, bufnr),

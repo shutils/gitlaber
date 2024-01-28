@@ -6,6 +6,7 @@ import { ActionArgs, isIssue, Node } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { openUiSelect } from "../../buffer/main.ts";
+import { getBuffer } from "../../helper.ts";
 
 export async function createIssue(args: ActionArgs): Promise<void> {
   const { denops, ctx } = args;
@@ -31,16 +32,17 @@ export async function createIssue(args: ActionArgs): Promise<void> {
 }
 
 export async function editIssueDescription(args: ActionArgs): Promise<void> {
-  const { denops, params, ctx } = args;
-  const actionParams = u.ensure(
-    params,
+  const { denops, ctx } = args;
+  const bufnr = await fn.bufnr(denops);
+  const buffer = await getBuffer(denops, bufnr);
+  const bufferParams = u.ensure(
+    buffer.params,
     u.isObjectOf({
-      bufnr: u.isNumber,
       id: u.isNumber,
       issue_iid: u.isNumber,
     }),
   );
-  const { bufnr, id, issue_iid } = actionParams;
+  const { id, issue_iid } = bufferParams;
 
   const lines = await util.flattenBuffer(
     denops,

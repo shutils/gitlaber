@@ -128,11 +128,11 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberIssueEdit",
     direction: "vertical botright",
     options: {
+      buftype: "nofile",
       modifiable: true,
       filetype: "markdown.gitlaber-issue-edit",
     },
     keymaps: BASE_MAPPINGS,
-    tmp: true,
   },
   {
     kind: "GitlaberMrPreview",
@@ -148,11 +148,11 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberMrEdit",
     direction: "vertical botright",
     options: {
+      buftype: "nofile",
       modifiable: true,
       filetype: "markdown.gitlaber-mr-edit",
     },
     keymaps: BASE_MAPPINGS,
-    tmp: true,
   },
   {
     kind: "GitlaberWikiPreview",
@@ -168,21 +168,21 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberWikiNew",
     direction: "vertical botright",
     options: {
+      buftype: "nofile",
       modifiable: true,
       filetype: "markdown.gitlaber-wiki-new",
     },
     keymaps: BASE_MAPPINGS,
-    tmp: true,
   },
   {
     kind: "GitlaberWikiEdit",
     direction: "vertical botright",
     options: {
+      buftype: "nofile",
       modifiable: true,
       filetype: "markdown.gitlaber-wiki-edit",
     },
     keymaps: BASE_MAPPINGS,
-    tmp: true,
   },
   {
     kind: "GitlaberUiSelect",
