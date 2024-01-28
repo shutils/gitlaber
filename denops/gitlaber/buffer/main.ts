@@ -1,7 +1,7 @@
 import { Denops, fn, helper, unknownutil as u } from "../deps.ts";
 
 import { createBuffer, reRenderBuffer } from "./core.ts";
-import { getCurrentInstance } from "../helper.ts";
+import { getBuffer, getCurrentInstance, updateBuffer } from "../helper.ts";
 import {
   createContentNodes,
   createDescriptionNodes,
@@ -41,6 +41,70 @@ export async function openIssueList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberIssueList");
   const nodes = await createProjectIssuesNodes(args.denops);
   await createBuffer(args.denops, config, nodes);
+}
+
+export async function nextIssueList(args: ActionArgs): Promise<void> {
+  const { denops } = args;
+  const buffer = await getBuffer(denops);
+  const bufnr = await fn.bufnr(denops);
+  if (buffer.kind !== "GitlaberIssueList") {
+    helper.echoerr(denops, "This buffer is not issue list.");
+    return;
+  }
+  const params = u.ensure(
+    buffer.params,
+    u.isOptionalOf(u.isObjectOf({
+      page: u.isOptionalOf(u.isNumber),
+      per_page: u.isOptionalOf(u.isNumber),
+      ...u.isUnknown,
+    })),
+  );
+  let oldPage: number;
+  let nextPage: number;
+  if (!params || !params?.page) {
+    nextPage = 2;
+  } else {
+    oldPage = params.page ?? 1;
+    nextPage = oldPage + 1;
+  }
+  const updatedParams = {
+    ...params,
+    page: nextPage,
+  };
+  await updateBuffer(denops, bufnr, undefined, updatedParams);
+  await reRenderBuffer(denops, bufnr);
+}
+
+export async function previousIssueList(args: ActionArgs): Promise<void> {
+  const { denops } = args;
+  const buffer = await getBuffer(denops);
+  const bufnr = await fn.bufnr(denops);
+  if (buffer.kind !== "GitlaberIssueList") {
+    helper.echoerr(denops, "This buffer is not issue list.");
+  }
+  const params = u.ensure(
+    buffer.params,
+    u.isOptionalOf(u.isObjectOf({
+      page: u.isOptionalOf(u.isNumber),
+      per_page: u.isOptionalOf(u.isNumber),
+      ...u.isUnknown,
+    })),
+  );
+  let oldPage: number;
+  let previousPage: number;
+  if (!params || !params?.page) {
+    helper.echoerr(denops, "Previous page does not exist.");
+    return;
+  } else {
+    oldPage = params.page ?? 1;
+    previousPage = oldPage - 1;
+  }
+  const updatedParams = {
+    ...params,
+    page: previousPage,
+  };
+  await updateBuffer(denops, bufnr, undefined, updatedParams);
+  await reRenderBuffer(denops, bufnr);
 }
 
 export async function openIssueConfig(args: ActionArgs): Promise<void> {

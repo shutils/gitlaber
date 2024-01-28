@@ -2,6 +2,7 @@ import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
 import { isIssue, IssueGetAttributes } from "./types.ts";
 import { objectToURLSearchParams } from "../helper.ts";
+import { PaginationAttributes } from "../types.ts";
 
 export async function getProjectIssue(
   url: string,
@@ -22,7 +23,7 @@ export async function getProjectIssue(
 export async function getProjectIssues(
   url: string,
   token: string,
-  attrs: { id: number | string } & IssueGetAttributes,
+  attrs: { id: number | string } & IssueGetAttributes & PaginationAttributes,
 ) {
   const baseApiPath = `${url}/api/v4/projects/${attrs.id}/issues`;
 

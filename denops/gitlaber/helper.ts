@@ -131,7 +131,7 @@ export async function getBuffer(denops: Denops, bufnr?: number) {
 export async function updateBuffer(
   denops: Denops,
   bufnr: number,
-  nodes: Node[],
+  nodes?: Node[],
   params?: object,
 ) {
   const gitlaberVar = await getGitlaberVar(denops);
@@ -139,7 +139,7 @@ export async function updateBuffer(
   if (!buffer) {
     throw new Error("Failed to get buffer.");
   }
-  buffer.nodes = nodes;
+  buffer.nodes = nodes ?? buffer.nodes;
   buffer.params = {
     ...buffer.params,
     ...params,

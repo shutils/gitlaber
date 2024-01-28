@@ -1,8 +1,14 @@
 import { Denops, unknownutil as u } from "../deps.ts";
 import * as client from "../client/index.ts";
 
-import { Context, Lint, Node, NodeParam } from "../types.ts";
-import { getContext, getCurrentNode } from "../helper.ts";
+import {
+  Context,
+  isPaginationAttributes,
+  Lint,
+  Node,
+  NodeParam,
+} from "../types.ts";
+import { getBuffer, getContext, getCurrentNode } from "../helper.ts";
 // import { getKv } from "../../kv.ts";
 
 async function makeNode(
@@ -79,12 +85,18 @@ export const createProjectIssuesNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (args) => {
+    const buffer = await getBuffer(args.denops);
+    const pageAttrs = u.ensure(
+      buffer.params,
+      u.isOptionalOf(isPaginationAttributes),
+    );
     const { instance, url, token } = args;
     const projectIssues = await client.getProjectIssues(
       url,
       token,
       {
         id: instance.project.id,
+        ...pageAttrs,
       },
     );
     return Promise.resolve(createNodes(

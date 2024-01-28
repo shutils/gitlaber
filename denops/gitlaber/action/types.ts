@@ -15,6 +15,8 @@ export const actionNames = [
   "issue-_edit",
   "issue-label",
   "issue-list",
+  "issue-list-next",
+  "issue-list-prev",
   "issue-new",
   "issue-preview",
   "issue-reopen",

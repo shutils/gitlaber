@@ -63,7 +63,6 @@ export async function reRenderBuffer(
     return;
   }
   const nodes = await config.nodeMaker(denops);
-  await setModifiable(denops, bufnr);
   await setNodesOnBuf(denops, nodes, bufnr);
   if (config.options) {
     setOptions(denops, config.options, bufnr);
@@ -77,6 +76,7 @@ export const setNodesOnBuf = async (
   nodes: Node[],
   bufnr: number,
 ) => {
+  await setModifiable(denops, bufnr);
   const bufLines = await fn.getbufline(
     denops,
     bufnr,

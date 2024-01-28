@@ -38,6 +38,7 @@ import {
 } from "./resource/mr.ts";
 import {
   closeBuffer,
+  nextIssueList,
   openBranchConfig,
   openBranchList,
   openIssueConfig,
@@ -55,6 +56,7 @@ import {
   openWikiList,
   openWikiNew,
   openWikiPreview,
+  previousIssueList,
   uiSelect,
 } from "../buffer/main.ts";
 import { echoNode } from "./common/main.ts";
@@ -96,6 +98,8 @@ const actionStore: ActionStore = {
   "issue-delete": deleteIssue,
   "issue-label": labelIssue,
   "issue-list": openIssueList,
+  "issue-list-next": nextIssueList,
+  "issue-list-prev": previousIssueList,
   "issue-new": createIssue,
   "issue-reopen": reopenIssue,
   "issue-unlabel": unlabelIssue,
