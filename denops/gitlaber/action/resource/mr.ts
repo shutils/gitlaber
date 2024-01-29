@@ -11,7 +11,7 @@ import {
 import * as util from "../../util.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
-import { openUiSelect } from "../ui/main.ts";
+import { openUiInput, openUiSelect } from "../ui/main.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import { setDiffOptions } from "../../buffer/helper.ts";
 import { getBufferConfig } from "../../helper.ts";
@@ -760,45 +760,69 @@ export async function createMrDiscussion(args: ActionArgs) {
       hlgroup === matchStr
     );
   }
-  const { denops, ctx } = args;
+  const { denops, ctx, params } = args;
   const { url, token } = ctx;
+  const ensuredParams = u.ensure(
+    params,
+    u.isOptionalOf(u.isObjectOf({
+      id: u.isOptionalOf(u.isNumber),
+      mr: u.isOptionalOf(isMergeRequest),
+      change: u.isOptionalOf(isChange),
+      body: u.isOptionalOf(u.isString),
+      line_pos: u.isOptionalOf(u.isObjectOf({
+        old_line: u.isOptionalOf(u.isNumber),
+        new_line: u.isOptionalOf(u.isNumber),
+      })),
+    })),
+  );
+  let id = ensuredParams?.id;
+  let mr = ensuredParams?.mr;
+  let change = ensuredParams?.change;
+  let line_pos = ensuredParams?.line_pos;
+  const body = ensuredParams?.body;
   const bufnr = await fn.bufnr(denops);
   const buffer = await getBuffer(denops, bufnr);
   const isOldFile = buffer.kind === "GitlaberDiffOldFile";
-  const bufferParams = u.ensure(
-    buffer.params,
-    u.isObjectOf({
-      id: u.isNumber,
-      mr: isMergeRequest,
-      change: isChange,
-    }),
-  );
-  const { id, mr, change } = bufferParams;
-  const linenr = await fn.line(denops, ".");
-  const colnr = await fn.col(denops, ".");
-  const synID = await fn.diff_hlID(denops, linenr, colnr);
-  const hlgroup = await fn.synIDattr(
-    denops,
-    synID,
-    "name",
-  );
-  const body = await helper.input(denops, {
-    prompt: "Discuttion body: ",
-  });
-  if (!body) {
-    return;
+  if (!id || !mr || !change || !line_pos) {
+    const bufferParams = u.ensure(
+      buffer.params,
+      u.isObjectOf({
+        id: u.isNumber,
+        mr: isMergeRequest,
+        change: isChange,
+      }),
+    );
+    id = bufferParams.id;
+    mr = bufferParams.mr;
+    change = bufferParams.change;
+    const linenr = await fn.line(denops, ".");
+    const colnr = await fn.col(denops, ".");
+    const synID = await fn.diff_hlID(denops, linenr, colnr);
+    const hlgroup = await fn.synIDattr(
+      denops,
+      synID,
+      "name",
+    );
+    if (isOldFile && hasDiff(hlgroup)) {
+      line_pos = {
+        old_line: linenr,
+      };
+    } else if (!isOldFile && hasDiff(hlgroup)) {
+      line_pos = {
+        new_line: linenr,
+      };
+    } else {
+      helper.echoerr(denops, "This feature is not yet supported.");
+      return;
+    }
   }
-  let line_pos: object = {};
-  if (isOldFile && hasDiff(hlgroup)) {
-    line_pos = {
-      old_line: linenr,
-    };
-  } else if (!isOldFile && hasDiff(hlgroup)) {
-    line_pos = {
-      new_line: linenr,
-    };
-  } else {
-    helper.echoerr(denops, "This feature is not yet supported.");
+  if (!body) {
+    await openUiInput(args, "body", {
+      id,
+      mr,
+      change,
+      line_pos,
+    });
     return;
   }
   await executeRequest(

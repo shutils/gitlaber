@@ -59,7 +59,7 @@ import {
 } from "./resource/mr.ts";
 import { nextList, previousList } from "./resource/common.ts";
 import { closeBuffer, echoNode, openMergedYaml } from "./common/main.ts";
-import { uiSelect } from "./ui/main.ts";
+import { uiInput, uiSelect } from "./ui/main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -141,6 +141,7 @@ const actionStore: ActionStore = {
   "wiki-preview": openWikiPreview,
   "util-echo-node": echoNode,
   "ui-select": uiSelect,
+  "ui-input": uiInput,
   "ci-lint": openMergedYaml,
   "buffer-close": closeBuffer,
 };

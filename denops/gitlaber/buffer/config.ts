@@ -195,6 +195,16 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: UI_SELECT,
   },
   {
+    kind: "GitlaberUiInput",
+    direction: "botright",
+    options: {
+      buftype: "nofile",
+      modifiable: true,
+      filetype: "markdown.gitlaber-ui-input",
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
     kind: "GitlaberMergedYaml",
     direction: "vertical botright",
     options: {

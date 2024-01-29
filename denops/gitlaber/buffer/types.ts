@@ -21,6 +21,7 @@ export const BUFFER_KINDS = [
   "GitlaberWikiEdit",
   "GitlaberWikiNew",
   "GitlaberUiSelect",
+  "GitlaberUiInput",
   "GitlaberMergedYaml",
   "GitlaberMrChangeList",
   "GitlaberDiffOldFile",

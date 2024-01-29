@@ -56,6 +56,7 @@ export const actionNames = [
   "wiki-preview",
   "util-echo-node",
   "ui-select",
+  "ui-input",
   "ci-lint",
   "buffer-close",
 ] as const;
