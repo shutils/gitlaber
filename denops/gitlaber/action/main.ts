@@ -10,16 +10,30 @@ import {
   deleteIssue,
   editIssueDescription,
   labelIssue,
+  openIssueConfig,
+  openIssueEdit,
+  openIssueList,
+  openIssuePreview,
   reopenIssue,
   unlabelIssue,
 } from "./resource/issue.ts";
-import { browseBranch, createBranch } from "./resource/branch.ts";
-import { browseProject } from "./resource/project.ts";
+import {
+  browseBranch,
+  createBranch,
+  openBranchConfig,
+  openBranchList,
+} from "./resource/branch.ts";
+import { browseProject, openProjectStatus } from "./resource/project.ts";
 import {
   browseWiki,
   createWiki,
   deleteWiki,
   editWikiContent,
+  openWikiConfig,
+  openWikiEdit,
+  openWikiList,
+  openWikiNew,
+  openWikiPreview,
 } from "./resource/wiki.ts";
 import {
   approveMergeRequest,
@@ -29,39 +43,22 @@ import {
   closeMergeRequest,
   createMergeRequest,
   deleteMergeRequest,
-  openMrChangeDiff,
   editMergeRequestDescription,
   labelMergeRequest,
   mergeMergeRequest,
-  reopenMergeRequest,
-  unapproveMergeRequest,
-  unlabelMergeRequest,
-} from "./resource/mr.ts";
-import {
-  closeBuffer,
-  nextList,
-  openBranchConfig,
-  openBranchList,
-  openIssueConfig,
-  openIssueEdit,
-  openIssueList,
-  openIssuePreview,
-  openMergedYaml,
+  openMrChangeDiff,
   openMrChangeList,
   openMrConfig,
   openMrEdit,
   openMrList,
   openMrPreview,
-  openProjectStatus,
-  openWikiConfig,
-  openWikiEdit,
-  openWikiList,
-  openWikiNew,
-  openWikiPreview,
-  previousList,
-  uiSelect,
-} from "../buffer/main.ts";
-import { echoNode } from "./common/main.ts";
+  reopenMergeRequest,
+  unapproveMergeRequest,
+  unlabelMergeRequest,
+} from "./resource/mr.ts";
+import { nextList, previousList } from "./resource/common.ts";
+import { closeBuffer, echoNode, openMergedYaml } from "./common/main.ts";
+import { uiSelect } from "./ui/main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {

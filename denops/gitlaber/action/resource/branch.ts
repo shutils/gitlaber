@@ -1,8 +1,30 @@
-import { Denops, helper } from "../../deps.ts";
+import { Denops, fn, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import { ActionArgs, isBranch, isIssue } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
+import { getBufferConfig } from "../../buffer/helper.ts";
+import { createBuffer } from "../../buffer/core.ts";
+import {
+  createProjectBranchesNodes,
+  createProjectBranchPanelNodes,
+} from "../../node/main.ts";
+
+export async function openBranchList(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberBranchList");
+  const nodes = await createProjectBranchesNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
+}
+
+export async function openBranchConfig(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberBranchConfig");
+  const nodes = await createProjectBranchPanelNodes(args.denops);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
+}
 
 export async function createBranch(args: ActionArgs): Promise<void> {
   const { denops, ctx, node } = args;

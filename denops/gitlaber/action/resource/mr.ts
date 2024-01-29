@@ -10,10 +10,76 @@ import {
 import * as util from "../../util.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
-import { openUiSelect } from "../../buffer/main.ts";
+import { openUiSelect } from "../ui/main.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import { getBufferConfig } from "../../buffer/helper.ts";
-import { getBuffer } from "../../helper.ts";
+import { getBuffer, updateBuffer } from "../../helper.ts";
+import {
+  createDescriptionNodes,
+  createProjectMergeRequestChangesNodes,
+  createProjectMergeRequestPanelNodes,
+  createProjectMergeRequestsNodes,
+} from "../../node/main.ts";
+
+export async function openMrList(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberMrList");
+  const nodes = await createProjectMergeRequestsNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
+}
+
+export async function openMrConfig(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberMrConfig");
+  const nodes = await createProjectMergeRequestPanelNodes(args.denops);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
+}
+
+export async function openMrPreview(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberMrPreview");
+  const mr = await ensureMergeRequest(args.denops, args);
+  if (!mr) {
+    return;
+  }
+  if (mr.description === null) {
+    await helper.echo(args.denops, "This merge request has not description.");
+    return;
+  }
+  const nodes = await createDescriptionNodes(mr);
+  await createBuffer(args.denops, config, nodes);
+}
+
+export async function openMrEdit(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberMrEdit");
+  const mr = await ensureMergeRequest(args.denops, args);
+  if (!mr) {
+    return;
+  }
+  const nodes = await createDescriptionNodes(mr);
+  const id = args.ctx.instance.project.id;
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await updateBuffer(args.denops, bufnr, undefined, {
+    id,
+    merge_request_iid: mr.iid,
+  });
+}
+
+export async function openMrChangeList(args: ActionArgs): Promise<void> {
+  const { denops, ctx } = args;
+  const mr = await ensureMergeRequest(denops, args);
+  if (!mr) {
+    return;
+  }
+  const config = getBufferConfig("GitlaberMrChangeList");
+  const nodes = await createProjectMergeRequestChangesNodes(denops);
+  const bufnr = await createBuffer(denops, config, nodes);
+  await updateBuffer(denops, bufnr, undefined, {
+    id: ctx.instance.project.id,
+    mr: mr,
+  });
+}
 
 async function assignMergeRequestMember(
   args: ActionArgs,

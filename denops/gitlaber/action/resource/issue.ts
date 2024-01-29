@@ -5,8 +5,58 @@ import * as util from "../../util.ts";
 import { ActionArgs, isIssue, Node } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
-import { openUiSelect } from "../../buffer/main.ts";
-import { getBuffer } from "../../helper.ts";
+import { getBuffer, updateBuffer } from "../../helper.ts";
+import { openUiSelect } from "../ui/main.ts";
+import { getBufferConfig } from "../../buffer/helper.ts";
+import { createBuffer } from "../../buffer/core.ts";
+import {
+  createDescriptionNodes,
+  createProjectIssuePanelNodes,
+  createProjectIssuesNodes,
+} from "../../node/main.ts";
+
+export async function openIssueList(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberIssueList");
+  const nodes = await createProjectIssuesNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
+}
+
+export async function openIssueConfig(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberIssueConfig");
+  const nodes = await createProjectIssuePanelNodes(args.denops);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
+}
+
+export async function openIssuePreview(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberIssuePreview");
+  const issue = await ensureIssue(args.denops, args);
+  if (!issue) {
+    return;
+  }
+  if (issue.description === null) {
+    await helper.echo(args.denops, "This issue has not description.");
+    return;
+  }
+  const nodes = await createDescriptionNodes(issue);
+  await createBuffer(args.denops, config, nodes);
+}
+
+export async function openIssueEdit(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberIssueEdit");
+  const issue = await ensureIssue(args.denops, args);
+  if (!issue) {
+    return;
+  }
+  const nodes = await createDescriptionNodes(issue);
+  const id = args.ctx.instance.project.id;
+  const issue_iid = issue.iid;
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await updateBuffer(args.denops, bufnr, undefined, { id, issue_iid });
+}
 
 export async function createIssue(args: ActionArgs): Promise<void> {
   const { denops, ctx } = args;

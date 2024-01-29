@@ -37,33 +37,22 @@ export const createMainPanelNodes = async (
   return await makeNode(denops, async (args) => {
     const { instance } = args;
     const project = instance.project;
+    const texts = [
+      "Project Status",
+      "",
+      `cwd: ${instance.cwd}`,
+      `id: ${project.id}`,
+      `name: ${project.name}`,
+      `description: ${project.description}`,
+      `created_at: ${project.created_at}`,
+      `updated_at: ${project.updated_at}`,
+      `open_issues_count: ${project.open_issues_count}`,
+    ];
     const nodes: Array<Node> = [];
-    nodes.push({
-      display: "Project Status",
-    });
-    nodes.push({
-      display: "",
-    });
-    nodes.push({
-      display: `cwd: ${instance.cwd}`,
-    });
-    nodes.push({
-      display: `id: ${project.id}`,
-    });
-    nodes.push({
-      display: `name: ${project.name}`,
-    });
-    nodes.push({
-      display: `description: ${project.description}`,
-    });
-    nodes.push({
-      display: `created_at: ${project.created_at}`,
-    });
-    nodes.push({
-      display: `updated_at: ${project.updated_at}`,
-    });
-    nodes.push({
-      display: `open_issues_count: ${project.open_issues_count}`,
+    texts.map((text) => {
+      nodes.push({
+        display: text,
+      });
     });
     return await Promise.resolve(nodes);
   });

@@ -5,7 +5,68 @@ import { ActionArgs, isWiki } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import * as util from "../../util.ts";
-import { getBuffer } from "../../helper.ts";
+import { getBuffer, updateBuffer } from "../../helper.ts";
+import { getBufferConfig } from "../../buffer/helper.ts";
+import { createBuffer } from "../../buffer/core.ts";
+import {
+  createContentNodes,
+  createProjectWikiNodes,
+  createProjectWikiPanelNodes,
+} from "../../node/main.ts";
+
+export async function openWikiList(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberWikiList");
+  const nodes = await createProjectWikiNodes(args.denops);
+  await createBuffer(args.denops, config, nodes);
+}
+
+export async function openWikiConfig(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberWikiConfig");
+  const nodes = await createProjectWikiPanelNodes(args.denops);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await fn.execute(
+    args.denops,
+    `autocmd WinLeave <buffer> bw ${bufnr}`,
+  );
+}
+
+export async function openWikiPreview(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberWikiPreview");
+  const wiki = await ensureWiki(args.denops, args);
+  if (!wiki) {
+    return;
+  }
+  const nodes = await createContentNodes(wiki);
+  await createBuffer(args.denops, config, nodes);
+}
+
+export async function openWikiEdit(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberWikiEdit");
+  const wiki = await ensureWiki(args.denops, args);
+  if (!wiki) {
+    return;
+  }
+  const id = args.ctx.instance.project.id;
+  const slug = wiki.slug;
+  const title = wiki.title;
+  const nodes = await createContentNodes(wiki);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await updateBuffer(args.denops, bufnr, undefined, { id, slug, title });
+}
+
+export async function openWikiNew(args: ActionArgs): Promise<void> {
+  const config = getBufferConfig("GitlaberWikiNew");
+  const id = args.ctx.instance.project.id;
+  const title = await helper.input(args.denops, {
+    prompt: "New wiki title: ",
+  });
+  if (!title) {
+    return;
+  }
+  const nodes = await createContentNodes({ title, content: "" });
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await updateBuffer(args.denops, bufnr, undefined, { id, title });
+}
 
 export async function browseWiki(args: ActionArgs) {
   const { denops, ctx } = args;
