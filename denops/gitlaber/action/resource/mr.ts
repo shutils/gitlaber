@@ -3,6 +3,7 @@ import * as client from "../../client/index.ts";
 import {
   ActionArgs,
   isBranch,
+  isChange,
   isMergeRequest,
   isProjectLabel,
   Node,
@@ -84,6 +85,7 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
   });
   const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
   const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
+  await fn.execute(denops, "diffoff!");
   const oldFileBufnr = await createBuffer(
     denops,
     oldFileConfig,
@@ -643,7 +645,7 @@ export async function unapproveMergeRequest(args: ActionArgs) {
 }
 
 export async function openMrChangeDiff(args: ActionArgs) {
-  const { denops, node } = args;
+  const { denops, node, ctx } = args;
   if (!node) {
     return;
   }
@@ -658,17 +660,7 @@ export async function openMrChangeDiff(args: ActionArgs) {
   );
   const change = u.ensure(
     node.params,
-    u.isObjectOf({
-      old_path: u.isString,
-      new_path: u.isString,
-      a_mode: u.isString,
-      b_mode: u.isString,
-      diff: u.isString,
-      new_file: u.isBoolean,
-      renamed_file: u.isBoolean,
-      deleted_file: u.isBoolean,
-      ...u.isUnknown,
-    }),
+    isChange,
   );
   const mr = bufferParams.mr;
   const decoder = new TextDecoder();
@@ -719,12 +711,23 @@ export async function openMrChangeDiff(args: ActionArgs) {
     oldFileConfig,
     oldFileNodes,
   );
+  await fn.execute(denops, "diffoff!");
+  await updateBuffer(denops, oldFileBufnr, undefined, {
+    id: ctx.instance.project.id,
+    mr,
+    change,
+  });
   setDiffOptions(denops, oldFileBufnr);
   const newFileBufnr = await createBuffer(
     args.denops,
     newFileConfig,
     newFileNodes,
   );
+  await updateBuffer(denops, newFileBufnr, undefined, {
+    id: ctx.instance.project.id,
+    mr,
+    change,
+  });
   setDiffOptions(denops, newFileBufnr);
   await denops.cmd("redraw");
 }
@@ -749,4 +752,74 @@ export async function ensureMergeRequest(
     merge_request_iid: Number(mrIid),
   });
   return mr;
+}
+
+export async function createMrDiscussion(args: ActionArgs) {
+  function hasDiff(hlgroup: string) {
+    return ["DiffAdd", "DiffChange", "DiffText"].some((matchStr) =>
+      hlgroup === matchStr
+    );
+  }
+  const { denops, ctx } = args;
+  const { url, token } = ctx;
+  const bufnr = await fn.bufnr(denops);
+  const buffer = await getBuffer(denops, bufnr);
+  const isOldFile = buffer.kind === "GitlaberDiffOldFile";
+  const bufferParams = u.ensure(
+    buffer.params,
+    u.isObjectOf({
+      id: u.isNumber,
+      mr: isMergeRequest,
+      change: isChange,
+    }),
+  );
+  const { id, mr, change } = bufferParams;
+  const linenr = await fn.line(denops, ".");
+  const colnr = await fn.col(denops, ".");
+  const synID = await fn.diff_hlID(denops, linenr, colnr);
+  const hlgroup = await fn.synIDattr(
+    denops,
+    synID,
+    "name",
+  );
+  const body = await helper.input(denops, {
+    prompt: "Discuttion body: ",
+  });
+  if (!body) {
+    return;
+  }
+  let line_pos: object = {};
+  if (isOldFile && hasDiff(hlgroup)) {
+    line_pos = {
+      old_line: linenr,
+    };
+  } else if (!isOldFile && hasDiff(hlgroup)) {
+    line_pos = {
+      new_line: linenr,
+    };
+  } else {
+    helper.echoerr(denops, "This feature is not yet supported.");
+    return;
+  }
+  await executeRequest(
+    denops,
+    client.createProjectMrDiscussion,
+    url,
+    token,
+    {
+      id,
+      merge_request_iid: mr.iid,
+      body,
+      position: {
+        base_sha: mr.diff_refs.base_sha,
+        head_sha: mr.diff_refs.head_sha,
+        start_sha: mr.diff_refs.start_sha,
+        new_path: change.new_path,
+        old_path: change.old_path,
+        position_type: "text",
+        ...line_pos,
+      },
+    },
+    "Successfully create a discussion.",
+  );
 }
