@@ -236,6 +236,24 @@ export const createMergeRequestsNodes = async (
 
 export const createMergeRequestChangesNodes = async (denops: Denops) => {
   return await makeNode(denops, async (args) => {
+    const createDisplay = (change: {
+      new_file: boolean;
+      old_path: string;
+      new_path: string;
+      deleted_file: boolean;
+    }) => {
+      let display: string;
+      if (change.new_file) {
+        display = `Created ${change.new_path}`;
+      } else if (change.deleted_file) {
+        display = `Deleted ${change.old_path}`;
+      } else if (change.new_path !== change.old_path) {
+        display = `${change.old_path} -> ${change.new_path}`;
+      } else {
+        display = change.new_path;
+      }
+      return display;
+    };
     const { node } = args;
     if (!node) {
       return await Promise.resolve([]);
@@ -260,9 +278,7 @@ export const createMergeRequestChangesNodes = async (denops: Denops) => {
     const changes = projectMergeRequestChanges.changes;
     changes.map((change) => {
       nodes.push({
-        display: `${change.new_file ? "Created " : change.old_path + " -> "}${
-          change.deleted_file ? "Deleted" : change.new_path
-        }`,
+        display: createDisplay(change),
         params: change,
       });
     });
