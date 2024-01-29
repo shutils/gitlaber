@@ -9,11 +9,13 @@ import {
   createBranchesNodes,
   createBranchPanelNodes,
 } from "../../node/main.ts";
+import * as util from "../../util.ts";
 
 export async function openBranchList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberBranchList");
   const nodes = await createBranchesNodes(args.denops);
-  await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await util.focusBuffer(args.denops, bufnr);
 }
 
 export async function openBranchConfig(args: ActionArgs): Promise<void> {

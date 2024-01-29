@@ -26,6 +26,8 @@ export async function openMrList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrList");
   const nodes = await createMergeRequestsNodes(args.denops);
   await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await util.focusBuffer(args.denops, bufnr);
 }
 
 export async function openMrConfig(args: ActionArgs): Promise<void> {
@@ -131,6 +133,8 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     discussionNodes,
   );
 
+  const winnr = await util.getBufferWindowNumber(args.denops, bufnr);
+  await fn.win_gotoid(args.denops, winnr);
   await denops.cmd("redraw");
 }
 

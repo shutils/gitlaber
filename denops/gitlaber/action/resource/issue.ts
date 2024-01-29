@@ -19,6 +19,8 @@ export async function openIssueList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberIssueList");
   const nodes = await createIssuesNodes(args.denops);
   await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await util.focusBuffer(args.denops, bufnr);
 }
 
 export async function openIssueConfig(args: ActionArgs): Promise<void> {

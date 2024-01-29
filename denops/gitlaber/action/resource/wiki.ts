@@ -17,7 +17,8 @@ import {
 export async function openWikiList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberWikiList");
   const nodes = await createWikiNodes(args.denops);
-  await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer(args.denops, config, nodes);
+  await util.focusBuffer(args.denops, bufnr);
 }
 
 export async function openWikiConfig(args: ActionArgs): Promise<void> {
