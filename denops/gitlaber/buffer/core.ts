@@ -73,19 +73,9 @@ export const setNodesOnBuf = async (
   bufnr: number,
 ) => {
   await setModifiable(denops, bufnr);
-  const bufLines = await fn.getbufline(
-    denops,
-    bufnr,
-    1,
-    "$",
-  );
-  if (bufLines.length > nodes.length) {
-    await fn.deletebufline(
-      denops,
-      bufnr,
-      nodes.length + 1,
-      "$",
-    );
+  const bufLines = await fn.getbufline(denops, bufnr, 1, "$");
+  if (bufLines.length > 1 && bufLines[0] !== "") {
+    await fn.execute(denops, `call deletebufline(${bufnr}, 1, '$')`);
   }
   for (let i = 0; i < nodes.length; i++) {
     await fn.setbufline(denops, bufnr, i + 1, nodes[i].display);
