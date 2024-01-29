@@ -1,4 +1,4 @@
-import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
+import { base64, Denops, fn, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import {
   ActionArgs,
@@ -11,6 +11,8 @@ import * as util from "../../util.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { openUiSelect } from "../../buffer/main.ts";
+import { createBuffer } from "../../buffer/core.ts";
+import { getBufferConfig } from "../../buffer/helper.ts";
 import { getBuffer } from "../../helper.ts";
 
 async function assignMergeRequestMember(
@@ -515,6 +517,84 @@ export async function unapproveMergeRequest(args: ActionArgs) {
     },
     "Successfully unapprove a merge request.",
   );
+}
+
+export async function openMrChangeDiff(args: ActionArgs) {
+  const { denops, node } = args;
+  if (!node) {
+    return;
+  }
+  const bufnr = await fn.bufnr(denops);
+  const buffer = await getBuffer(denops, bufnr);
+  const bufferParams = u.ensure(
+    buffer.params,
+    u.isObjectOf({
+      id: u.isNumber,
+      mr: isMergeRequest,
+    }),
+  );
+  const change = u.ensure(
+    node.params,
+    u.isObjectOf({
+      old_path: u.isString,
+      new_path: u.isString,
+      a_mode: u.isString,
+      b_mode: u.isString,
+      diff: u.isString,
+      new_file: u.isBoolean,
+      renamed_file: u.isBoolean,
+      deleted_file: u.isBoolean,
+      ...u.isUnknown,
+    }),
+  );
+  const mr = bufferParams.mr;
+  const decoder = new TextDecoder();
+  const oldFileNodes: Node[] = [];
+  if (!change.new_file) {
+    const oldFile = await client.getProjectFile(
+      args.ctx.url,
+      args.ctx.token,
+      {
+        id: args.ctx.instance.project.id,
+        file_path: change.old_path,
+        ref: mr.diff_refs.start_sha,
+      },
+    );
+    const decodedOldFile = decoder.decode(base64.decodeBase64(oldFile.content));
+    decodedOldFile.split("\n").map((line) => {
+      oldFileNodes.push({
+        display: line,
+      });
+    });
+    // There is a blank line at the end of oldFileNodes, so delete it.
+    oldFileNodes.pop();
+  }
+  const newFileNodes: Node[] = [];
+  if (!change.deleted_file) {
+    const newFile = await client.getProjectFile(
+      args.ctx.url,
+      args.ctx.token,
+      {
+        id: args.ctx.instance.project.id,
+        file_path: change.new_path,
+        ref: mr.diff_refs.head_sha,
+      },
+    );
+    const decodedNewFile = decoder.decode(base64.decodeBase64(newFile.content));
+    decodedNewFile.split("\n").map((line) => {
+      newFileNodes.push({
+        display: line,
+      });
+    });
+    // There is a blank line at the end of newFileNodes, so delete it.
+    newFileNodes.pop();
+  }
+  const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
+  const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
+  await createBuffer(args.denops, oldFileConfig, oldFileNodes);
+  await fn.execute(denops, "diffthis");
+  await createBuffer(args.denops, newFileConfig, newFileNodes);
+  await fn.execute(denops, "diffthis");
 }
 
 export async function ensureMergeRequest(

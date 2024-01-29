@@ -245,6 +245,42 @@ export const createProjectMergeRequestsNodes = async (
   });
 };
 
+export const createProjectMergeRequestChangesNodes = async (denops: Denops) => {
+  return await makeNode(denops, async (args) => {
+    const { node } = args;
+    if (!node) {
+      return await Promise.resolve([]);
+    }
+    const mr = u.ensure(
+      node.params,
+      u.isObjectOf({
+        iid: u.isNumber,
+      }),
+    );
+    const { instance, url, token } = args;
+    const projectMergeRequestChanges = await client
+      .getProjectMergeRequestChanges(
+        url,
+        token,
+        {
+          id: instance.project.id,
+          merge_request_iid: mr.iid,
+        },
+      );
+    const nodes: Node[] = [];
+    const changes = projectMergeRequestChanges.changes;
+    changes.map((change) => {
+      nodes.push({
+        display: `${change.new_file ? "Created " : change.old_path + " -> "}${
+          change.deleted_file ? "Deleted" : change.new_path
+        }`,
+        params: change,
+      });
+    });
+    return await Promise.resolve(nodes);
+  });
+};
+
 export const createEmptyNodes = async (
   _denops: Denops,
 ) => {

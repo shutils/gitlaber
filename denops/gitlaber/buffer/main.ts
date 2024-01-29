@@ -11,6 +11,7 @@ import {
   createProjectBranchPanelNodes,
   createProjectIssuePanelNodes,
   createProjectIssuesNodes,
+  createProjectMergeRequestChangesNodes,
   createProjectMergeRequestPanelNodes,
   createProjectMergeRequestsNodes,
   createProjectWikiNodes,
@@ -178,6 +179,21 @@ export async function openMrPreview(args: ActionArgs): Promise<void> {
   }
   const nodes = await createDescriptionNodes(mr);
   await createBuffer(args.denops, config, nodes);
+}
+
+export async function openMrChangeList(args: ActionArgs): Promise<void> {
+  const { denops, ctx } = args;
+  const mr = await ensureMergeRequest(denops, args);
+  if (!mr) {
+    return;
+  }
+  const config = getBufferConfig("GitlaberMrChangeList");
+  const nodes = await createProjectMergeRequestChangesNodes(denops);
+  const bufnr = await createBuffer(denops, config, nodes);
+  await updateBuffer(denops, bufnr, undefined, {
+    id: ctx.instance.project.id,
+    mr: mr,
+  });
 }
 
 export async function openUiSelect(

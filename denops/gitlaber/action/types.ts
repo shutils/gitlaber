@@ -40,6 +40,8 @@ export const actionNames = [
   "mr-reopen",
   "mr-unapprove",
   "mr-unlabel",
+  "mr-change-list",
+  "mr-change-diff",
   "project-browse",
   "project-status",
   "wiki-browse",

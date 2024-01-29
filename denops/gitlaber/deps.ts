@@ -11,3 +11,5 @@ export * as vars from "https://deno.land/x/denops_std@v5.2.0/variable/mod.ts";
 export * as unknownutil from "https://deno.land/x/unknownutil@v3.13.0/mod.ts";
 export * as fs from "https://deno.land/std@0.212.0/fs/mod.ts";
 export * as http from "https://deno.land/std@0.148.0/http/http_status.ts";
+export * as base64 from "https://deno.land/std@0.213.0/encoding/base64.ts";
+export * as encodeurl from "https://deno.land/x/encodeurl@1.0.0/mod.ts"

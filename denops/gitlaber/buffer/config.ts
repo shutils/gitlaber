@@ -204,4 +204,34 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     },
     keymaps: BASE_MAPPINGS,
   },
+  {
+    kind: "GitlaberMrChangeList",
+    direction: "tab",
+    options: {
+      filetype: "gitlaber-mr-change-list",
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
+    kind: "GitlaberDiffOldFile",
+    direction: "vertical botright",
+    options: {
+      filetype: "gitlaber-diff-old",
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
+    kind: "GitlaberDiffNewFile",
+    direction: "vertical botright",
+    options: {
+      filetype: "gitlaber-diff-new",
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
 ];

@@ -1,6 +1,6 @@
 import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
-import { isMergeRequest, MergeRequest } from "./types.ts";
+import { isMergeRequest, isMergeRequestChange, MergeRequest } from "./types.ts";
 
 export async function createProjectMergeRequest(
   url: string,
@@ -52,6 +52,22 @@ export async function getProjectMergeRequests(
   return u.ensure(
     await request(gitlabApiPath, token, "GET"),
     u.isArrayOf(isMergeRequest),
+  );
+}
+
+export async function getProjectMergeRequestChanges(
+  url: string,
+  token: string,
+  attrs: {
+    id: number;
+    merge_request_iid: number;
+  },
+) {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/changes`;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    isMergeRequestChange,
   );
 }
 
@@ -158,6 +174,11 @@ export async function getProjectMergeRequestsGraphQL(
             targetBranch
             sourceBranch
             state
+            diffRefs {
+              baseSha
+              headSha
+              startSha
+            }
             approvedBy {
               nodes {
                 id
@@ -211,6 +232,11 @@ export async function getProjectMergeRequestsGraphQL(
     webUrl: string;
     squash: boolean;
     state: string;
+    diffRefs: {
+      baseSha: string;
+      headSha: string;
+      startSha: string;
+    };
     labels: {
       nodes: {
         title: string;
@@ -246,6 +272,11 @@ export async function getProjectMergeRequestsGraphQL(
       web_url: mr.webUrl,
       squash: mr.squash,
       state: mr.state,
+      diff_refs: {
+        base_sha: mr.diffRefs.baseSha,
+        head_sha: mr.diffRefs.headSha,
+        start_sha: mr.diffRefs.startSha,
+      },
       labels: mr.labels.nodes.map((label) => label.title),
       approved: mr.approvedBy.nodes.length > 0,
       assignees: mr.assignees.nodes.map((assignee) => {

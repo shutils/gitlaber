@@ -22,6 +22,7 @@ export const isNodeParam = u.isOptionalOf(u.isOneOf([
   isMergeRequest,
   isProject,
   isProjectLabel,
+  u.isUnknown,
 ]));
 
 export type NodeParam = u.PredicateType<typeof isNodeParam>;

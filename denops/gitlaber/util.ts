@@ -18,3 +18,7 @@ export function select(
   const texts = [description, ...contents.reverse()];
   return fn.inputlist(denops, texts);
 }
+
+export function escapeSlash(str: string) {
+  return str.replaceAll("/", "%2F");
+}
