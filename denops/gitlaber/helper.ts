@@ -10,6 +10,7 @@ import {
   Node,
 } from "./types.ts";
 import { getProject } from "./client/index.ts";
+import { BUFFER_CONFIGS } from "./buffer/config.ts";
 
 export const getCurrentNode = async (
   denops: Denops,
@@ -145,6 +146,14 @@ export async function updateBuffer(
     ...params,
   };
   await setGitlaberVar(denops, gitlaberVar);
+}
+
+export function getBufferConfig(kind: BufferKind) {
+  const config = BUFFER_CONFIGS.find((config) => config.kind === kind);
+  if (!config) {
+    throw new Error(`Buffer config is not found: ${kind}`);
+  }
+  return config;
 }
 
 export function getGitlabUrl(cwd?: string) {

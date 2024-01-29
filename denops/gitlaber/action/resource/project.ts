@@ -1,6 +1,6 @@
 import { ActionArgs } from "../../types.ts";
 import { openWithBrowser } from "../browse/core.ts";
-import { getBufferConfig } from "../../buffer/helper.ts";
+import { getBufferConfig } from "../../helper.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import { createMainPanelNodes } from "../../node/main.ts";
 

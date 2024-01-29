@@ -12,24 +12,24 @@ import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { openUiSelect } from "../ui/main.ts";
 import { createBuffer } from "../../buffer/core.ts";
-import { getBufferConfig } from "../../buffer/helper.ts";
+import { getBufferConfig } from "../../helper.ts";
 import { getBuffer, updateBuffer } from "../../helper.ts";
 import {
   createDescriptionNodes,
-  createProjectMergeRequestChangesNodes,
-  createProjectMergeRequestPanelNodes,
-  createProjectMergeRequestsNodes,
+  createMergeRequestChangesNodes,
+  createMergeRequestPanelNodes,
+  createMergeRequestsNodes,
 } from "../../node/main.ts";
 
 export async function openMrList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrList");
-  const nodes = await createProjectMergeRequestsNodes(args.denops);
+  const nodes = await createMergeRequestsNodes(args.denops);
   await createBuffer(args.denops, config, nodes);
 }
 
 export async function openMrConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrConfig");
-  const nodes = await createProjectMergeRequestPanelNodes(args.denops);
+  const nodes = await createMergeRequestPanelNodes(args.denops);
   const bufnr = await createBuffer(args.denops, config, nodes);
   await fn.execute(
     args.denops,
@@ -73,7 +73,7 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     return;
   }
   const config = getBufferConfig("GitlaberMrChangeList");
-  const nodes = await createProjectMergeRequestChangesNodes(denops);
+  const nodes = await createMergeRequestChangesNodes(denops);
   const bufnr = await createBuffer(denops, config, nodes);
   await updateBuffer(denops, bufnr, undefined, {
     id: ctx.instance.project.id,

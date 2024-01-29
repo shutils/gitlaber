@@ -1,7 +1,7 @@
 import { fn, unknownutil as u } from "../../deps.ts";
 
 import { createBuffer } from "../../buffer/core.ts";
-import { getBufferConfig } from "../../buffer/helper.ts";
+import { getBufferConfig } from "../../helper.ts";
 import { ActionArgs, isAction, Node } from "../../types.ts";
 
 export async function openUiSelect(

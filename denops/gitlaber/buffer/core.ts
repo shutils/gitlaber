@@ -5,10 +5,11 @@ import { BufferConfig, Node } from "../types.ts";
 import {
   addBuffer,
   getBuffer,
+  getBufferConfig,
   getCurrentInstance,
   updateBuffer,
 } from "../helper.ts";
-import { getBufferConfig, setModifiable, setOptions } from "./helper.ts";
+import { setModifiable, setOptions } from "./helper.ts";
 import { getUserCustomBufferConfig, loadConfig } from "../config/main.ts";
 
 export async function createBuffer(

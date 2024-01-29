@@ -2,7 +2,7 @@ import { fn, helper } from "../../deps.ts";
 
 import { createBuffer } from "../../buffer/core.ts";
 import { createMergedYamlNodes } from "../../node/main.ts";
-import { getBufferConfig } from "../../buffer/helper.ts";
+import { getBufferConfig } from "../../helper.ts";
 import { ActionArgs } from "../../types.ts";
 import { getLint } from "../../client/index.ts";
 import { flattenBuffer } from "../../util.ts";

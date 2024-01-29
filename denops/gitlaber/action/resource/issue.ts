@@ -7,23 +7,23 @@ import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { getBuffer, updateBuffer } from "../../helper.ts";
 import { openUiSelect } from "../ui/main.ts";
-import { getBufferConfig } from "../../buffer/helper.ts";
+import { getBufferConfig } from "../../helper.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import {
   createDescriptionNodes,
-  createProjectIssuePanelNodes,
-  createProjectIssuesNodes,
+  createIssuePanelNodes,
+  createIssuesNodes,
 } from "../../node/main.ts";
 
 export async function openIssueList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberIssueList");
-  const nodes = await createProjectIssuesNodes(args.denops);
+  const nodes = await createIssuesNodes(args.denops);
   await createBuffer(args.denops, config, nodes);
 }
 
 export async function openIssueConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberIssueConfig");
-  const nodes = await createProjectIssuePanelNodes(args.denops);
+  const nodes = await createIssuePanelNodes(args.denops);
   const bufnr = await createBuffer(args.denops, config, nodes);
   await fn.execute(
     args.denops,

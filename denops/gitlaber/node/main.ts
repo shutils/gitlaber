@@ -58,7 +58,7 @@ export const createMainPanelNodes = async (
   });
 };
 
-export const createProjectIssuePanelNodes = async (
+export const createIssuePanelNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (_args) => {
@@ -70,7 +70,7 @@ export const createProjectIssuePanelNodes = async (
   });
 };
 
-export const createProjectIssuesNodes = async (
+export const createIssuesNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (args) => {
@@ -95,7 +95,7 @@ export const createProjectIssuesNodes = async (
   });
 };
 
-export const createProjectBranchPanelNodes = async (
+export const createBranchPanelNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (_args) => {
@@ -107,7 +107,7 @@ export const createProjectBranchPanelNodes = async (
   });
 };
 
-export const createProjectBranchesNodes = async (
+export const createBranchesNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (args) => {
@@ -127,7 +127,7 @@ export const createProjectBranchesNodes = async (
   });
 };
 
-export const createProjectWikiNodes = async (
+export const createWikiNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (args) => {
@@ -160,7 +160,7 @@ export const createDescriptionNodes = async (
   return await Promise.resolve(nodes);
 };
 
-export const createProjectWikiPanelNodes = async (
+export const createWikiPanelNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (_args) => {
@@ -204,7 +204,7 @@ export const createMergedYamlNodes = async (
   return await Promise.resolve(nodes);
 };
 
-export const createProjectMergeRequestPanelNodes = async (
+export const createMergeRequestPanelNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (_args) => {
@@ -216,7 +216,7 @@ export const createProjectMergeRequestPanelNodes = async (
   });
 };
 
-export const createProjectMergeRequestsNodes = async (
+export const createMergeRequestsNodes = async (
   denops: Denops,
 ) => {
   return await makeNode(denops, async (args) => {
@@ -234,7 +234,7 @@ export const createProjectMergeRequestsNodes = async (
   });
 };
 
-export const createProjectMergeRequestChangesNodes = async (denops: Denops) => {
+export const createMergeRequestChangesNodes = async (denops: Denops) => {
   return await makeNode(denops, async (args) => {
     const { node } = args;
     if (!node) {

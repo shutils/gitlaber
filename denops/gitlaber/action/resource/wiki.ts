@@ -6,23 +6,23 @@ import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import * as util from "../../util.ts";
 import { getBuffer, updateBuffer } from "../../helper.ts";
-import { getBufferConfig } from "../../buffer/helper.ts";
+import { getBufferConfig } from "../../helper.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import {
   createContentNodes,
-  createProjectWikiNodes,
-  createProjectWikiPanelNodes,
+  createWikiNodes,
+  createWikiPanelNodes,
 } from "../../node/main.ts";
 
 export async function openWikiList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberWikiList");
-  const nodes = await createProjectWikiNodes(args.denops);
+  const nodes = await createWikiNodes(args.denops);
   await createBuffer(args.denops, config, nodes);
 }
 
 export async function openWikiConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberWikiConfig");
-  const nodes = await createProjectWikiPanelNodes(args.denops);
+  const nodes = await createWikiPanelNodes(args.denops);
   const bufnr = await createBuffer(args.denops, config, nodes);
   await fn.execute(
     args.denops,

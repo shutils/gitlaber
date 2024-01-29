@@ -29,7 +29,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberIssueConfig",
     direction: "botright",
-    nodeMaker: node.createProjectIssuePanelNodes,
+    nodeMaker: node.createIssuePanelNodes,
     options: {
       filetype: "gitlaber-issue-config",
       buftype: "nofile",
@@ -40,7 +40,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberWikiConfig",
     direction: "botright",
-    nodeMaker: node.createProjectWikiPanelNodes,
+    nodeMaker: node.createWikiPanelNodes,
     options: {
       filetype: "gitlaber-wiki-config",
       buftype: "nofile",
@@ -51,7 +51,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberBranchConfig",
     direction: "botright",
-    nodeMaker: node.createProjectBranchPanelNodes,
+    nodeMaker: node.createBranchPanelNodes,
     options: {
       filetype: "gitlaber-branch-config",
       buftype: "nofile",
@@ -62,7 +62,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberMrConfig",
     direction: "botright",
-    nodeMaker: node.createProjectMergeRequestPanelNodes,
+    nodeMaker: node.createMergeRequestPanelNodes,
     options: {
       filetype: "gitlaber-mr-config",
       buftype: "nofile",
@@ -73,7 +73,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberIssueList",
     direction: "tab",
-    nodeMaker: node.createProjectIssuesNodes,
+    nodeMaker: node.createIssuesNodes,
     options: {
       filetype: "gitlaber-issue-list",
       buftype: "nofile",
@@ -84,7 +84,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberWikiList",
     direction: "tab",
-    nodeMaker: node.createProjectWikiNodes,
+    nodeMaker: node.createWikiNodes,
     options: {
       filetype: "gitlaber-wiki-list",
       buftype: "nofile",
@@ -95,7 +95,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberBranchList",
     direction: "tab",
-    nodeMaker: node.createProjectBranchesNodes,
+    nodeMaker: node.createBranchesNodes,
     options: {
       filetype: "gitlaber-branch-list",
       buftype: "nofile",
@@ -106,7 +106,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberMrList",
     direction: "tab",
-    nodeMaker: node.createProjectMergeRequestsNodes,
+    nodeMaker: node.createMergeRequestsNodes,
     options: {
       filetype: "gitlaber-mr-list",
       buftype: "nofile",
