@@ -47,3 +47,21 @@ export function setOptions(
     await fn.setbufvar(denops, bufnr, "&" + key, value);
   });
 }
+
+export function setDiffOptions(
+  denops: Denops,
+  bufnr: number,
+) {
+  const options = {
+    diff: true,
+    scrollbind: true,
+    cursorbind: true,
+    scrollopt: "hor",
+    wrap: false,
+    foldmethod: "diff",
+    foldcolumn: 2,
+  };
+  Object.entries(options).map(async ([key, value]) => {
+    await fn.setbufvar(denops, bufnr, "&" + key, value);
+  });
+}

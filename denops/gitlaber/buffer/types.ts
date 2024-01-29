@@ -48,7 +48,6 @@ export type BufferConfig = {
   nodeMaker?: (denops: Denops, seed?: Node) => Promise<Node[]>;
   options?: BufferOptions;
   keymaps?: Keymap[];
-  tmp?: boolean;
 };
 
 export type BufferOptions = {

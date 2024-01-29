@@ -12,6 +12,7 @@ import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { openUiSelect } from "../ui/main.ts";
 import { createBuffer } from "../../buffer/core.ts";
+import { setDiffOptions } from "../../buffer/helper.ts";
 import { getBufferConfig } from "../../helper.ts";
 import { getBuffer, updateBuffer } from "../../helper.ts";
 import {
@@ -79,6 +80,21 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     id: ctx.instance.project.id,
     mr: mr,
   });
+  const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
+  const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
+  const oldFileBufnr = await createBuffer(
+    denops,
+    oldFileConfig,
+    [{ display: "" }],
+  );
+  setDiffOptions(denops, oldFileBufnr);
+  const newFileBufnr = await createBuffer(
+    denops,
+    newFileConfig,
+    [{ display: "" }],
+  );
+  setDiffOptions(denops, newFileBufnr);
+  await denops.cmd("redraw");
 }
 
 async function assignMergeRequestMember(
@@ -657,10 +673,19 @@ export async function openMrChangeDiff(args: ActionArgs) {
   }
   const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
   const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
-  await createBuffer(args.denops, oldFileConfig, oldFileNodes);
-  await fn.execute(denops, "diffthis");
-  await createBuffer(args.denops, newFileConfig, newFileNodes);
-  await fn.execute(denops, "diffthis");
+  const oldFileBufnr = await createBuffer(
+    args.denops,
+    oldFileConfig,
+    oldFileNodes,
+  );
+  setDiffOptions(denops, oldFileBufnr);
+  const newFileBufnr = await createBuffer(
+    args.denops,
+    newFileConfig,
+    newFileNodes,
+  );
+  setDiffOptions(denops, newFileBufnr);
+  await denops.cmd("redraw");
 }
 
 export async function ensureMergeRequest(

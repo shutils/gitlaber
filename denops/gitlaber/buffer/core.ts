@@ -23,20 +23,15 @@ export async function createBuffer(
   if (userBufferConfig) {
     config = { ...config, ...userBufferConfig };
   }
-  let bufnr: number;
   let exists = false;
-  let bufname: string;
-  if (config.tmp) {
-    bufname = await fn.tempname(denops);
-    bufnr = await fn.bufadd(denops, bufname);
-  } else {
-    bufname = `${config.kind}\ [${instance.id}]`;
-    exists = await fn.bufexists(denops, bufname);
-    bufnr = await fn.bufadd(denops, `${config.kind}\ [${instance.id}]`);
+  const bufname = `${config.kind}\ [${instance.id}]`;
+  exists = await fn.bufexists(denops, bufname);
+  const bufnr = await fn.bufadd(denops, `${config.kind}\ [${instance.id}]`);
+  if (!exists) {
+    await fn.bufload(denops, bufnr);
+    await fn.execute(denops, `${config.direction} new ${bufname}`);
+    await fn.execute(denops, `buffer ${bufnr}`);
   }
-  await fn.bufload(denops, bufnr);
-  await fn.execute(denops, `${config.direction} new ${bufname}`);
-  await fn.execute(denops, `buffer ${bufnr}`);
   await setNodesOnBuf(denops, nodes, bufnr);
   if (config.options) {
     setOptions(denops, config.options, bufnr);
@@ -46,10 +41,10 @@ export async function createBuffer(
       await mapping.map(denops, keymap.lhs, keymap.rhs, keymap.option);
     });
   }
-  if (exists) {
-    await updateBuffer(denops, bufnr, nodes);
-  } else {
+  if (!exists) {
     await addBuffer(denops, config.kind, bufnr, nodes);
+  } else {
+    await updateBuffer(denops, bufnr, nodes);
   }
   return bufnr;
 }
@@ -60,7 +55,7 @@ export async function reRenderBuffer(
 ) {
   const buffer = await getBuffer(denops, bufnr);
   const config = getBufferConfig(buffer.kind);
-  if (config.tmp || !config.nodeMaker) {
+  if (!config.nodeMaker) {
     return;
   }
   const nodes = await config.nodeMaker(denops);
