@@ -8,5 +8,6 @@ export * from "./member/main.ts";
 export * from "./label/main.ts";
 export * from "./lint/main.ts";
 export * from "./file/main.ts";
+export * from "./discussion/main.ts";
 
 export * from "./helper.ts";

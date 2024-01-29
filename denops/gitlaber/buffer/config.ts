@@ -234,4 +234,14 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     },
     keymaps: BASE_MAPPINGS,
   },
+  {
+    kind: "GitlaberMrDiscussion",
+    direction: "botright",
+    options: {
+      filetype: "gitlaber-mr-discussion",
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
 ];

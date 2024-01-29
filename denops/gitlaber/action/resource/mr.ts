@@ -94,6 +94,43 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     [{ display: "" }],
   );
   setDiffOptions(denops, newFileBufnr);
+  const mrDiscussionConfig = getBufferConfig("GitlaberMrDiscussion");
+  const discussionNodes: Node[] = [];
+  const discussions = await client.getProjectMrDiscussion(
+    ctx.url,
+    ctx.token,
+    {
+      id: ctx.instance.project.id,
+      mr_iid: mr.iid,
+    },
+  );
+  discussions.map((discussion) => {
+    if (discussion.notes[0].system === true) {
+      return;
+    }
+    const lines = discussion.notes[0].body?.split("\n");
+    if (!lines) {
+      return;
+    }
+    lines.map((line) => {
+      discussionNodes.push({
+        display: line,
+        params: {
+          name: args.name,
+          params: { id: ctx.instance.project.id, mr: mr },
+        },
+      });
+    });
+    discussionNodes.push({
+      display: "",
+    });
+  });
+  await createBuffer(
+    denops,
+    mrDiscussionConfig,
+    discussionNodes,
+  );
+
   await denops.cmd("redraw");
 }
 
