@@ -60,6 +60,7 @@ export const actionNames = [
   "ui-input",
   "ci-lint",
   "buffer-close",
+  "buffer-close-all",
 ] as const;
 
 export const isActionName = u.isLiteralOneOf(actionNames);

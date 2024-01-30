@@ -59,7 +59,12 @@ import {
   unlabelMergeRequest,
 } from "./resource/mr.ts";
 import { nextList, previousList } from "./resource/common.ts";
-import { closeBuffer, echoNode, openMergedYaml } from "./common/main.ts";
+import {
+  closeAllBuffer,
+  closeBuffer,
+  echoNode,
+  openMergedYaml,
+} from "./common/main.ts";
 import { uiInput, uiSelect } from "./ui/main.ts";
 
 export function main(denops: Denops): void {
@@ -146,6 +151,7 @@ const actionStore: ActionStore = {
   "ui-input": uiInput,
   "ci-lint": openMergedYaml,
   "buffer-close": closeBuffer,
+  "buffer-close-all": closeAllBuffer,
 };
 
 function verifyActionName(actionName: string): void {

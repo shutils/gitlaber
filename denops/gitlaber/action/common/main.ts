@@ -2,7 +2,7 @@ import { fn, helper } from "../../deps.ts";
 
 import { createBuffer } from "../../buffer/core.ts";
 import { createMergedYamlNodes } from "../../node/main.ts";
-import { getBufferConfig } from "../../helper.ts";
+import { getBufferConfig, getGitlaberVar } from "../../helper.ts";
 import { ActionArgs } from "../../types.ts";
 import { getLint } from "../../client/index.ts";
 import { flattenBuffer } from "../../util.ts";
@@ -39,4 +39,15 @@ export async function openMergedYaml(args: ActionArgs): Promise<void> {
 
 export async function closeBuffer(args: ActionArgs): Promise<void> {
   await fn.execute(args.denops, "bwipe");
+}
+
+export async function closeAllBuffer(args: ActionArgs): Promise<void> {
+  const gitlaberVar = await getGitlaberVar(args.denops);
+  const buffers = gitlaberVar.buffers;
+  buffers.map(async (buffer) => {
+    const exists = await fn.bufexists(args.denops, buffer.bufnr);
+    if (exists) {
+      await fn.execute(args.denops, `bwipe ${buffer.bufnr}`);
+    }
+  });
 }
