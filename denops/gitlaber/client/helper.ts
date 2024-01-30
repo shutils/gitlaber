@@ -16,7 +16,7 @@ export function getRemoteUrl(cwd?: string) {
 export function getUrlEncodedPath(path: string) {
   if (isHttpPath(path) || isSshPath(path)) {
     const splitedPath = path.split("/");
-    const namespace = splitedPath[splitedPath.length - 2];
+    const namespace = splitedPath.slice(3, splitedPath.length - 1).join("%2F");
     const projectPathWithExt = splitedPath[splitedPath.length - 1];
     const projectPath = parse(projectPathWithExt).name;
     return namespace + "%2F" + projectPath;
