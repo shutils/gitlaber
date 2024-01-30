@@ -791,7 +791,15 @@ export async function openMrChangeDiff(args: ActionArgs) {
     });
   }
   const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
+  if (oldFileConfig.options) {
+    oldFileConfig.options.filetype = util.predicateFileType(change.old_path) ??
+      "" + "." + oldFileConfig.options?.filetype;
+  }
   const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
+  if (newFileConfig.options) {
+    newFileConfig.options.filetype = util.predicateFileType(change.new_path) ??
+      "" + "." + newFileConfig.options?.filetype;
+  }
   const oldFileBufnr = await createBuffer(
     args.denops,
     oldFileConfig,
