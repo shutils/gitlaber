@@ -20,7 +20,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createMainPanelNodes,
     options: {
-      filetype: "gitlaber-project-status",
       buftype: "nofile",
       modifiable: false,
     },
@@ -31,7 +30,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "botright",
     nodeMaker: node.createIssuePanelNodes,
     options: {
-      filetype: "gitlaber-issue-config",
       buftype: "nofile",
       modifiable: false,
     },
@@ -42,7 +40,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "botright",
     nodeMaker: node.createWikiPanelNodes,
     options: {
-      filetype: "gitlaber-wiki-config",
       buftype: "nofile",
       modifiable: false,
     },
@@ -53,7 +50,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "botright",
     nodeMaker: node.createBranchPanelNodes,
     options: {
-      filetype: "gitlaber-branch-config",
       buftype: "nofile",
       modifiable: false,
     },
@@ -64,7 +60,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "botright",
     nodeMaker: node.createMergeRequestPanelNodes,
     options: {
-      filetype: "gitlaber-mr-config",
       buftype: "nofile",
       modifiable: false,
     },
@@ -75,7 +70,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createIssuesNodes,
     options: {
-      filetype: "gitlaber-issue-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -86,7 +80,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createWikiNodes,
     options: {
-      filetype: "gitlaber-wiki-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -97,7 +90,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createBranchesNodes,
     options: {
-      filetype: "gitlaber-branch-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -108,7 +100,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     direction: "tab",
     nodeMaker: node.createMergeRequestsNodes,
     options: {
-      filetype: "gitlaber-mr-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -120,7 +111,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: false,
-      filetype: "markdown.gitlaber-issue-preview",
+      filetype: "markdown",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -130,7 +121,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: true,
-      filetype: "markdown.gitlaber-issue-edit",
+      filetype: "markdown",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -140,7 +131,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: false,
-      filetype: "markdown.gitlaber-mr-preview",
+      filetype: "markdown",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -150,7 +141,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: true,
-      filetype: "markdown.gitlaber-mr-edit",
+      filetype: "markdown",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -160,7 +151,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: false,
-      filetype: "markdown.gitlaber-wiki-preview",
+      filetype: "markdown",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -170,7 +161,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: true,
-      filetype: "markdown.gitlaber-wiki-new",
+      filetype: "markdown",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -180,7 +171,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: true,
-      filetype: "markdown.gitlaber-wiki-edit",
+      filetype: "markdown",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -190,7 +181,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: false,
-      filetype: "markdown.gitlaber-ui-select",
+      filetype: "markdown",
     },
     keymaps: UI_SELECT,
   },
@@ -200,7 +191,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     options: {
       buftype: "nofile",
       modifiable: true,
-      filetype: "markdown.gitlaber-ui-input",
+      filetype: "markdown",
     },
     keymaps: BASE_MAPPINGS,
   },
@@ -208,7 +199,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberMergedYaml",
     direction: "vertical botright",
     options: {
-      filetype: "yaml.gitlaber-ci-lint",
+      filetype: "yaml",
       buftype: "nofile",
       modifiable: false,
     },
@@ -218,7 +209,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberMrChangeList",
     direction: "tab",
     options: {
-      filetype: "gitlaber-mr-change-list",
       buftype: "nofile",
       modifiable: false,
     },
@@ -228,7 +218,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberDiffOldFile",
     direction: "vertical botright",
     options: {
-      filetype: "gitlaber-diff-old",
       buftype: "nofile",
       modifiable: false,
     },
@@ -238,7 +227,6 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberDiffNewFile",
     direction: "vertical botright",
     options: {
-      filetype: "gitlaber-diff-new",
       buftype: "nofile",
       modifiable: false,
     },
@@ -248,7 +236,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberMrDiscussion",
     direction: "botright",
     options: {
-      filetype: "markdown.gitlaber-mr-discussion",
+      filetype: "markdown",
       buftype: "nofile",
       modifiable: false,
     },
@@ -258,7 +246,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberMrDiscussionInspect",
     direction: "botright",
     options: {
-      filetype: "markdown.gitlaber-mr-discussion-inspect",
+      filetype: "markdown",
       buftype: "nofile",
       modifiable: false,
     },
