@@ -81,6 +81,7 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrChangeList");
   const nodes = await createMergeRequestChangesNodes(denops);
   const bufnr = await createBuffer(denops, config, nodes);
+  const winnr = await util.getBufferWindowNumber(args.denops, bufnr);
   await updateBuffer(denops, bufnr, undefined, {
     id: ctx.instance.project.id,
     mr: mr,
@@ -94,6 +95,8 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     [{ display: "" }],
   );
   setDiffOptions(denops, oldFileBufnr);
+  const listWidth = 30;
+  await fn.win_execute(args.denops, winnr, `vertical resize ${listWidth}`);
   const newFileBufnr = await createBuffer(
     denops,
     newFileConfig,
@@ -131,13 +134,40 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
       display: "",
     });
   });
-  await createBuffer(
+  const discussionBufnr = await createBuffer(
     denops,
     mrDiscussionConfig,
     discussionNodes,
   );
+  const discussionWinnr = await util.getBufferWindowNumber(
+    args.denops,
+    discussionBufnr,
+  );
 
-  const winnr = await util.getBufferWindowNumber(args.denops, bufnr);
+  await fn.win_execute(args.denops, discussionWinnr, `resize 10`);
+
+  const screenWidth = await fn.screencol(args.denops);
+  const diffWidth = (screenWidth - listWidth) / 2;
+
+  const oldFileWinnr = await util.getBufferWindowNumber(
+    args.denops,
+    oldFileBufnr,
+  );
+  await fn.win_execute(
+    args.denops,
+    oldFileWinnr,
+    `vertical resize ${diffWidth}`,
+  );
+  const newFileWinnr = await util.getBufferWindowNumber(
+    args.denops,
+    newFileBufnr,
+  );
+  await fn.win_execute(
+    args.denops,
+    newFileWinnr,
+    `vertical resize ${diffWidth}`,
+  );
+
   await fn.win_gotoid(args.denops, winnr);
   await denops.cmd("redraw");
 }
