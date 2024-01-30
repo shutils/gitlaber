@@ -234,7 +234,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   },
   {
     kind: "GitlaberMrDiscussion",
-    direction: "botright",
+    direction: "horizontal belowright",
     options: {
       filetype: "markdown",
       buftype: "nofile",

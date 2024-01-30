@@ -86,23 +86,6 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     id: ctx.instance.project.id,
     mr: mr,
   });
-  const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
-  const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
-  await fn.execute(denops, "diffoff!");
-  const oldFileBufnr = await createBuffer(
-    denops,
-    oldFileConfig,
-    [{ display: "" }],
-  );
-  setDiffOptions(denops, oldFileBufnr);
-  const listWidth = 30;
-  await fn.win_execute(args.denops, winnr, `vertical resize ${listWidth}`);
-  const newFileBufnr = await createBuffer(
-    denops,
-    newFileConfig,
-    [{ display: "" }],
-  );
-  setDiffOptions(denops, newFileBufnr);
   const mrDiscussionConfig = getBufferConfig("GitlaberMrDiscussion");
   const discussionNodes: Node[] = [];
   const discussions = await client.getProjectMrDiscussion(
@@ -134,39 +117,28 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
       display: "",
     });
   });
-  const discussionBufnr = await createBuffer(
+  await createBuffer(
     denops,
     mrDiscussionConfig,
     discussionNodes,
   );
-  const discussionWinnr = await util.getBufferWindowNumber(
-    args.denops,
-    discussionBufnr,
+  const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
+  const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
+  await fn.execute(denops, "diffoff!");
+  const listWidth = 30;
+  const oldFileBufnr = await createBuffer(
+    denops,
+    oldFileConfig,
+    [{ display: "" }],
   );
-
-  await fn.win_execute(args.denops, discussionWinnr, `resize 10`);
-
-  const screenWidth = await fn.screencol(args.denops);
-  const diffWidth = (screenWidth - listWidth) / 2;
-
-  const oldFileWinnr = await util.getBufferWindowNumber(
-    args.denops,
-    oldFileBufnr,
+  setDiffOptions(denops, oldFileBufnr);
+  await fn.win_execute(args.denops, winnr, `vertical resize ${listWidth}`);
+  const newFileBufnr = await createBuffer(
+    denops,
+    newFileConfig,
+    [{ display: "" }],
   );
-  await fn.win_execute(
-    args.denops,
-    oldFileWinnr,
-    `vertical resize ${diffWidth}`,
-  );
-  const newFileWinnr = await util.getBufferWindowNumber(
-    args.denops,
-    newFileBufnr,
-  );
-  await fn.win_execute(
-    args.denops,
-    newFileWinnr,
-    `vertical resize ${diffWidth}`,
-  );
+  setDiffOptions(denops, newFileBufnr);
 
   await fn.win_gotoid(args.denops, winnr);
   await denops.cmd("redraw");

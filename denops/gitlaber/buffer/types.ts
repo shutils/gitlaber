@@ -64,6 +64,7 @@ export const BufferDirections = [
   "botright",
   "aboveleft",
   "vertical botright",
+  "horizontal belowright",
 ] as const;
 
 export const isBufferDirection = u.isLiteralOneOf(BufferDirections);
