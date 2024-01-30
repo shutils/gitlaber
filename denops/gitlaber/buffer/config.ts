@@ -248,7 +248,17 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     kind: "GitlaberMrDiscussion",
     direction: "botright",
     options: {
-      filetype: "gitlaber-mr-discussion",
+      filetype: "markdown.gitlaber-mr-discussion",
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
+    kind: "GitlaberMrDiscussionInspect",
+    direction: "botright",
+    options: {
+      filetype: "markdown.gitlaber-mr-discussion-inspect",
       buftype: "nofile",
       modifiable: false,
     },

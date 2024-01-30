@@ -43,6 +43,7 @@ export const actionNames = [
   "mr-change-list",
   "mr-change-diff",
   "mr-discussion-new",
+  "mr-discussion-inspect",
   "project-browse",
   "project-status",
   "wiki-browse",

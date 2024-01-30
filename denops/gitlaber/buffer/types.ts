@@ -27,6 +27,7 @@ export const BUFFER_KINDS = [
   "GitlaberDiffOldFile",
   "GitlaberDiffNewFile",
   "GitlaberMrDiscussion",
+  "GitlaberMrDiscussionInspect",
 ] as const;
 
 export const isBufferKind = u.isLiteralOneOf(BUFFER_KINDS);

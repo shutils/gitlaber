@@ -4,6 +4,7 @@ import { main as mainBuffer } from "./buffer/main.ts";
 import { main as mainAction } from "./action/main.ts";
 import { initKv } from "./kv.ts";
 import { registPlugMap } from "./keymap/main.ts";
+import { initSign } from "./sign/main.ts";
 
 export async function main(denops: Denops) {
   await initKv();
@@ -16,6 +17,7 @@ export async function main(denops: Denops) {
       "call denops#notify('gitlaber', 'command:buffer:autoreload', [])",
     );
   });
+  await initSign(denops);
   mainBuffer(denops);
   mainAction(denops);
 }

@@ -4,6 +4,7 @@ import {
   ActionArgs,
   isBranch,
   isChange,
+  isDiscussion,
   isMergeRequest,
   isProjectLabel,
   Node,
@@ -22,6 +23,7 @@ import {
   createMergeRequestPanelNodes,
   createMergeRequestsNodes,
 } from "../../node/main.ts";
+import { clearSign, setSign } from "../../sign/main.ts";
 
 export async function openMrList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrList");
@@ -663,6 +665,38 @@ export async function openMrChangeDiff(args: ActionArgs) {
     isChange,
   );
   const mr = bufferParams.mr;
+  const discussions = await client.getProjectMrDiscussion(
+    ctx.url,
+    ctx.token,
+    {
+      id: ctx.instance.project.id,
+      mr_iid: mr.iid,
+    },
+  );
+  const changeFileDiscussion = discussions.filter((discussion) => {
+    const position = discussion.notes[0].position;
+    if (!position) {
+      return false;
+    }
+    return (
+      position.new_path === change.new_path ||
+      position.old_path === change.old_path
+    );
+  });
+  const newFileDiscussion = changeFileDiscussion.filter((discussion) => {
+    const position = discussion.notes[0].position;
+    if (!position) {
+      return false;
+    }
+    return position.new_path === change.new_path;
+  });
+  const oldFileDiscussion = changeFileDiscussion.filter((discussion) => {
+    const position = discussion.notes[0].position;
+    if (!position) {
+      return false;
+    }
+    return position.old_path === change.old_path;
+  });
   const decoder = new TextDecoder();
   const oldFileNodes: Node[] = [];
   if (!change.new_file) {
@@ -683,6 +717,16 @@ export async function openMrChangeDiff(args: ActionArgs) {
     });
     // There is a blank line at the end of oldFileNodes, so delete it.
     oldFileNodes.pop();
+    oldFileDiscussion.map((discussion) => {
+      const position = discussion.notes[0].position;
+      if (!position) {
+        return;
+      }
+      if (!position.old_line) {
+        return;
+      }
+      oldFileNodes[position.old_line - 1].params = discussion;
+    });
   }
   const newFileNodes: Node[] = [];
   if (!change.deleted_file) {
@@ -696,13 +740,25 @@ export async function openMrChangeDiff(args: ActionArgs) {
       },
     );
     const decodedNewFile = decoder.decode(base64.decodeBase64(newFile.content));
-    decodedNewFile.split("\n").map((line) => {
+    const lines = decodedNewFile.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       newFileNodes.push({
         display: line,
       });
-    });
+    }
     // There is a blank line at the end of newFileNodes, so delete it.
     newFileNodes.pop();
+    newFileDiscussion.map((discussion) => {
+      const position = discussion.notes[0].position;
+      if (!position) {
+        return;
+      }
+      if (!position.new_line) {
+        return;
+      }
+      newFileNodes[position.new_line - 1].params = discussion;
+    });
   }
   const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
   const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
@@ -712,22 +768,60 @@ export async function openMrChangeDiff(args: ActionArgs) {
     oldFileNodes,
   );
   await fn.execute(denops, "diffoff!");
+  await clearSign(denops, oldFileBufnr, "GitlaberDiscussion");
   await updateBuffer(denops, oldFileBufnr, undefined, {
     id: ctx.instance.project.id,
     mr,
     change,
   });
+  for (let i = 0; i < oldFileDiscussion.length; i++) {
+    const discussion = oldFileDiscussion[i];
+    const position = discussion.notes[0].position;
+    if (!position) {
+      continue;
+    }
+    if (!position.old_line) {
+      continue;
+    }
+    await setSign(
+      denops,
+      i + 1,
+      position.old_line,
+      "GitlaberDiscussion",
+      oldFileBufnr,
+      "GitlaberDiscussion",
+    );
+  }
   setDiffOptions(denops, oldFileBufnr);
   const newFileBufnr = await createBuffer(
     args.denops,
     newFileConfig,
     newFileNodes,
   );
+  await clearSign(denops, newFileBufnr, "GitlaberDiscussion");
   await updateBuffer(denops, newFileBufnr, undefined, {
     id: ctx.instance.project.id,
     mr,
     change,
   });
+  for (let i = 0; i < newFileDiscussion.length; i++) {
+    const discussion = newFileDiscussion[i];
+    const position = discussion.notes[0].position;
+    if (!position) {
+      continue;
+    }
+    if (!position.new_line) {
+      continue;
+    }
+    await setSign(
+      denops,
+      i + 1,
+      position.new_line,
+      "GitlaberDiscussion",
+      newFileBufnr,
+      "GitlaberDiscussion",
+    );
+  }
   setDiffOptions(denops, newFileBufnr);
   await denops.cmd("redraw");
 }
@@ -845,5 +939,45 @@ export async function createMrDiscussion(args: ActionArgs) {
       },
     },
     "Successfully create a discussion.",
+  );
+}
+
+export async function inspectMrDiscussion(args: ActionArgs) {
+  const { denops, node } = args;
+  if (!node) {
+    return;
+  }
+  const discussion = u.ensure(
+    node.params,
+    isDiscussion,
+  );
+  const nodes: Node[] = [];
+  discussion.notes.map((note) => {
+    if (note.system === true) {
+      return;
+    }
+    nodes.push({
+      display: `${note.author.name}:`,
+    });
+    nodes.push({
+      display: "------------------",
+    });
+    const lines = note.body?.split("\n");
+    if (!lines) {
+      return;
+    }
+    lines.map((line) => {
+      nodes.push({
+        display: line,
+      });
+    });
+    nodes.push({
+      display: "",
+    });
+  });
+  await createBuffer(
+    denops,
+    getBufferConfig("GitlaberMrDiscussionInspect"),
+    nodes,
   );
 }

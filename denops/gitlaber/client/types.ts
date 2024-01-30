@@ -9,6 +9,7 @@ export * from "./mr/types.ts";
 export * from "./project/types.ts";
 export * from "./wiki/types.ts";
 export * from "./lint/types.ts";
+export * from "./discussion/types.ts";
 
 export const isPaginationAttributes = u.isObjectOf({
   page: u.isOptionalOf(u.isNumber),
