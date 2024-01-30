@@ -11,7 +11,7 @@ export async function getProjectMrDiscussion(
   },
 ) {
   const baseApiPath =
-    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.mr_iid}/discussions`;
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.mr_iid}/discussions?per_page=100`;
   return u.ensure(
     await request(baseApiPath, token, "GET"),
     u.isArrayOf(isDiscussion),
