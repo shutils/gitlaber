@@ -90,8 +90,10 @@ export async function selectAssignee(args: ActionArgs): Promise<void> {
     nodes.push({
       display: member.name,
       params: {
-        name: args.name,
-        params: { ...args.params, assignee_id: member.id },
+        action: {
+          name: args.name,
+          params: { ...args.params, assignee_id: member.id },
+        },
       },
     });
   });
@@ -137,8 +139,10 @@ export async function selectReviewer(args: ActionArgs): Promise<void> {
     nodes.push({
       display: member.name,
       params: {
-        name: args.name,
-        params: { ...args.params, reviewer_id: member.id },
+        action: {
+          name: args.name,
+          params: { ...args.params, reviewer_id: member.id },
+        },
       },
     });
   });
@@ -168,8 +172,10 @@ export async function selectBranch(args: ActionArgs): Promise<void> {
     nodes.push({
       display: branch.name,
       params: {
-        name: args.name,
-        params: { ...args.params, branch: branch },
+        action: {
+          name: args.name,
+          params: { ...args.params, branch: branch },
+        },
       },
     });
   });
@@ -189,8 +195,10 @@ export async function selectLabel(args: ActionArgs): Promise<void> {
     nodes.push({
       display: label.name,
       params: {
-        name: args.name,
-        params: { ...args.params, label: label },
+        action: {
+          name: args.name,
+          params: { ...args.params, label: label },
+        },
       },
     });
   });

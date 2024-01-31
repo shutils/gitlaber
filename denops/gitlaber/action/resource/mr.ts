@@ -224,8 +224,8 @@ export async function createMergeRequest(args: ActionArgs) {
   const { instance, url, token } = ctx;
   let currentBranch: string | undefined;
   let defaultTitle: string | undefined;
-  if (isBranch(node?.params)) {
-    const branch = node.params;
+  if (isBranch(node?.params?.branch)) {
+    const branch = node.params.branch;
     currentBranch = branch.name;
     const commitId = branch.commit.short_id;
     const commit = await client.getProjectCommit(
@@ -931,7 +931,7 @@ export async function inspectMrDiscussion(args: ActionArgs) {
 function argsHasMergeRequest(args: ActionArgs): boolean {
   if (isMergeRequest(args.params?.mr)) {
     return true;
-  } else if (isMergeRequest(args.node?.params)) {
+  } else if (isMergeRequest(args.node?.params?.mr)) {
     return true;
   }
   return false;
@@ -940,8 +940,8 @@ function argsHasMergeRequest(args: ActionArgs): boolean {
 function getMergeRequestFromArgs(args: ActionArgs): MergeRequest {
   if (isMergeRequest(args.params?.mr)) {
     return args.params.mr;
-  } else if (isMergeRequest(args.node?.params)) {
-    return args.node.params;
+  } else if (isMergeRequest(args.node?.params?.mr)) {
+    return args.node.params.mr;
   }
   throw new Error("Merge request not found.");
 }
@@ -960,8 +960,10 @@ async function selectMergeRequest(args: ActionArgs): Promise<void> {
     nodes.push({
       display: `#${mr.iid} ${mr.title}`,
       params: {
-        name: args.name,
-        params: { id, mr },
+        action: {
+          name: args.name,
+          params: { id, mr },
+        },
       },
     });
   });
@@ -983,8 +985,10 @@ async function selectLabelFromMergeRequest(
     nodes.push({
       display: label,
       params: {
-        name: args.name,
-        params: { ...args.params, label: label },
+        action: {
+          name: args.name,
+          params: { ...args.params, label: label },
+        },
       },
     });
   });

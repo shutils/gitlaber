@@ -44,7 +44,7 @@ export async function uiSelect(
   args: ActionArgs,
 ): Promise<void> {
   const { node, denops } = args;
-  const ensuredAction = u.ensure(node?.params, isAction);
+  const ensuredAction = u.ensure(node?.params?.action, isAction);
   const { name, params } = ensuredAction;
   await fn.call(denops, "denops#notify", [
     "gitlaber",

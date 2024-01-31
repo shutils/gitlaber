@@ -7,6 +7,7 @@ import {
   Lint,
   Node,
   NodeParam,
+  ResourceKind,
 } from "../types.ts";
 import { getBuffer, getContext, getCurrentNode } from "../helper.ts";
 // import { getKv } from "../../kv.ts";
@@ -90,6 +91,7 @@ export const createIssuesNodes = async (
     );
     return Promise.resolve(createNodes(
       projectIssues,
+      "issue",
       ["iid", "title", "labels", "state", "assignees"],
     ));
   });
@@ -122,7 +124,7 @@ export const createBranchesNodes = async (
       ...pageAttrs,
     });
     return await Promise.resolve(
-      createNodes(projectBranches, ["name", "merged"]),
+      createNodes(projectBranches, "branch", ["name", "merged"]),
     );
   });
 };
@@ -136,7 +138,7 @@ export const createWikiNodes = async (
       id: instance.project.id,
     });
     return await Promise.resolve(
-      createNodes(projectWikis, ["title", "format"]),
+      createNodes(projectWikis, "wiki", ["title", "format"]),
     );
   });
 };
@@ -229,6 +231,7 @@ export const createMergeRequestsNodes = async (
     );
     return await Promise.resolve(createNodes(
       projectMergeRequests,
+      "mr",
       ["iid", "title", "state", "assignees", "reviewers", "labels", "approved"],
     ));
   });
@@ -259,7 +262,7 @@ export const createMergeRequestChangesNodes = async (denops: Denops) => {
       return await Promise.resolve([]);
     }
     const mr = u.ensure(
-      node.params,
+      node.params?.mr,
       u.isObjectOf({
         iid: u.isNumber,
       }),
@@ -293,7 +296,8 @@ export const createEmptyNodes = async (
 };
 
 export const createNodes = (
-  resources: NodeParam[],
+  resources: Record<string, unknown>[],
+  resourceKind: ResourceKind,
   columns: string[],
 ): Node[] => {
   const nodes: Array<Node> = [];
@@ -364,7 +368,7 @@ export const createNodes = (
 
     nodes.push({
       display,
-      params: resource,
+      params: { [resourceKind]: resource },
     });
   });
 

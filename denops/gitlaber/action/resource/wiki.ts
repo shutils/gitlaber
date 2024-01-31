@@ -93,8 +93,8 @@ export async function deleteWiki(args: ActionArgs) {
   const { denops, ctx, node } = args;
   const { instance, url, token } = ctx;
   let wiki: Wiki;
-  if (isWiki(node?.params)) {
-    wiki = node.params;
+  if (isWiki(node?.params?.wiki)) {
+    wiki = node.params.wiki;
   } else if (isWiki(args.params?.wiki)) {
     wiki = args.params.wiki;
   } else {
@@ -183,7 +183,7 @@ export async function editWikiContent(args: ActionArgs) {
 function argsHasWiki(args: ActionArgs) {
   if (isWiki(args.params?.wiki)) {
     return true;
-  } else if (isWiki(args.node?.params)) {
+  } else if (isWiki(args.node?.params?.wiki)) {
     return true;
   }
   return false;
@@ -192,8 +192,8 @@ function argsHasWiki(args: ActionArgs) {
 function getWikiFromArgs(args: ActionArgs) {
   if (isWiki(args.params?.wiki)) {
     return args.params.wiki;
-  } else if (isWiki(args.node?.params)) {
-    return args.node.params;
+  } else if (isWiki(args.node?.params?.wiki)) {
+    return args.node.params.wiki;
   }
   throw new Error("Wiki not found.");
 }

@@ -32,8 +32,8 @@ export async function createBranch(args: ActionArgs): Promise<void> {
   const { denops, ctx, node } = args;
   const { instance, url, token } = ctx;
   let text: string | undefined;
-  if (isIssue(node?.params)) {
-    const issue = node.params;
+  if (isIssue(node?.params?.issue)) {
+    const issue = node.params.issue;
     text = `${issue.iid}-${issue.title}`;
   }
   const defaultBranch = instance.project.default_branch;
@@ -71,8 +71,8 @@ async function ensureBranch(
   denops: Denops,
   args: ActionArgs,
 ) {
-  if (isBranch(args.node?.params)) {
-    return args.node.params;
+  if (isBranch(args.node?.params?.branch)) {
+    return args.node.params.branch;
   }
   const branchName = await helper.input(denops, {
     prompt: "Branch name: ",

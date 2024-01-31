@@ -29,7 +29,9 @@ export type NodeParam = u.PredicateType<typeof isNodeParam>;
 
 export const isNode = u.isObjectOf({
   display: u.isString,
-  params: isNodeParam,
+  params: u.isOptionalOf(u.isRecord),
 });
 
 export type Node = u.PredicateType<typeof isNode>;
+
+export type ResourceKind = "project" | "issue" | "mr" | "wiki" | "branch" | "commit" | "member" | "label" | "action";

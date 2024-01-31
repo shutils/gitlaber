@@ -272,8 +272,10 @@ async function selectIssue(args: ActionArgs): Promise<void> {
     nodes.push({
       display: `#${issue.iid} ${issue.title}`,
       params: {
-        name: args.name,
-        params: { ...args.params, issue: issue },
+        action: {
+          name: args.name,
+          params: { ...args.params, issue: issue },
+        },
       },
     });
   });
@@ -295,8 +297,10 @@ async function selectLabelFromIssue(
     nodes.push({
       display: label,
       params: {
-        name: args.name,
-        params: { ...args.params, label: label },
+        action: {
+          name: args.name,
+          params: { ...args.params, label: label },
+        },
       },
     });
   });
@@ -306,7 +310,7 @@ async function selectLabelFromIssue(
 function argsHasIssue(args: ActionArgs): boolean {
   if (isIssue(args.params?.issue)) {
     return true;
-  } else if (isIssue(args.node?.params)) {
+  } else if (isIssue(args.node?.params?.issue)) {
     return true;
   }
   return false;
@@ -315,8 +319,8 @@ function argsHasIssue(args: ActionArgs): boolean {
 function getIssueFromArgs(args: ActionArgs): Issue {
   if (isIssue(args.params?.issue)) {
     return args.params.issue;
-  } else if (isIssue(args.node?.params)) {
-    return args.node.params;
+  } else if (isIssue(args.node?.params?.issue)) {
+    return args.node.params.issue;
   }
   throw new Error("Issue not found.");
 }
