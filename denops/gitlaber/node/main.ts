@@ -3,8 +3,10 @@ import * as client from "../client/index.ts";
 
 import {
   Context,
+  isMergeRequest,
   isPaginationAttributes,
   Lint,
+  MergeRequest,
   Node,
   NodeParam,
   ResourceKind,
@@ -237,7 +239,10 @@ export const createMergeRequestsNodes = async (
   });
 };
 
-export const createMergeRequestChangesNodes = async (denops: Denops) => {
+export const createMergeRequestChangesNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
   return await makeNode(denops, async (args) => {
     const createDisplay = (change: {
       new_file: boolean;
@@ -257,16 +262,15 @@ export const createMergeRequestChangesNodes = async (denops: Denops) => {
       }
       return display;
     };
-    const { node } = args;
-    if (!node) {
-      return await Promise.resolve([]);
+
+    let mr: MergeRequest;
+    if (isMergeRequest(seed)) {
+      mr = seed;
+    } else if (isMergeRequest(args.node?.params?.mr)) {
+      mr = args.node.params.mr;
+    } else {
+      throw new Error("MergeRequest not found.");
     }
-    const mr = u.ensure(
-      node.params?.mr,
-      u.isObjectOf({
-        iid: u.isNumber,
-      }),
-    );
     const { instance, url, token } = args;
     const projectMergeRequestChanges = await client
       .getProjectMergeRequestChanges(
