@@ -10,13 +10,13 @@ export const isMergeRequest = u.isObjectOf({
   draft: u.isBoolean,
   web_url: u.isString,
   squash: u.isBoolean,
-  approved: u.isBoolean,
-  diff_refs: u.isObjectOf({
+  approved: u.isOptionalOf(u.isBoolean),
+  diff_refs: u.isOptionalOf(u.isObjectOf({
     base_sha: u.isString,
     head_sha: u.isString,
     start_sha: u.isString,
     ...u.isUnknown,
-  }),
+  })),
   labels: u.isArrayOf(u.isString),
   assignees: u.isArrayOf(
     u.isObjectOf({

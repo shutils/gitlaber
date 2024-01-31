@@ -1,7 +1,7 @@
-import { Denops, fn, helper, unknownutil as u } from "../../deps.ts";
+import { fn, helper, unknownutil as u } from "../../deps.ts";
 
 import * as client from "../../client/index.ts";
-import { ActionArgs, isWiki } from "../../types.ts";
+import { ActionArgs, isWiki, Node, Wiki } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import * as util from "../../util.ts";
@@ -13,6 +13,7 @@ import {
   createWikiNodes,
   createWikiPanelNodes,
 } from "../../node/main.ts";
+import { openUiSelect } from "../ui/main.ts";
 
 export async function openWikiList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberWikiList");
@@ -33,8 +34,11 @@ export async function openWikiConfig(args: ActionArgs): Promise<void> {
 
 export async function openWikiPreview(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberWikiPreview");
-  const wiki = await ensureWiki(args.denops, args);
-  if (!wiki) {
+  let wiki: Wiki;
+  if (argsHasWiki(args)) {
+    wiki = getWikiFromArgs(args);
+  } else {
+    selectWiki(args);
     return;
   }
   const nodes = await createContentNodes(wiki);
@@ -43,8 +47,11 @@ export async function openWikiPreview(args: ActionArgs): Promise<void> {
 
 export async function openWikiEdit(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberWikiEdit");
-  const wiki = await ensureWiki(args.denops, args);
-  if (!wiki) {
+  let wiki: Wiki;
+  if (argsHasWiki(args)) {
+    wiki = getWikiFromArgs(args);
+  } else {
+    selectWiki(args);
     return;
   }
   const id = args.ctx.instance.project.id;
@@ -71,13 +78,29 @@ export async function openWikiNew(args: ActionArgs): Promise<void> {
 
 export async function browseWiki(args: ActionArgs) {
   const { denops, ctx } = args;
-  await openWithBrowser(denops, ctx.instance.project.web_url + "/-/wikis");
+  const baseUrl = ctx.instance.project.web_url + "/-/wikis/";
+  let wiki: Wiki;
+  if (argsHasWiki(args)) {
+    wiki = getWikiFromArgs(args);
+  } else {
+    selectWiki(args);
+    return;
+  }
+  await openWithBrowser(denops, baseUrl + wiki.slug);
 }
 
 export async function deleteWiki(args: ActionArgs) {
   const { denops, ctx, node } = args;
   const { instance, url, token } = ctx;
-  const wiki = u.ensure(node?.params, isWiki);
+  let wiki: Wiki;
+  if (isWiki(node?.params)) {
+    wiki = node.params;
+  } else if (isWiki(args.params?.wiki)) {
+    wiki = args.params.wiki;
+  } else {
+    selectWiki(args);
+    return;
+  }
   const slug = wiki.slug;
   const title = wiki.title;
   const confirm = await helper.input(denops, {
@@ -93,7 +116,7 @@ export async function deleteWiki(args: ActionArgs) {
     token,
     {
       id: instance.project.id,
-      slug: slug,
+      slug,
     },
     "Successfully delete a wiki.",
   );
@@ -157,24 +180,43 @@ export async function editWikiContent(args: ActionArgs) {
   );
 }
 
-export async function ensureWiki(
-  denops: Denops,
-  args: ActionArgs,
-) {
-  if (isWiki(args.node?.params)) {
+function argsHasWiki(args: ActionArgs) {
+  if (isWiki(args.params?.wiki)) {
+    return true;
+  } else if (isWiki(args.node?.params)) {
+    return true;
+  }
+  return false;
+}
+
+function getWikiFromArgs(args: ActionArgs) {
+  if (isWiki(args.params?.wiki)) {
+    return args.params.wiki;
+  } else if (isWiki(args.node?.params)) {
     return args.node.params;
   }
-  const slug = await helper.input(denops, {
-    prompt: "Wiki slug: ",
+  throw new Error("Wiki not found.");
+}
+
+async function selectWiki(args: ActionArgs): Promise<void> {
+  const { denops, ctx } = args;
+  const { url, token, instance } = ctx;
+  const wikis = await client.getProjectWikis(url, token, {
+    id: instance.project.id,
   });
-  if (!slug) {
+  if (wikis.length === 0) {
+    helper.echo(denops, "Project has not wikis.");
     return;
   }
-  const { ctx } = args;
-  const { url, token, instance } = ctx;
-  const wiki = await client.getProjectWiki(url, token, {
-    id: instance.project.id,
-    slug: slug,
+  const nodes: Node[] = [];
+  wikis.map((wiki) => {
+    nodes.push({
+      display: wiki.title,
+      params: {
+        name: args.name,
+        params: { wiki },
+      },
+    });
   });
-  return wiki;
+  await openUiSelect(args, nodes);
 }

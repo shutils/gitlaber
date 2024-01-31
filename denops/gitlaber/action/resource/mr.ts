@@ -1,4 +1,4 @@
-import { base64, Denops, fn, helper, unknownutil as u } from "../../deps.ts";
+import { base64, fn, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import {
   ActionArgs,
@@ -6,8 +6,9 @@ import {
   isChange,
   isDiscussion,
   isMergeRequest,
-  isProjectLabel,
+  MergeRequest,
   Node,
+  ProjectLabel,
 } from "../../types.ts";
 import * as util from "../../util.ts";
 import { executeRequest } from "./core.ts";
@@ -24,6 +25,17 @@ import {
   createMergeRequestsNodes,
 } from "../../node/main.ts";
 import { clearSign, setSign } from "../../sign/main.ts";
+import {
+  argsHasAssignee,
+  argsHasLabel,
+  argsHasReviewer,
+  getAssigneeFromArgs,
+  getLabelFromArgs,
+  getReviewerFromArgs,
+  selectAssignee,
+  selectLabel,
+  selectReviewer,
+} from "./common.ts";
 
 export async function openMrList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrList");
@@ -45,8 +57,11 @@ export async function openMrConfig(args: ActionArgs): Promise<void> {
 
 export async function openMrPreview(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrPreview");
-  const mr = await ensureMergeRequest(args.denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   if (mr.description === null) {
@@ -59,8 +74,11 @@ export async function openMrPreview(args: ActionArgs): Promise<void> {
 
 export async function openMrEdit(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberMrEdit");
-  const mr = await ensureMergeRequest(args.denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   const nodes = await createDescriptionNodes(mr);
@@ -74,8 +92,11 @@ export async function openMrEdit(args: ActionArgs): Promise<void> {
 
 export async function openMrChangeList(args: ActionArgs): Promise<void> {
   const { denops, ctx } = args;
-  const mr = await ensureMergeRequest(denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   const config = getBufferConfig("GitlaberMrChangeList");
@@ -148,48 +169,23 @@ async function assignMergeRequestMember(
   args: ActionArgs,
   role: "assignee" | "reviewer",
 ) {
-  const { denops, ctx, params } = args;
+  const { denops, ctx } = args;
   const { instance, url, token } = ctx;
-  const ensuredParams = u.ensure(
-    params,
-    u.isOptionalOf(u.isObjectOf({
-      id: u.isOptionalOf(u.isNumber),
-      mr: u.isOptionalOf(isMergeRequest),
-      assignee_id: u.isOptionalOf(u.isNumber),
-      reviewer_ids: u.isOptionalOf(u.isArrayOf(u.isNumber)),
-    })),
-  );
-  const id = instance.project.id;
-  const assignee_id = ensuredParams?.assignee_id;
-  const reviewer_ids = ensuredParams?.reviewer_ids;
-  let mr = ensuredParams?.mr;
-  if (!mr) {
-    mr = await ensureMergeRequest(denops, args);
-    if (!mr) {
-      return;
-    }
-  }
-  const members = await client.getProjectMembers(url, token, {
-    id: instance.project.id,
-  });
-  if (members.length === 0) {
-    helper.echo(denops, "Project has not members.");
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
+  const id = instance.project.id;
   let extraAttrs: object;
   if (role === "assignee") {
-    if (!assignee_id) {
-      const nodes: Node[] = [];
-      members.map((member) => {
-        nodes.push({
-          display: `${member.name}`,
-          params: {
-            name: args.name,
-            params: { ...params, id, mr, assignee_id: member.id },
-          },
-        });
-      });
-      await openUiSelect(args, nodes);
+    let assignee_id: number;
+    if (argsHasAssignee(args)) {
+      assignee_id = getAssigneeFromArgs(args);
+    } else {
+      selectAssignee(args);
       return;
     }
 
@@ -197,29 +193,16 @@ async function assignMergeRequestMember(
       assignee_id: assignee_id,
     };
   } else {
-    if (!reviewer_ids) {
-      const nodes: Node[] = [];
-      members.map((member) => {
-        nodes.push({
-          display: `${member.name}`,
-          params: {
-            name: args.name,
-            params: {
-              ...params,
-              id,
-              mr,
-              reviewer_ids: reviewer_ids
-                ? [...reviewer_ids, member.id]
-                : [member.id],
-            },
-          },
-        });
-      });
-      await openUiSelect(args, nodes);
+    let reviewer_id: number;
+    if (argsHasReviewer(args)) {
+      reviewer_id = getReviewerFromArgs(args);
+    } else {
+      selectReviewer(args);
       return;
     }
+
     extraAttrs = {
-      reviewer_ids: reviewer_ids,
+      reviewer_ids: [reviewer_id],
     };
   }
   await executeRequest(
@@ -331,8 +314,11 @@ export async function editMergeRequestDescription(args: ActionArgs) {
 
 export async function browseMergeRequest(args: ActionArgs) {
   const { denops } = args;
-  const mr = await ensureMergeRequest(denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   await openWithBrowser(denops, mr.web_url);
@@ -341,8 +327,11 @@ export async function browseMergeRequest(args: ActionArgs) {
 export async function approveMergeRequest(args: ActionArgs) {
   const { denops, ctx } = args;
   const { instance, url, token } = ctx;
-  const mr = await ensureMergeRequest(denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   const confirm = await helper.input(denops, {
@@ -375,8 +364,11 @@ export async function assignReviewerMergeRequest(args: ActionArgs) {
 export async function closeMergeRequest(args: ActionArgs) {
   const { denops, ctx } = args;
   const { instance, url, token } = ctx;
-  const mr = await ensureMergeRequest(denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   const confirm = await helper.input(denops, {
@@ -402,8 +394,11 @@ export async function closeMergeRequest(args: ActionArgs) {
 export async function reopenMergeRequest(args: ActionArgs) {
   const { denops, ctx } = args;
   const { instance, url, token } = ctx;
-  const mr = await ensureMergeRequest(denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   const confirm = await helper.input(denops, {
@@ -429,8 +424,11 @@ export async function reopenMergeRequest(args: ActionArgs) {
 export async function deleteMergeRequest(args: ActionArgs) {
   const { denops, ctx } = args;
   const { instance, url, token } = ctx;
-  const mr = await ensureMergeRequest(denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   const confirm = await helper.input(denops, {
@@ -453,50 +451,23 @@ export async function deleteMergeRequest(args: ActionArgs) {
 }
 
 export async function labelMergeRequest(args: ActionArgs) {
-  const { denops, ctx, params } = args;
+  const { denops, ctx } = args;
   const { instance, url, token } = ctx;
-  const ensuredParams = u.ensure(
-    params,
-    u.isOptionalOf(u.isObjectOf({
-      id: u.isOptionalOf(u.isNumber),
-      mr: u.isOptionalOf(isMergeRequest),
-      labels: u.isOptionalOf(u.isArrayOf(isProjectLabel)),
-      add_labels: u.isOptionalOf(u.isString),
-    })),
-  );
-  const id = instance.project.id;
-  let labels = ensuredParams?.labels;
-  const add_labels = ensuredParams?.add_labels;
-  let mr = ensuredParams?.mr;
-  if (!mr) {
-    mr = await ensureMergeRequest(denops, args);
-    if (!mr) {
-      return;
-    }
-  }
-  if (!labels) {
-    labels = await client.getProjectLabels(url, token, {
-      id: instance.project.id,
-    });
-    if (labels.length === 0) {
-      helper.echo(denops, "Project has not labels.");
-      return;
-    }
-  }
-  if (!add_labels) {
-    const nodes: Node[] = [];
-    labels.map((label) => {
-      nodes.push({
-        display: `${label.name}`,
-        params: {
-          name: args.name,
-          params: { ...params, id, mr, add_labels: label.name },
-        },
-      });
-    });
-    await openUiSelect(args, nodes);
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
+  let label: ProjectLabel;
+  if (argsHasLabel(args)) {
+    label = getLabelFromArgs(args);
+  } else {
+    selectLabel(args);
+    return;
+  }
+  const id = instance.project.id;
   await executeRequest(
     denops,
     client.editProjectMergeRequest,
@@ -505,7 +476,7 @@ export async function labelMergeRequest(args: ActionArgs) {
     {
       id,
       merge_request_iid: mr.iid,
-      add_labels,
+      add_labels: label.name,
     },
     "Successfully add a label.",
   );
@@ -514,47 +485,22 @@ export async function labelMergeRequest(args: ActionArgs) {
 export async function unlabelMergeRequest(args: ActionArgs) {
   const { denops, ctx, params } = args;
   const { instance, url, token } = ctx;
-  const ensuredParams = u.ensure(
-    params,
-    u.isOptionalOf(u.isObjectOf({
-      id: u.isOptionalOf(u.isNumber),
-      mr: u.isOptionalOf(isMergeRequest),
-      labels: u.isOptionalOf(u.isArrayOf(u.isString)),
-      remove_labels: u.isOptionalOf(u.isString),
-    })),
-  );
-  const id = instance.project.id;
-  let labels = ensuredParams?.labels;
-  const remove_labels = ensuredParams?.remove_labels;
-  let mr = ensuredParams?.mr;
-  if (!mr) {
-    mr = await ensureMergeRequest(denops, args);
-    if (!mr) {
-      return;
-    }
-  }
-
-  if (!labels) {
-    labels = mr.labels;
-    if (labels.length === 0) {
-      helper.echo(denops, "Project has not labels.");
-      return;
-    }
-  }
-  if (!remove_labels) {
-    const nodes: Node[] = [];
-    labels.map((label) => {
-      nodes.push({
-        display: `${label}`,
-        params: {
-          name: args.name,
-          params: { ...params, id, mr, remove_labels: label },
-        },
-      });
-    });
-    await openUiSelect(args, nodes);
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
+  let label: string;
+  if (u.isString(params?.label)) {
+    label = params.label;
+  } else {
+    selectLabelFromMergeRequest(args, mr);
+    return;
+  }
+  const id = instance.project.id;
+  const remove_labels = label;
   await executeRequest(
     denops,
     client.editProjectMergeRequest,
@@ -572,8 +518,11 @@ export async function unlabelMergeRequest(args: ActionArgs) {
 export async function mergeMergeRequest(args: ActionArgs) {
   const { denops, ctx } = args;
   const { instance, url, token } = ctx;
-  const mr = await ensureMergeRequest(denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   const confirm = await helper.input(denops, {
@@ -625,8 +574,11 @@ export async function mergeMergeRequest(args: ActionArgs) {
 export async function unapproveMergeRequest(args: ActionArgs) {
   const { denops, ctx } = args;
   const { instance, url, token } = ctx;
-  const mr = await ensureMergeRequest(denops, args);
-  if (!mr) {
+  let mr: MergeRequest;
+  if (argsHasMergeRequest(args)) {
+    mr = getMergeRequestFromArgs(args);
+  } else {
+    selectMergeRequest(args);
     return;
   }
   const confirm = await helper.input(denops, {
@@ -667,6 +619,9 @@ export async function openMrChangeDiff(args: ActionArgs) {
     isChange,
   );
   const mr = bufferParams.mr;
+  if (!mr.diff_refs) {
+    return;
+  }
   const discussions = await client.getProjectMrDiscussion(
     ctx.url,
     ctx.token,
@@ -836,28 +791,6 @@ export async function openMrChangeDiff(args: ActionArgs) {
   await denops.cmd("redraw");
 }
 
-export async function ensureMergeRequest(
-  denops: Denops,
-  args: ActionArgs,
-) {
-  if (isMergeRequest(args.node?.params)) {
-    return args.node.params;
-  }
-  const mrIid = await helper.input(denops, {
-    prompt: "Merge request IID: ",
-  });
-  if (!mrIid) {
-    return;
-  }
-  const { ctx } = args;
-  const { url, token, instance } = ctx;
-  const mr = await client.getProjectMergeRequest(url, token, {
-    id: instance.project.id,
-    merge_request_iid: Number(mrIid),
-  });
-  return mr;
-}
-
 export async function createMrDiscussion(args: ActionArgs) {
   function hasDiff(hlgroup: string) {
     return ["DiffAdd", "DiffChange", "DiffText"].some((matchStr) =>
@@ -919,6 +852,9 @@ export async function createMrDiscussion(args: ActionArgs) {
       helper.echoerr(denops, "This feature is not yet supported.");
       return;
     }
+  }
+  if (!mr.diff_refs) {
+    return;
   }
   if (!body) {
     await openUiInput(args, "body", {
@@ -990,4 +926,67 @@ export async function inspectMrDiscussion(args: ActionArgs) {
     getBufferConfig("GitlaberMrDiscussionInspect"),
     nodes,
   );
+}
+
+function argsHasMergeRequest(args: ActionArgs): boolean {
+  if (isMergeRequest(args.params?.mr)) {
+    return true;
+  } else if (isMergeRequest(args.node?.params)) {
+    return true;
+  }
+  return false;
+}
+
+function getMergeRequestFromArgs(args: ActionArgs): MergeRequest {
+  if (isMergeRequest(args.params?.mr)) {
+    return args.params.mr;
+  } else if (isMergeRequest(args.node?.params)) {
+    return args.node.params;
+  }
+  throw new Error("Merge request not found.");
+}
+
+async function selectMergeRequest(args: ActionArgs): Promise<void> {
+  const { denops, ctx } = args;
+  const { instance, url, token } = ctx;
+  const id = instance.project.id;
+  const mrs = await client.getProjectMergeRequests(url, token, { id });
+  if (mrs.length === 0) {
+    helper.echo(denops, "Project has not merge requests.");
+    return;
+  }
+  const nodes: Node[] = [];
+  mrs.map((mr) => {
+    nodes.push({
+      display: `#${mr.iid} ${mr.title}`,
+      params: {
+        name: args.name,
+        params: { id, mr },
+      },
+    });
+  });
+  await openUiSelect(args, nodes);
+}
+
+async function selectLabelFromMergeRequest(
+  args: ActionArgs,
+  mr: MergeRequest,
+): Promise<void> {
+  const { denops } = args;
+  const labels = mr.labels;
+  if (labels.length === 0) {
+    helper.echo(denops, "This merge request has not labels.");
+    return;
+  }
+  const nodes: Node[] = [];
+  labels.map((label) => {
+    nodes.push({
+      display: label,
+      params: {
+        name: args.name,
+        params: { ...args.params, label: label },
+      },
+    });
+  });
+  await openUiSelect(args, nodes);
 }
