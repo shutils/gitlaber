@@ -16,6 +16,7 @@ export async function createBuffer(
   denops: Denops,
   config: BufferConfig,
   nodes: Node[],
+  cmd?: string,
 ) {
   const instance = await getCurrentInstance(denops);
   const userConfig = await loadConfig(denops);
@@ -29,7 +30,7 @@ export async function createBuffer(
   const bufnr = await fn.bufadd(denops, `${config.kind}\ [${instance.id}]`);
   if (!exists) {
     await fn.bufload(denops, bufnr);
-    await fn.execute(denops, `${config.direction} new ${bufname}`);
+    await fn.execute(denops, `${config.direction} new ${cmd ?? ""}${bufname}`);
     await fn.execute(denops, `buffer ${bufnr}`);
   }
   await setNodesOnBuf(denops, nodes, bufnr);

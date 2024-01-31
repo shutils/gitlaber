@@ -1,4 +1,4 @@
-import { fn, unknownutil as u } from "../../deps.ts";
+import { fn, option, unknownutil as u } from "../../deps.ts";
 
 import { createBuffer } from "../../buffer/core.ts";
 import { getBuffer, getBufferConfig, updateBuffer } from "../../helper.ts";
@@ -10,7 +10,15 @@ export async function openUiSelect(
   nodes: Node[],
 ): Promise<void> {
   const config = getBufferConfig("GitlaberUiSelect");
-  const bufnr = await createBuffer(args.denops, config, nodes);
+  const maxRow = await option.lines.getGlobal(args.denops) / 3;
+  const row = nodes.length > maxRow ? maxRow : nodes.length;
+  const bufnr = await createBuffer(
+    args.denops,
+    config,
+    nodes,
+    `+resize\\ ${row} `,
+  );
+
   await fn.execute(
     args.denops,
     `autocmd WinLeave <buffer> bw ${bufnr}`,
