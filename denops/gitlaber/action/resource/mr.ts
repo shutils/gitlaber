@@ -852,6 +852,34 @@ export async function addMrDiscussionComment(args: ActionArgs) {
   );
 }
 
+export async function resolveMrDiscussion(args: ActionArgs) {
+  const { denops, ctx } = args;
+  const { url, token } = ctx;
+  const buffer = await getBuffer(denops, await fn.bufnr(denops));
+  const bufferParams = buffer.params;
+  const { mr, discussion } = u.ensure(
+    bufferParams,
+    u.isObjectOf({
+      mr: isMergeRequest,
+      discussion: isDiscussion,
+      ...u.isUnknown,
+    }),
+  );
+  const id = ctx.instance.project.id;
+  await executeRequest(
+    denops,
+    client.resolveProjectMrDiscussion,
+    url,
+    token,
+    {
+      id,
+      merge_request_iid: mr.iid,
+      discussion_id: discussion.id,
+    },
+    "Successfully resolve a discussion.",
+  );
+}
+
 function argsHasMergeRequest(args: ActionArgs): boolean {
   if (isMergeRequest(args.params?.mr)) {
     return true;

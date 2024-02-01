@@ -56,6 +56,7 @@ import {
   openMrList,
   openMrPreview,
   reopenMergeRequest,
+  resolveMrDiscussion,
   unapproveMergeRequest,
   unlabelMergeRequest,
 } from "./resource/mr.ts";
@@ -137,6 +138,7 @@ const actionStore: ActionStore = {
   "mr-discussion-new": createMrDiscussion,
   "mr-discussion-inspect": inspectMrDiscussion,
   "mr-discussion-add-note": addMrDiscussionComment,
+  "mr-discussion-resolve": resolveMrDiscussion,
   "project-browse": browseProject,
   "project-status": openProjectStatus,
   "wiki-browse": browseWiki,

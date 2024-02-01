@@ -80,3 +80,21 @@ export async function addNoteToDiscussion(
     `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/discussions/${attrs.discussion_id}/notes`;
   await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
 }
+
+export async function resolveProjectMrDiscussion(
+  url: string,
+  token: string,
+  attrs: {
+    id: number | string;
+    merge_request_iid: number;
+    discussion_id: string;
+  },
+) {
+  const exAttrs = {
+    ...attrs,
+    resolved: true,
+  };
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/discussions/${attrs.discussion_id}`;
+  await request(gitlabApiPath, token, "PUT", JSON.stringify(exAttrs));
+}
