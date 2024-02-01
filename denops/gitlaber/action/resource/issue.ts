@@ -17,11 +17,6 @@ import { openUiSelect } from "../ui/main.ts";
 import { getBufferConfig } from "../../helper.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import {
-  createDescriptionNodes,
-  createIssuePanelNodes,
-  createIssuesNodes,
-} from "../../node/main.ts";
-import {
   argsHasAssignee,
   getAssigneeFromArgs,
   selectAssignee,
@@ -30,16 +25,22 @@ import {
 
 export async function openIssueList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberIssueList");
-  const nodes = await createIssuesNodes(args.denops);
-  await createBuffer(args.denops, config, nodes);
-  const bufnr = await createBuffer(args.denops, config, nodes);
+  const seed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id: args.ctx.instance.project.id,
+  };
+  const bufnr = await createBuffer({
+    denops: args.denops,
+    config,
+    seed,
+  });
   await util.focusBuffer(args.denops, bufnr);
 }
 
 export async function openIssueConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberIssueConfig");
-  const nodes = await createIssuePanelNodes(args.denops);
-  const bufnr = await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer({ denops: args.denops, config });
   await fn.execute(
     args.denops,
     `autocmd WinLeave <buffer> bw ${bufnr}`,
@@ -56,11 +57,16 @@ export async function openIssuePreview(args: ActionArgs): Promise<void> {
     return;
   }
   if (issue.description === null) {
-    await helper.echo(args.denops, "This issue has not description.");
-    return;
+    helper.echo(args.denops, "No description.");
+    return
   }
-  const nodes = await createDescriptionNodes(issue);
-  await createBuffer(args.denops, config, nodes);
+  const seed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id: args.ctx.instance.project.id,
+    issue_iid: issue.iid,
+  };
+  await createBuffer({ denops: args.denops, config, seed });
 }
 
 export async function openIssueEdit(args: ActionArgs): Promise<void> {
@@ -73,11 +79,15 @@ export async function openIssueEdit(args: ActionArgs): Promise<void> {
     selectIssue(args);
     return;
   }
-  const nodes = await createDescriptionNodes(issue);
   const id = args.ctx.instance.project.id;
-  const issue_iid = issue.iid;
-  const bufnr = await createBuffer(args.denops, config, nodes);
-  await updateBuffer({ denops, bufnr, params: { id, issue_iid } });
+  const seed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id,
+    issue_iid: issue.iid,
+  };
+  const bufnr = await createBuffer({ denops: args.denops, config, seed });
+  await updateBuffer({ denops, bufnr, params: { id, issue_iid: issue.iid } });
 }
 
 export async function createIssue(args: ActionArgs): Promise<void> {

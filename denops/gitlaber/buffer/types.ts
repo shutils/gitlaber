@@ -41,6 +41,7 @@ export const isBuffer = u.isObjectOf({
   params: u.isOptionalOf(u.isObjectOf({
     ...u.isUnknown,
   })),
+  seed: u.isOptionalOf(u.isRecord),
 });
 
 export type Buffer = u.PredicateType<typeof isBuffer>;
@@ -48,7 +49,10 @@ export type Buffer = u.PredicateType<typeof isBuffer>;
 export type BufferConfig = {
   kind: BufferKind;
   direction: BufferDirection;
-  nodeMaker?: (denops: Denops, seed?: Node) => Promise<Node[]>;
+  nodeMaker?: (
+    denops: Denops,
+    seed?: Record<string, unknown>,
+  ) => Promise<Node[]>;
   options?: BufferOptions;
   keymaps?: Keymap[];
 };

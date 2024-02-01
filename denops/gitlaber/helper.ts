@@ -95,11 +95,15 @@ export async function addInstance(denops: Denops) {
 }
 
 export async function addBuffer(
-  denops: Denops,
-  kind: BufferKind,
-  bufnr: number,
-  nodes: Node[],
+  args: {
+    denops: Denops;
+    kind: BufferKind;
+    bufnr: number;
+    nodes: Node[];
+    seed?: Record<string, unknown>;
+  },
 ) {
+  const { denops, kind, bufnr, nodes } = args;
   const gitlaberVar = await getGitlaberVar(denops);
   const cwd = await fn.getcwd(denops);
   const instance = gitlaberVar.instances.find((instance) =>
@@ -113,6 +117,7 @@ export async function addBuffer(
     bufnr: bufnr,
     nodes: nodes,
     kind: kind,
+    seed: args.seed ?? {},
   });
   await setGitlaberVar(denops, gitlaberVar);
 }
@@ -135,6 +140,7 @@ export async function updateBuffer(
     bufnr: number;
     nodes?: Node[];
     params?: object;
+    seed?: Record<string, unknown>;
   },
 ) {
   const { denops, bufnr, nodes, params } = args;
@@ -147,6 +153,10 @@ export async function updateBuffer(
   buffer.params = {
     ...buffer.params,
     ...params,
+  };
+  buffer.seed = {
+    ...buffer.seed,
+    ...args.seed,
   };
   await setGitlaberVar(denops, gitlaberVar);
 }

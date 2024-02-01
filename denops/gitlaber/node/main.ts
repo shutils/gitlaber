@@ -1,12 +1,11 @@
-import { Denops, unknownutil as u } from "../deps.ts";
+import { base64, Denops, unknownutil as u } from "../deps.ts";
 import * as client from "../client/index.ts";
 
 import {
   Context,
-  isMergeRequest,
+  Discussion,
   isPaginationAttributes,
   Lint,
-  MergeRequest,
   Node,
   NodeParam,
   ResourceKind,
@@ -75,22 +74,27 @@ export const createIssuePanelNodes = async (
 
 export const createIssuesNodes = async (
   denops: Denops,
+  seed?: Record<string, unknown>,
 ) => {
   return await makeNode(denops, async (args) => {
-    const buffer = await getBuffer(args.denops);
-    const pageAttrs = u.ensure(
-      buffer.params,
-      u.isOptionalOf(isPaginationAttributes),
+    let pageAttrs: Record<string, unknown> | undefined;
+    try {
+      const buffer = await getBuffer(args.denops);
+      pageAttrs = u.ensure(
+        buffer.params,
+        u.isOptionalOf(isPaginationAttributes),
+      );
+    } catch {
+      pageAttrs = {};
+    }
+    const { url, token, id } = u.ensure(
+      seed,
+      u.isObjectOf({ url: u.isString, token: u.isString, id: u.isNumber }),
     );
-    const { instance, url, token } = args;
-    const projectIssues = await client.getProjectIssues(
-      url,
-      token,
-      {
-        id: instance.project.id,
-        ...pageAttrs,
-      },
-    );
+    const projectIssues = await client.getProjectIssues(url, token, {
+      id,
+      ...pageAttrs,
+    });
     return Promise.resolve(createNodes(
       projectIssues,
       "issue",
@@ -113,16 +117,25 @@ export const createBranchPanelNodes = async (
 
 export const createBranchesNodes = async (
   denops: Denops,
+  seed?: Record<string, unknown>,
 ) => {
   return await makeNode(denops, async (args) => {
-    const buffer = await getBuffer(args.denops);
-    const pageAttrs = u.ensure(
-      buffer.params,
-      u.isOptionalOf(isPaginationAttributes),
+    let pageAttrs: Record<string, unknown> | undefined;
+    try {
+      const buffer = await getBuffer(args.denops);
+      pageAttrs = u.ensure(
+        buffer.params,
+        u.isOptionalOf(isPaginationAttributes),
+      );
+    } catch {
+      pageAttrs = {};
+    }
+    const { url, token, id } = u.ensure(
+      seed,
+      u.isObjectOf({ url: u.isString, token: u.isString, id: u.isNumber }),
     );
-    const { instance, url, token } = args;
     const projectBranches = await client.getProjectBranches(url, token, {
-      id: instance.project.id,
+      id,
       ...pageAttrs,
     });
     return await Promise.resolve(
@@ -133,17 +146,83 @@ export const createBranchesNodes = async (
 
 export const createWikiNodes = async (
   denops: Denops,
+  seed?: Record<string, unknown>,
 ) => {
-  return await makeNode(denops, async (args) => {
-    const { instance, url, token } = args;
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id } = u.ensure(
+      seed,
+      u.isObjectOf({ url: u.isString, token: u.isString, id: u.isNumber }),
+    );
     const projectWikis = await client.getProjectWikis(url, token, {
-      id: instance.project.id,
+      id,
     });
     return await Promise.resolve(
       createNodes(projectWikis, "wiki", ["title", "format"]),
     );
   });
 };
+
+export async function createIssueDescriptionNodes(
+  _denops: Denops,
+  seed?: Record<string, unknown>,
+) {
+  const { id, issue_iid, url, token } = u.ensure(
+    seed,
+    u.isObjectOf({
+      url: u.isString,
+      token: u.isString,
+      id: u.isNumber,
+      issue_iid: u.isNumber,
+      ...u.isUnknown,
+    }),
+  );
+  const issue = await client.getProjectIssue(url, token, {
+    id,
+    issue_iid,
+  });
+  if (issue.description === null) {
+    return await Promise.resolve([]);
+  }
+  const nodes: Node[] = [];
+  const lines = issue.description.split("\n");
+  lines.map((line) => {
+    nodes.push({
+      display: line,
+    });
+  });
+  return await Promise.resolve(nodes);
+}
+
+export async function createMergeRequestDescriptionNodes(
+  _denops: Denops,
+  seed?: Record<string, unknown>,
+) {
+  const { id, merge_request_iid, url, token } = u.ensure(
+    seed,
+    u.isObjectOf({
+      url: u.isString,
+      token: u.isString,
+      id: u.isNumber,
+      merge_request_iid: u.isNumber,
+      ...u.isUnknown,
+    }),
+  );
+  const mergeRequest = await client.getProjectMergeRequest(url, token, {
+    id,
+    merge_request_iid,
+  });
+  if (mergeRequest.description === null) {
+    return await Promise.resolve([]);
+  }
+  const nodes: Node[] = [];
+  const lines = mergeRequest.description.split("\n");
+  lines.map((line) => {
+    nodes.push({
+      display: line,
+    });
+  });
+  return await Promise.resolve(nodes);
+}
 
 export const createDescriptionNodes = async (
   seed: {
@@ -171,6 +250,35 @@ export const createWikiPanelNodes = async (
     const nodes: Array<Node> = [];
     nodes.push({
       display: "Wiki Config",
+    });
+    return await Promise.resolve(nodes);
+  });
+};
+
+export const createWikiContentNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id, slug } = u.ensure(
+      seed,
+      u.isObjectOf({
+        url: u.isString,
+        token: u.isString,
+        id: u.isNumber,
+        slug: u.isString,
+      }),
+    );
+    const projectWiki = await client.getProjectWiki(url, token, {
+      id,
+      slug,
+    });
+    const nodes: Node[] = [];
+    const lines = projectWiki.content.split("\n");
+    lines.map((line) => {
+      nodes.push({
+        display: line,
+      });
     });
     return await Promise.resolve(nodes);
   });
@@ -222,14 +330,23 @@ export const createMergeRequestPanelNodes = async (
 
 export const createMergeRequestsNodes = async (
   denops: Denops,
+  seed?: Record<string, unknown>,
 ) => {
-  return await makeNode(denops, async (args) => {
-    const { instance, url, token } = args;
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id, path_with_namespace } = u.ensure(
+      seed,
+      u.isObjectOf({
+        url: u.isString,
+        token: u.isString,
+        id: u.isNumber,
+        path_with_namespace: u.isString,
+      }),
+    );
     const projectMergeRequests = await client.getProjectMergeRequestsGraphQL(
       url,
       token,
-      instance.project.path_with_namespace,
-      instance.project.id,
+      path_with_namespace,
+      id,
     );
     return await Promise.resolve(createNodes(
       projectMergeRequests,
@@ -243,7 +360,7 @@ export const createMergeRequestChangesNodes = async (
   denops: Denops,
   seed?: Record<string, unknown>,
 ) => {
-  return await makeNode(denops, async (args) => {
+  return await makeNode(denops, async (_args) => {
     const createDisplay = (change: {
       new_file: boolean;
       old_path: string;
@@ -263,22 +380,23 @@ export const createMergeRequestChangesNodes = async (
       return display;
     };
 
-    let mr: MergeRequest;
-    if (isMergeRequest(seed)) {
-      mr = seed;
-    } else if (isMergeRequest(args.node?.params?.mr)) {
-      mr = args.node.params.mr;
-    } else {
-      throw new Error("MergeRequest not found.");
-    }
-    const { instance, url, token } = args;
+    const { id, merge_request_iid, url, token } = u.ensure(
+      seed,
+      u.isObjectOf({
+        url: u.isString,
+        token: u.isString,
+        id: u.isNumber,
+        merge_request_iid: u.isNumber,
+        ...u.isUnknown,
+      }),
+    );
     const projectMergeRequestChanges = await client
       .getProjectMergeRequestChanges(
         url,
         token,
         {
-          id: instance.project.id,
-          merge_request_iid: mr.iid,
+          id,
+          merge_request_iid,
         },
       );
     const nodes: Node[] = [];
@@ -286,7 +404,199 @@ export const createMergeRequestChangesNodes = async (
     changes.map((change) => {
       nodes.push({
         display: createDisplay(change),
-        params: change,
+        params: { change },
+      });
+    });
+    return await Promise.resolve(nodes);
+  });
+};
+
+export const createMergeRequestDiscussionsNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
+  return await makeNode(denops, async (_args) => {
+    const { id, merge_request_iid, url, token } = u.ensure(
+      seed,
+      u.isObjectOf({
+        url: u.isString,
+        token: u.isString,
+        id: u.isNumber,
+        merge_request_iid: u.isNumber,
+        ...u.isUnknown,
+      }),
+    );
+    const projectMergeRequestDiscussions = await client.getProjectMrDiscussions(
+      url,
+      token,
+      { id, merge_request_iid },
+    );
+    const nodes: Node[] = [];
+    projectMergeRequestDiscussions.map((discussion) => {
+      if (discussion.notes[0].system === true) {
+        return;
+      }
+      const lines = discussion.notes[0].body?.split("\n");
+      if (!lines) {
+        return;
+      }
+      lines.map((line) => {
+        nodes.push({
+          display: line,
+        });
+      });
+      nodes.push({
+        display: "",
+      });
+    });
+    return await Promise.resolve(nodes);
+  });
+};
+
+export const createMrFileWithDiscussionNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id, file_path, ref, merge_request_iid, kind } = u
+      .ensure(
+        seed,
+        u.isObjectOf({
+          url: u.isString,
+          token: u.isString,
+          id: u.isNumber,
+          file_path: u.isString,
+          ref: u.isString,
+          merge_request_iid: u.isNumber,
+          kind: u.isLiteralOneOf(["old", "new"] as const),
+          ...u.isUnknown,
+        }),
+      );
+    const discussions = await client.getProjectMrDiscussions(url, token, {
+      id,
+      merge_request_iid,
+    });
+    const positionDiscussions = discussions.filter((discussion) => {
+      return discussion.notes[0].position !== null;
+    });
+    const fileDiscussions: Discussion[] = [];
+    if (kind === "old") {
+      positionDiscussions.map((discussion) => {
+        if (discussion.notes[0].position?.old_path === file_path) {
+          fileDiscussions.push(discussion);
+        }
+      });
+    } else {
+      positionDiscussions.map((discussion) => {
+        if (discussion.notes[0].position?.new_path === file_path) {
+          fileDiscussions.push(discussion);
+        }
+      });
+    }
+    let file;
+    try {
+      file = await client.getProjectFile(url, token, {
+        id,
+        file_path,
+        ref,
+      });
+    } catch {
+      return await Promise.resolve([]);
+    }
+    const nodes: Node[] = [];
+    const decodedFile = new TextDecoder().decode(
+      base64.decodeBase64(file.content),
+    );
+    decodedFile.split("\n").map((line) => {
+      nodes.push({
+        display: line,
+      });
+    });
+    // There is a blank line at the end of nodes, so delete it.
+    nodes.pop();
+
+    // Add discussions to nodes.
+    fileDiscussions.map((discussion) => {
+      const position = discussion.notes[0].position;
+      if (!position) {
+        return;
+      }
+      const line = position.new_line ?? position.old_line;
+      if (line === null) {
+        return;
+      }
+      if (nodes[line - 1] === undefined) {
+        return;
+      }
+      if (nodes[line - 1].params === undefined) {
+        nodes[line - 1] = {
+          ...nodes[line - 1],
+          params: {
+            discussion: discussion,
+            sign: {
+              name: "GitlaberDiscussion",
+              group: "GitlaberDiscussion",
+            },
+          },
+        };
+      } else {
+        nodes[line - 1].params = {
+          ...nodes[line - 1].params,
+          discussion: discussion,
+          sign: {
+            name: "GitlaberDiscussion",
+            group: "GitlaberDiscussion",
+          },
+        };
+      }
+    });
+    return await Promise.resolve(nodes);
+  });
+};
+
+export const createMrDiscussionInspectNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id, merge_request_iid, discussion_id } = u.ensure(
+      seed,
+      u.isObjectOf({
+        url: u.isString,
+        token: u.isString,
+        id: u.isNumber,
+        discussion_id: u.isString,
+        merge_request_iid: u.isNumber,
+        ...u.isUnknown,
+      }),
+    );
+    const discussion = await client.getProjectMrDiscussion(url, token, {
+      id,
+      merge_request_iid,
+      discussion_id,
+    });
+    const nodes: Node[] = [];
+    discussion.notes.map((note) => {
+      if (note.system === true) {
+        return;
+      }
+      nodes.push({
+        display: `${note.author.name}:`,
+      });
+      nodes.push({
+        display: "------------------",
+      });
+      const lines = note.body?.split("\n");
+      if (!lines) {
+        return;
+      }
+      lines.map((line) => {
+        nodes.push({
+          display: line,
+        });
+      });
+      nodes.push({
+        display: "",
       });
     });
     return await Promise.resolve(nodes);

@@ -7,11 +7,28 @@ export async function getProjectMrDiscussion(
   token: string,
   attrs: {
     id: number | string;
-    mr_iid: number;
+    merge_request_iid: number;
+    discussion_id: string;
   },
 ) {
   const baseApiPath =
-    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.mr_iid}/discussions?per_page=100`;
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/discussions/${attrs.discussion_id}`;
+  return u.ensure(
+    await request(baseApiPath, token, "GET"),
+    isDiscussion,
+  );
+}
+
+export async function getProjectMrDiscussions(
+  url: string,
+  token: string,
+  attrs: {
+    id: number | string;
+    merge_request_iid: number;
+  },
+) {
+  const baseApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/discussions?per_page=100`;
   return u.ensure(
     await request(baseApiPath, token, "GET"),
     u.isArrayOf(isDiscussion),

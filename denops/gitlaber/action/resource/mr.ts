@@ -1,4 +1,4 @@
-import { base64, fn, helper, unknownutil as u } from "../../deps.ts";
+import { fn, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
 import {
   ActionArgs,
@@ -19,13 +19,6 @@ import { setDiffOptions } from "../../buffer/helper.ts";
 import { getBufferConfig } from "../../helper.ts";
 import { getBuffer, updateBuffer } from "../../helper.ts";
 import {
-  createDescriptionNodes,
-  createMergeRequestChangesNodes,
-  createMergeRequestPanelNodes,
-  createMergeRequestsNodes,
-} from "../../node/main.ts";
-import { clearSign, setSign } from "../../sign/main.ts";
-import {
   argsHasAssignee,
   argsHasLabel,
   argsHasReviewer,
@@ -38,17 +31,22 @@ import {
 } from "./common.ts";
 
 export async function openMrList(args: ActionArgs): Promise<void> {
+  const { denops } = args;
   const config = getBufferConfig("GitlaberMrList");
-  const nodes = await createMergeRequestsNodes(args.denops);
-  await createBuffer(args.denops, config, nodes);
-  const bufnr = await createBuffer(args.denops, config, nodes);
+  const seed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id: args.ctx.instance.project.id,
+    path_with_namespace: args.ctx.instance.project.path_with_namespace,
+  };
+  const bufnr = await createBuffer({ denops, config, seed });
   await util.focusBuffer(args.denops, bufnr);
 }
 
 export async function openMrConfig(args: ActionArgs): Promise<void> {
+  const { denops } = args;
   const config = getBufferConfig("GitlaberMrConfig");
-  const nodes = await createMergeRequestPanelNodes(args.denops);
-  const bufnr = await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer({ denops, config });
   await fn.execute(
     args.denops,
     `autocmd WinLeave <buffer> bw ${bufnr}`,
@@ -56,6 +54,7 @@ export async function openMrConfig(args: ActionArgs): Promise<void> {
 }
 
 export async function openMrPreview(args: ActionArgs): Promise<void> {
+  const { denops } = args;
   const config = getBufferConfig("GitlaberMrPreview");
   let mr: MergeRequest;
   if (argsHasMergeRequest(args)) {
@@ -65,11 +64,16 @@ export async function openMrPreview(args: ActionArgs): Promise<void> {
     return;
   }
   if (mr.description === null) {
-    await helper.echo(args.denops, "This merge request has not description.");
+    helper.echo(denops, "No description.");
     return;
   }
-  const nodes = await createDescriptionNodes(mr);
-  await createBuffer(args.denops, config, nodes);
+  const seed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id: args.ctx.instance.project.id,
+    merge_request_iid: mr.iid,
+  };
+  await createBuffer({ denops, config, seed });
 }
 
 export async function openMrEdit(args: ActionArgs): Promise<void> {
@@ -82,9 +86,14 @@ export async function openMrEdit(args: ActionArgs): Promise<void> {
     selectMergeRequest(args);
     return;
   }
-  const nodes = await createDescriptionNodes(mr);
+  const seed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id: args.ctx.instance.project.id,
+    merge_request_iid: mr.iid,
+  };
   const id = args.ctx.instance.project.id;
-  const bufnr = await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer({ denops, config, seed });
   await updateBuffer({
     denops,
     bufnr,
@@ -105,8 +114,13 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     return;
   }
   const config = getBufferConfig("GitlaberMrChangeList");
-  const nodes = await createMergeRequestChangesNodes(denops);
-  const bufnr = await createBuffer(denops, config, nodes);
+  const seed = {
+    url: ctx.url,
+    token: ctx.token,
+    id: ctx.instance.project.id,
+    merge_request_iid: mr.iid,
+  };
+  const bufnr = await createBuffer({ denops, config, seed });
   const winnr = await util.getBufferWindowNumber(args.denops, bufnr);
   await updateBuffer({
     denops,
@@ -117,56 +131,33 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     },
   });
   const mrDiscussionConfig = getBufferConfig("GitlaberMrDiscussion");
-  const discussionNodes: Node[] = [];
-  const discussions = await client.getProjectMrDiscussion(
-    ctx.url,
-    ctx.token,
-    {
-      id: ctx.instance.project.id,
-      mr_iid: mr.iid,
-    },
-  );
-  discussions.map((discussion) => {
-    if (discussion.notes[0].system === true) {
-      return;
-    }
-    const lines = discussion.notes[0].body?.split("\n");
-    if (!lines) {
-      return;
-    }
-    lines.map((line) => {
-      discussionNodes.push({
-        display: line,
-        params: {
-          name: args.name,
-          params: { id: ctx.instance.project.id, mr: mr },
-        },
-      });
-    });
-    discussionNodes.push({
-      display: "",
-    });
-  });
+  const discussionSeed = seed;
   await createBuffer(
-    denops,
-    mrDiscussionConfig,
-    discussionNodes,
+    {
+      denops,
+      config: mrDiscussionConfig,
+      seed: discussionSeed,
+    },
   );
   const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
   const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
   await fn.execute(denops, "diffoff!");
   const listWidth = 30;
   const oldFileBufnr = await createBuffer(
-    denops,
-    oldFileConfig,
-    [{ display: "" }],
+    {
+      denops,
+      config: oldFileConfig,
+      nodes: [{ display: "" }],
+    },
   );
   setDiffOptions(denops, oldFileBufnr);
   await fn.win_execute(args.denops, winnr, `vertical resize ${listWidth}`);
   const newFileBufnr = await createBuffer(
-    denops,
-    newFileConfig,
-    [{ display: "" }],
+    {
+      denops,
+      config: newFileConfig,
+      nodes: [{ display: "" }],
+    },
   );
   setDiffOptions(denops, newFileBufnr);
 
@@ -623,109 +614,31 @@ export async function openMrChangeDiff(args: ActionArgs) {
       mr: isMergeRequest,
     }),
   );
-  const change = u.ensure(
-    node.params,
-    isChange,
-  );
+  const change = u.ensure(node.params?.change, isChange);
   const mr = bufferParams.mr;
   if (!mr.diff_refs) {
     return;
   }
-  const discussions = await client.getProjectMrDiscussion(
-    ctx.url,
-    ctx.token,
-    {
-      id: ctx.instance.project.id,
-      mr_iid: mr.iid,
-    },
-  );
-  const changeFileDiscussion = discussions.filter((discussion) => {
-    const position = discussion.notes[0].position;
-    if (!position) {
-      return false;
-    }
-    return (
-      position.new_path === change.new_path ||
-      position.old_path === change.old_path
-    );
-  });
-  const newFileDiscussion = changeFileDiscussion.filter((discussion) => {
-    const position = discussion.notes[0].position;
-    if (!position) {
-      return false;
-    }
-    return position.new_path === change.new_path;
-  });
-  const oldFileDiscussion = changeFileDiscussion.filter((discussion) => {
-    const position = discussion.notes[0].position;
-    if (!position) {
-      return false;
-    }
-    return position.old_path === change.old_path;
-  });
-  const decoder = new TextDecoder();
-  const oldFileNodes: Node[] = [];
-  if (!change.new_file) {
-    const oldFile = await client.getProjectFile(
-      args.ctx.url,
-      args.ctx.token,
-      {
-        id: args.ctx.instance.project.id,
-        file_path: change.old_path,
-        ref: mr.diff_refs.start_sha,
-      },
-    );
-    const decodedOldFile = decoder.decode(base64.decodeBase64(oldFile.content));
-    decodedOldFile.split("\n").map((line) => {
-      oldFileNodes.push({
-        display: line,
-      });
-    });
-    // There is a blank line at the end of oldFileNodes, so delete it.
-    oldFileNodes.pop();
-    oldFileDiscussion.map((discussion) => {
-      const position = discussion.notes[0].position;
-      if (!position) {
-        return;
-      }
-      if (!position.old_line) {
-        return;
-      }
-      oldFileNodes[position.old_line - 1].params = discussion;
-    });
-  }
-  const newFileNodes: Node[] = [];
-  if (!change.deleted_file) {
-    const newFile = await client.getProjectFile(
-      args.ctx.url,
-      args.ctx.token,
-      {
-        id: args.ctx.instance.project.id,
-        file_path: change.new_path,
-        ref: mr.diff_refs.head_sha,
-      },
-    );
-    const decodedNewFile = decoder.decode(base64.decodeBase64(newFile.content));
-    const lines = decodedNewFile.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      newFileNodes.push({
-        display: line,
-      });
-    }
-    // There is a blank line at the end of newFileNodes, so delete it.
-    newFileNodes.pop();
-    newFileDiscussion.map((discussion) => {
-      const position = discussion.notes[0].position;
-      if (!position) {
-        return;
-      }
-      if (!position.new_line) {
-        return;
-      }
-      newFileNodes[position.new_line - 1].params = discussion;
-    });
-  }
+  const oldFileSeed = {
+    url: ctx.url,
+    token: ctx.token,
+    id: ctx.instance.project.id,
+    file_path: change.old_path,
+    ref: mr.diff_refs.base_sha,
+    merge_request_iid: mr.iid,
+    kind: "old",
+  };
+
+  const newFileSeed = {
+    url: ctx.url,
+    token: ctx.token,
+    id: ctx.instance.project.id,
+    file_path: change.new_path,
+    ref: mr.diff_refs.head_sha,
+    merge_request_iid: mr.iid,
+    kind: "new",
+  };
+
   const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
   if (oldFileConfig.options) {
     oldFileConfig.options.filetype = util.predicateFileType(change.old_path) ??
@@ -737,73 +650,23 @@ export async function openMrChangeDiff(args: ActionArgs) {
       "";
   }
   const oldFileBufnr = await createBuffer(
-    args.denops,
-    oldFileConfig,
-    oldFileNodes,
+    { denops, config: oldFileConfig, seed: oldFileSeed },
   );
   await fn.execute(denops, "diffoff!");
-  await clearSign(denops, oldFileBufnr, "GitlaberDiscussion");
   await updateBuffer({
     denops,
     bufnr: oldFileBufnr,
-    params: {
-      id: ctx.instance.project.id,
-      mr,
-      change,
-    },
+    params: { id: ctx.instance.project.id, mr, change },
   });
-  for (let i = 0; i < oldFileDiscussion.length; i++) {
-    const discussion = oldFileDiscussion[i];
-    const position = discussion.notes[0].position;
-    if (!position) {
-      continue;
-    }
-    if (!position.old_line) {
-      continue;
-    }
-    await setSign(
-      denops,
-      i + 1,
-      position.old_line,
-      "GitlaberDiscussion",
-      oldFileBufnr,
-      "GitlaberDiscussion",
-    );
-  }
   setDiffOptions(denops, oldFileBufnr);
   const newFileBufnr = await createBuffer(
-    args.denops,
-    newFileConfig,
-    newFileNodes,
+    { denops, config: newFileConfig, seed: newFileSeed },
   );
-  await clearSign(denops, newFileBufnr, "GitlaberDiscussion");
   await updateBuffer({
     denops,
     bufnr: newFileBufnr,
-    params: {
-      id: ctx.instance.project.id,
-      mr,
-      change,
-    },
+    params: { id: ctx.instance.project.id, mr, change },
   });
-  for (let i = 0; i < newFileDiscussion.length; i++) {
-    const discussion = newFileDiscussion[i];
-    const position = discussion.notes[0].position;
-    if (!position) {
-      continue;
-    }
-    if (!position.new_line) {
-      continue;
-    }
-    await setSign(
-      denops,
-      i + 1,
-      position.new_line,
-      "GitlaberDiscussion",
-      newFileBufnr,
-      "GitlaberDiscussion",
-    );
-  }
   setDiffOptions(denops, newFileBufnr);
   await denops.cmd("redraw");
 }
@@ -911,7 +774,7 @@ export async function inspectMrDiscussion(args: ActionArgs) {
     return;
   }
   const discussion = u.ensure(
-    node.params,
+    node.params?.discussion,
     isDiscussion,
   );
   const buffer = await getBuffer(denops, await fn.bufnr(denops));
@@ -922,35 +785,20 @@ export async function inspectMrDiscussion(args: ActionArgs) {
       ...u.isUnknown,
     }),
   );
+  const seed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id: args.ctx.instance.project.id,
+    merge_request_iid: bufferParams.mr.iid,
+    discussion_id: discussion.id,
+  };
 
-  const nodes: Node[] = [];
-  discussion.notes.map((note) => {
-    if (note.system === true) {
-      return;
-    }
-    nodes.push({
-      display: `${note.author.name}:`,
-    });
-    nodes.push({
-      display: "------------------",
-    });
-    const lines = note.body?.split("\n");
-    if (!lines) {
-      return;
-    }
-    lines.map((line) => {
-      nodes.push({
-        display: line,
-      });
-    });
-    nodes.push({
-      display: "",
-    });
-  });
   const bufnr = await createBuffer(
-    denops,
-    getBufferConfig("GitlaberMrDiscussionInspect"),
-    nodes,
+    {
+      denops,
+      config: getBufferConfig("GitlaberMrDiscussionInspect"),
+      seed,
+    },
   );
   await updateBuffer({
     denops,
@@ -967,11 +815,14 @@ export async function addMrDiscussionComment(args: ActionArgs) {
   const { url, token } = ctx;
   const buffer = await getBuffer(denops, await fn.bufnr(denops));
   const bufferParams = buffer.params;
-  const { mr, discussion } = u.ensure(bufferParams, u.isObjectOf({
-    mr: isMergeRequest,
-    discussion: isDiscussion,
-    ...u.isUnknown,
-  }))
+  const { mr, discussion } = u.ensure(
+    bufferParams,
+    u.isObjectOf({
+      mr: isMergeRequest,
+      discussion: isDiscussion,
+      ...u.isUnknown,
+    }),
+  );
   const id = ctx.instance.project.id;
   let body: string | undefined;
   if (u.isString(params?.body)) {

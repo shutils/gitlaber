@@ -34,7 +34,7 @@ export async function openMergedYaml(args: ActionArgs): Promise<void> {
     return;
   }
   const nodes = await createMergedYamlNodes(lint);
-  await createBuffer(args.denops, config, nodes);
+  await createBuffer({ denops, config, nodes });
 }
 
 export async function closeBuffer(args: ActionArgs): Promise<void> {

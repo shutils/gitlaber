@@ -108,6 +108,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberIssuePreview",
     direction: "vertical botright",
+    nodeMaker: node.createIssueDescriptionNodes,
     options: {
       buftype: "nofile",
       modifiable: false,
@@ -118,6 +119,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberIssueEdit",
     direction: "vertical botright",
+    nodeMaker: node.createIssueDescriptionNodes,
     options: {
       buftype: "nofile",
       modifiable: true,
@@ -128,6 +130,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberMrPreview",
     direction: "vertical botright",
+    nodeMaker: node.createMergeRequestDescriptionNodes,
     options: {
       buftype: "nofile",
       modifiable: false,
@@ -138,6 +141,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberMrEdit",
     direction: "vertical botright",
+    nodeMaker: node.createMergeRequestDescriptionNodes,
     options: {
       buftype: "nofile",
       modifiable: true,
@@ -148,6 +152,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberWikiPreview",
     direction: "vertical botright",
+    nodeMaker: node.createWikiContentNodes,
     options: {
       buftype: "nofile",
       modifiable: false,
@@ -158,6 +163,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberWikiNew",
     direction: "vertical botright",
+    nodeMaker: node.createEmptyNodes,
     options: {
       buftype: "nofile",
       modifiable: true,
@@ -168,6 +174,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberWikiEdit",
     direction: "vertical botright",
+    nodeMaker: node.createWikiContentNodes,
     options: {
       buftype: "nofile",
       modifiable: true,
@@ -207,6 +214,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   },
   {
     kind: "GitlaberMrChangeList",
+    nodeMaker: node.createMergeRequestChangesNodes,
     direction: "tab",
     options: {
       buftype: "nofile",
@@ -217,6 +225,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberDiffOldFile",
     direction: "vertical botright",
+    nodeMaker: node.createMrFileWithDiscussionNodes,
     options: {
       buftype: "nofile",
       modifiable: false,
@@ -226,6 +235,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberDiffNewFile",
     direction: "vertical botright",
+    nodeMaker: node.createMrFileWithDiscussionNodes,
     options: {
       buftype: "nofile",
       modifiable: false,
@@ -235,6 +245,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberMrDiscussion",
     direction: "horizontal belowright",
+    nodeMaker: node.createMergeRequestDiscussionsNodes,
     options: {
       filetype: "markdown",
       buftype: "nofile",
@@ -245,6 +256,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   {
     kind: "GitlaberMrDiscussionInspect",
     direction: "botright",
+    nodeMaker: node.createMrDiscussionInspectNodes,
     options: {
       filetype: "markdown",
       buftype: "nofile",

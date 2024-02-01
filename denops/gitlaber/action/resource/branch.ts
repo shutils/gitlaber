@@ -5,23 +5,22 @@ import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { getBufferConfig } from "../../helper.ts";
 import { createBuffer } from "../../buffer/core.ts";
-import {
-  createBranchesNodes,
-  createBranchPanelNodes,
-} from "../../node/main.ts";
 import * as util from "../../util.ts";
 
 export async function openBranchList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberBranchList");
-  const nodes = await createBranchesNodes(args.denops);
-  const bufnr = await createBuffer(args.denops, config, nodes);
+  const seed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id: args.ctx.instance.project.id,
+  };
+  const bufnr = await createBuffer({ denops: args.denops, config, seed });
   await util.focusBuffer(args.denops, bufnr);
 }
 
 export async function openBranchConfig(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberBranchConfig");
-  const nodes = await createBranchPanelNodes(args.denops);
-  const bufnr = await createBuffer(args.denops, config, nodes);
+  const bufnr = await createBuffer({ denops: args.denops, config });
   await fn.execute(
     args.denops,
     `autocmd WinLeave <buffer> bw ${bufnr}`,

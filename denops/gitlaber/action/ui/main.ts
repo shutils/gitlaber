@@ -13,10 +13,12 @@ export async function openUiSelect(
   const maxRow = await option.lines.getGlobal(args.denops) / 3;
   const row = nodes.length > maxRow ? maxRow : nodes.length;
   const bufnr = await createBuffer(
-    args.denops,
-    config,
-    nodes,
-    `+resize\\ ${row} `,
+    {
+      denops: args.denops,
+      config,
+      nodes,
+      cmd: `+resize\\ ${row} `,
+    },
   );
 
   await fn.execute(
@@ -32,7 +34,7 @@ export async function openUiInput(
 ): Promise<void> {
   const { denops } = args;
   const config = getBufferConfig("GitlaberUiInput");
-  const bufnr = await createBuffer(args.denops, config, []);
+  const bufnr = await createBuffer({ denops: args.denops, config, nodes: [] });
   const { name } = args;
   await updateBuffer({
     denops,
