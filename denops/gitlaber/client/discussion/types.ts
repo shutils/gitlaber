@@ -32,6 +32,8 @@ export const isNote = u.isObjectOf({
     new_line: u.isOneOf([u.isNumber, u.isNull]),
     ...u.isUnknown,
   })),
+  created_at: u.isString,
+  updated_at: u.isOneOf([u.isString, u.isNull]),
   ...u.isUnknown,
 });
 

@@ -436,17 +436,25 @@ export const createMergeRequestDiscussionsNodes = async (
       if (discussion.notes[0].system === true) {
         return;
       }
-      const lines = discussion.notes[0].body?.split("\n");
-      if (!lines) {
-        return;
-      }
-      lines.map((line) => {
-        nodes.push({
-          display: line,
-        });
-      });
       nodes.push({
-        display: "",
+        display: "--------------",
+      });
+      discussion.notes.map((note) => {
+        const lines = note.body?.split("\n");
+        if (!lines) {
+          return;
+        }
+        nodes.push({
+          display: `@${note.author.name} ${note.created_at}`,
+        });
+        lines.map((line) => {
+          nodes.push({
+            display: line,
+          });
+        });
+        nodes.push({
+          display: "",
+        });
       });
     });
     return await Promise.resolve(nodes);
