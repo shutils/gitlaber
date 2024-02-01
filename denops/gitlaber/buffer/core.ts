@@ -1,6 +1,6 @@
 import { Denops, fn, mapping } from "../deps.ts";
 
-import {} from "./config.ts";
+import { getBufferWindowNumber } from "../util.ts";
 import { BufferConfig, Node } from "../types.ts";
 import {
   addBuffer,
@@ -67,6 +67,8 @@ export async function createBuffer(
   } else {
     await updateBuffer({ denops, bufnr, nodes: validNodes, seed: args.seed });
   }
+  const winid = await getBufferWindowNumber(denops, bufnr);
+  await fn.win_execute(denops, winid, "clearjumps");
   return bufnr;
 }
 
