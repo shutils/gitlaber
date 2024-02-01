@@ -103,8 +103,10 @@ export const setNodesOnBuf = async (
   if (bufLines.length > 1 && bufLines[0] !== "") {
     await fn.execute(denops, `call deletebufline(${bufnr}, 1, '$')`);
   }
-  for (let i = 0; i < nodes.length; i++) {
-    await fn.setbufline(denops, bufnr, i + 1, nodes[i].display);
-  }
+  const writeLines: string[] = [];
+  nodes.map((node) => {
+    writeLines.push(node.display);
+  });
+  await fn.setbufline(denops, bufnr, 1, writeLines);
   await denops.cmd("redraw");
 };
