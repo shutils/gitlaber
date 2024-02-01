@@ -36,7 +36,7 @@ export async function nextList(args: ActionArgs): Promise<void> {
     ...params,
     page: nextPage,
   };
-  await updateBuffer(denops, bufnr, undefined, updatedParams);
+  await updateBuffer({ denops, bufnr, params: updatedParams });
   await reRenderBuffer(denops, bufnr);
 }
 
@@ -71,7 +71,7 @@ export async function previousList(args: ActionArgs): Promise<void> {
     ...params,
     page: previousPage,
   };
-  await updateBuffer(denops, bufnr, undefined, updatedParams);
+  await updateBuffer({ denops, bufnr, params: updatedParams });
   await reRenderBuffer(denops, bufnr);
 }
 

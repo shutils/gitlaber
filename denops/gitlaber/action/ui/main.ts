@@ -30,13 +30,18 @@ export async function openUiInput(
   paramName: string,
   params: object,
 ): Promise<void> {
+  const { denops } = args;
   const config = getBufferConfig("GitlaberUiInput");
   const bufnr = await createBuffer(args.denops, config, []);
   const { name } = args;
-  await updateBuffer(args.denops, bufnr, undefined, {
-    actionName: name,
-    paramName: paramName,
-    actionParams: params ?? {},
+  await updateBuffer({
+    denops,
+    bufnr,
+    params: {
+      actionName: name,
+      paramName: paramName,
+      actionParams: params ?? {},
+    },
   });
 }
 

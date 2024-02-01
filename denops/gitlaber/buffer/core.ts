@@ -45,7 +45,7 @@ export async function createBuffer(
   if (!exists) {
     await addBuffer(denops, config.kind, bufnr, nodes);
   } else {
-    await updateBuffer(denops, bufnr, nodes);
+    await updateBuffer({ denops, bufnr, nodes });
   }
   return bufnr;
 }
@@ -64,7 +64,7 @@ export async function reRenderBuffer(
   if (config.options) {
     setOptions(denops, config.options, bufnr);
   }
-  await updateBuffer(denops, bufnr, nodes);
+  await updateBuffer({ denops, bufnr, nodes });
   return bufnr;
 }
 

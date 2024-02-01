@@ -130,11 +130,14 @@ export async function getBuffer(denops: Denops, bufnr?: number) {
 }
 
 export async function updateBuffer(
-  denops: Denops,
-  bufnr: number,
-  nodes?: Node[],
-  params?: object,
+  args: {
+    denops: Denops;
+    bufnr: number;
+    nodes?: Node[];
+    params?: object;
+  },
 ) {
+  const { denops, bufnr, nodes, params } = args;
   const gitlaberVar = await getGitlaberVar(denops);
   const buffer = gitlaberVar.buffers.find((buffer) => buffer.bufnr === bufnr);
   if (!buffer) {

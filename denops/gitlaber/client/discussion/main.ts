@@ -47,3 +47,19 @@ export async function createProjectMrDiscussion(
   };
   await request(gitlabApiPath, token, "POST", JSON.stringify(attributes));
 }
+
+export async function addNoteToDiscussion(
+  url: string,
+  token: string,
+  attrs: {
+    id: number | string;
+    merge_request_iid: number;
+    discussion_id: string;
+    body: string;
+    note_id: number;
+  },
+) {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/discussions/${attrs.discussion_id}/notes`;
+  await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
+}

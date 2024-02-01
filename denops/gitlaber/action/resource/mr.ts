@@ -73,6 +73,7 @@ export async function openMrPreview(args: ActionArgs): Promise<void> {
 }
 
 export async function openMrEdit(args: ActionArgs): Promise<void> {
+  const { denops } = args;
   const config = getBufferConfig("GitlaberMrEdit");
   let mr: MergeRequest;
   if (argsHasMergeRequest(args)) {
@@ -84,9 +85,13 @@ export async function openMrEdit(args: ActionArgs): Promise<void> {
   const nodes = await createDescriptionNodes(mr);
   const id = args.ctx.instance.project.id;
   const bufnr = await createBuffer(args.denops, config, nodes);
-  await updateBuffer(args.denops, bufnr, undefined, {
-    id,
-    merge_request_iid: mr.iid,
+  await updateBuffer({
+    denops,
+    bufnr,
+    params: {
+      id,
+      merge_request_iid: mr.iid,
+    },
   });
 }
 
@@ -103,9 +108,13 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
   const nodes = await createMergeRequestChangesNodes(denops);
   const bufnr = await createBuffer(denops, config, nodes);
   const winnr = await util.getBufferWindowNumber(args.denops, bufnr);
-  await updateBuffer(denops, bufnr, undefined, {
-    id: ctx.instance.project.id,
-    mr: mr,
+  await updateBuffer({
+    denops,
+    bufnr,
+    params: {
+      id: ctx.instance.project.id,
+      mr: mr,
+    },
   });
   const mrDiscussionConfig = getBufferConfig("GitlaberMrDiscussion");
   const discussionNodes: Node[] = [];
@@ -734,10 +743,14 @@ export async function openMrChangeDiff(args: ActionArgs) {
   );
   await fn.execute(denops, "diffoff!");
   await clearSign(denops, oldFileBufnr, "GitlaberDiscussion");
-  await updateBuffer(denops, oldFileBufnr, undefined, {
-    id: ctx.instance.project.id,
-    mr,
-    change,
+  await updateBuffer({
+    denops,
+    bufnr: oldFileBufnr,
+    params: {
+      id: ctx.instance.project.id,
+      mr,
+      change,
+    },
   });
   for (let i = 0; i < oldFileDiscussion.length; i++) {
     const discussion = oldFileDiscussion[i];
@@ -764,10 +777,14 @@ export async function openMrChangeDiff(args: ActionArgs) {
     newFileNodes,
   );
   await clearSign(denops, newFileBufnr, "GitlaberDiscussion");
-  await updateBuffer(denops, newFileBufnr, undefined, {
-    id: ctx.instance.project.id,
-    mr,
-    change,
+  await updateBuffer({
+    denops,
+    bufnr: newFileBufnr,
+    params: {
+      id: ctx.instance.project.id,
+      mr,
+      change,
+    },
   });
   for (let i = 0; i < newFileDiscussion.length; i++) {
     const discussion = newFileDiscussion[i];
@@ -897,6 +914,15 @@ export async function inspectMrDiscussion(args: ActionArgs) {
     node.params,
     isDiscussion,
   );
+  const buffer = await getBuffer(denops, await fn.bufnr(denops));
+  const bufferParams = u.ensure(
+    buffer.params,
+    u.isObjectOf({
+      mr: isMergeRequest,
+      ...u.isUnknown,
+    }),
+  );
+
   const nodes: Node[] = [];
   discussion.notes.map((note) => {
     if (note.system === true) {
@@ -921,10 +947,57 @@ export async function inspectMrDiscussion(args: ActionArgs) {
       display: "",
     });
   });
-  await createBuffer(
+  const bufnr = await createBuffer(
     denops,
     getBufferConfig("GitlaberMrDiscussionInspect"),
     nodes,
+  );
+  await updateBuffer({
+    denops,
+    bufnr,
+    params: {
+      ...bufferParams,
+      discussion,
+    },
+  });
+}
+
+export async function addMrDiscussionComment(args: ActionArgs) {
+  const { denops, ctx, params } = args;
+  const { url, token } = ctx;
+  const buffer = await getBuffer(denops, await fn.bufnr(denops));
+  const bufferParams = buffer.params;
+  const { mr, discussion } = u.ensure(bufferParams, u.isObjectOf({
+    mr: isMergeRequest,
+    discussion: isDiscussion,
+    ...u.isUnknown,
+  }))
+  const id = ctx.instance.project.id;
+  let body: string | undefined;
+  if (u.isString(params?.body)) {
+    body = params.body;
+  } else {
+    await openUiInput(args, "body", {
+      id,
+      mr,
+      discussion,
+    });
+    return;
+  }
+
+  await executeRequest(
+    denops,
+    client.addNoteToDiscussion,
+    url,
+    token,
+    {
+      id,
+      merge_request_iid: mr.iid,
+      discussion_id: discussion.id,
+      body,
+      note_id: discussion.notes[0].id,
+    },
+    "Successfully create a discussion comment.",
   );
 }
 

@@ -36,6 +36,7 @@ import {
   openWikiPreview,
 } from "./resource/wiki.ts";
 import {
+  addMrDiscussionComment,
   approveMergeRequest,
   assignAssigneeMergeRequest,
   assignReviewerMergeRequest,
@@ -135,6 +136,7 @@ const actionStore: ActionStore = {
   "mr-change-diff": openMrChangeDiff,
   "mr-discussion-new": createMrDiscussion,
   "mr-discussion-inspect": inspectMrDiscussion,
+  "mr-discussion-add-note": addMrDiscussionComment,
   "project-browse": browseProject,
   "project-status": openProjectStatus,
   "wiki-browse": browseWiki,

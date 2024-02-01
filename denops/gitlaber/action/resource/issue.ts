@@ -64,6 +64,7 @@ export async function openIssuePreview(args: ActionArgs): Promise<void> {
 }
 
 export async function openIssueEdit(args: ActionArgs): Promise<void> {
+  const { denops } = args;
   const config = getBufferConfig("GitlaberIssueEdit");
   let issue: Issue;
   if (argsHasIssue(args)) {
@@ -76,7 +77,7 @@ export async function openIssueEdit(args: ActionArgs): Promise<void> {
   const id = args.ctx.instance.project.id;
   const issue_iid = issue.iid;
   const bufnr = await createBuffer(args.denops, config, nodes);
-  await updateBuffer(args.denops, bufnr, undefined, { id, issue_iid });
+  await updateBuffer({ denops, bufnr, params: { id, issue_iid } });
 }
 
 export async function createIssue(args: ActionArgs): Promise<void> {

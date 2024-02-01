@@ -46,6 +46,7 @@ export async function openWikiPreview(args: ActionArgs): Promise<void> {
 }
 
 export async function openWikiEdit(args: ActionArgs): Promise<void> {
+  const { denops } = args;
   const config = getBufferConfig("GitlaberWikiEdit");
   let wiki: Wiki;
   if (argsHasWiki(args)) {
@@ -59,10 +60,11 @@ export async function openWikiEdit(args: ActionArgs): Promise<void> {
   const title = wiki.title;
   const nodes = await createContentNodes(wiki);
   const bufnr = await createBuffer(args.denops, config, nodes);
-  await updateBuffer(args.denops, bufnr, undefined, { id, slug, title });
+  await updateBuffer({ denops, bufnr, params: { id, slug, title } });
 }
 
 export async function openWikiNew(args: ActionArgs): Promise<void> {
+  const { denops } = args;
   const config = getBufferConfig("GitlaberWikiNew");
   const id = args.ctx.instance.project.id;
   const title = await helper.input(args.denops, {
@@ -73,7 +75,7 @@ export async function openWikiNew(args: ActionArgs): Promise<void> {
   }
   const nodes = await createContentNodes({ title, content: "" });
   const bufnr = await createBuffer(args.denops, config, nodes);
-  await updateBuffer(args.denops, bufnr, undefined, { id, title });
+  await updateBuffer({ denops, bufnr, params: { id, title } });
 }
 
 export async function browseWiki(args: ActionArgs) {
