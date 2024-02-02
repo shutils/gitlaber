@@ -14,7 +14,7 @@ export const isNote = u.isObjectOf({
   // noteable_id: u.isNumber,
   // project_id: u.isNumber,
   // resolvable: u.isOptionalOf(u.isBoolean),
-  // resolved: u.isOptionalOf(u.isBoolean),
+  resolved: u.isOptionalOf(u.isBoolean),
   // resolved_by: u.isOptionalOf(u.isObjectOf({
   //   id: u.isNumber,
   //   name: u.isString,

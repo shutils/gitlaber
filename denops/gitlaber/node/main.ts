@@ -439,13 +439,16 @@ export const createMergeRequestDiscussionsNodes = async (
       nodes.push({
         display: "--------------",
       });
+      nodes.push({
+        display: `${discussion.notes[0].resolved ? "Resolved" : "Unresolved"}`,
+      });
       const filepath = discussion.notes[0].position?.new_path ??
         discussion.notes[0].position?.old_path;
       const position = discussion.notes[0].position?.new_line ??
         discussion.notes[0].position?.old_line;
       if (filepath && position) {
         nodes.push({
-          display: `${filepath} ${position} `,
+          display: `${filepath} ${position}`,
         });
       }
       discussion.notes.map((note) => {
