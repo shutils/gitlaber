@@ -35,6 +35,20 @@ export async function getProjectMrDiscussions(
   );
 }
 
+export async function createProjectMrOverviewDiscussion(
+  url: string,
+  token: string,
+  attrs: {
+    id: number | string;
+    merge_request_iid: number;
+    body: string;
+  },
+) {
+  const gitlabApiPath =
+    `${url}/api/v4/projects/${attrs.id}/merge_requests/${attrs.merge_request_iid}/discussions`;
+  await request(gitlabApiPath, token, "POST", JSON.stringify(attrs));
+}
+
 export async function createProjectMrDiscussion(
   url: string,
   token: string,

@@ -481,6 +481,20 @@ export const createMrFileWithDiscussionNodes = async (
   seed?: Record<string, unknown>,
 ) => {
   return await makeNode(denops, async (_args) => {
+    if (
+      !u.isObjectOf({
+        url: u.isString,
+        token: u.isString,
+        id: u.isNumber,
+        file_path: u.isString,
+        ref: u.isString,
+        merge_request_iid: u.isNumber,
+        kind: u.isLiteralOneOf(["old", "new"] as const),
+        ...u.isUnknown,
+      })(seed)
+    ) {
+      return await Promise.resolve([]);
+    }
     const { url, token, id, file_path, ref, merge_request_iid, kind } = u
       .ensure(
         seed,

@@ -679,6 +679,42 @@ export async function openMrChangeDiff(args: ActionArgs) {
   await denops.cmd("redraw");
 }
 
+export async function createMrDiscussionOverview(args: ActionArgs) {
+  const { denops, ctx, params } = args;
+  const { url, token } = ctx;
+  const ensuredParams = u.ensure(
+    params,
+    u.isOptionalOf(u.isObjectOf({
+      merge_request_iid: u.isOptionalOf(u.isNumber),
+      body: u.isOptionalOf(u.isString),
+    })),
+  );
+  const body = ensuredParams?.body;
+  const merge_request_iid = ctx.instance.activeResource?.mr?.iid;
+  if (!merge_request_iid) {
+    helper.echoerr(denops, "There are no active merge requests.");
+    return;
+  }
+  if (!body) {
+    await openUiInput(args, "body", {
+      merge_request_iid,
+    });
+    return;
+  }
+  await executeRequest(
+    denops,
+    client.createProjectMrOverviewDiscussion,
+    url,
+    token,
+    {
+      id: ctx.instance.project.id,
+      merge_request_iid,
+      body,
+    },
+    "Successfully create a discussion.",
+  );
+}
+
 export async function createMrDiscussion(args: ActionArgs) {
   function hasDiff(hlgroup: string) {
     return ["DiffAdd", "DiffChange", "DiffText"].some((matchStr) =>
