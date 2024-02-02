@@ -8,6 +8,12 @@ export const isInstance = u.isObjectOf({
   bufnrs: u.isArrayOf(u.isNumber),
   project: isProject,
   id: u.isNumber,
+  activeResource: u.isOptionalOf(u.isObjectOf({
+    mr: u.isOptionalOf(u.isObjectOf({
+      iid: u.isNumber,
+    })),
+    ...u.isUnknown,
+  })),
 });
 
 export type Instance = u.PredicateType<typeof isInstance>;

@@ -46,6 +46,7 @@ export const actionNames = [
   "mr-discussion-inspect",
   "mr-discussion-add-note",
   "mr-discussion-resolve",
+  "mr-discussion-open",
   "project-browse",
   "project-status",
   "wiki-browse",

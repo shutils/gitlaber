@@ -94,6 +94,25 @@ export async function addInstance(denops: Denops) {
   await setGitlaberVar(denops, gitlaberVar);
 }
 
+export async function updateInstanceActiveResource(
+  denops: Denops,
+  instanceId: number,
+  resource: object,
+) {
+  const gitlaberVar = await getGitlaberVar(denops);
+  const instance = gitlaberVar.instances.find((instance) =>
+    instance.id === instanceId
+  );
+  if (!instance) {
+    throw new Error("Failed to get gitlaber instance.");
+  }
+  instance.activeResource = {
+    ...instance.activeResource,
+    ...resource,
+  };
+  await setGitlaberVar(denops, gitlaberVar);
+}
+
 export async function addBuffer(
   args: {
     denops: Denops;

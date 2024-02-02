@@ -17,7 +17,11 @@ import { openUiInput, openUiSelect } from "../ui/main.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import { setDiffOptions } from "../../buffer/helper.ts";
 import { getBufferConfig } from "../../helper.ts";
-import { getBuffer, updateBuffer } from "../../helper.ts";
+import {
+  getBuffer,
+  updateBuffer,
+  updateInstanceActiveResource,
+} from "../../helper.ts";
 import {
   argsHasAssignee,
   argsHasLabel,
@@ -161,6 +165,10 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
       seed: discussionSeed,
     },
   );
+
+  await updateInstanceActiveResource(denops, ctx.instance.id, {
+    mr: { iid: mr.iid },
+  });
   await fn.win_gotoid(args.denops, winnr);
   await denops.cmd("redraw");
 }
@@ -807,6 +815,32 @@ export async function inspectMrDiscussion(args: ActionArgs) {
       ...bufferParams,
       discussion,
     },
+  });
+}
+
+export async function openMrDiscussion(args: ActionArgs) {
+  const { denops, ctx } = args;
+  const activeMr = ctx.instance.activeResource?.mr;
+  if (!activeMr) {
+    return;
+  }
+  const seed = {
+    url: ctx.url,
+    token: ctx.token,
+    id: ctx.instance.project.id,
+    merge_request_iid: activeMr.iid,
+  };
+  const bufnr = await createBuffer(
+    {
+      denops,
+      config: getBufferConfig("GitlaberMrDiscussion"),
+      seed,
+    },
+  );
+  await updateBuffer({
+    denops,
+    bufnr,
+    seed,
   });
 }
 
