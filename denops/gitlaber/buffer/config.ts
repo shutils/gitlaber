@@ -244,7 +244,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
   },
   {
     kind: "GitlaberMrDiscussion",
-    direction: "horizontal belowright",
+    direction: "botright",
     nodeMaker: node.createMergeRequestDiscussionsNodes,
     options: {
       filetype: "markdown",

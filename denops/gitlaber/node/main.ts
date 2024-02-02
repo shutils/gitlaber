@@ -439,13 +439,28 @@ export const createMergeRequestDiscussionsNodes = async (
       nodes.push({
         display: "--------------",
       });
+      const filepath = discussion.notes[0].position?.new_path ??
+        discussion.notes[0].position?.old_path;
+      const position = discussion.notes[0].position?.new_line ??
+        discussion.notes[0].position?.old_line;
+      if (filepath && position) {
+        nodes.push({
+          display: `${filepath} ${position} `,
+        });
+      }
       discussion.notes.map((note) => {
+        if (note.system === true) {
+          return;
+        }
         const lines = note.body?.split("\n");
         if (!lines) {
           return;
         }
         nodes.push({
           display: `@${note.author.name} ${note.created_at}`,
+        });
+        nodes.push({
+          display: "--------------",
         });
         lines.map((line) => {
           nodes.push({

@@ -130,15 +130,6 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
       mr: mr,
     },
   });
-  const mrDiscussionConfig = getBufferConfig("GitlaberMrDiscussion");
-  const discussionSeed = seed;
-  await createBuffer(
-    {
-      denops,
-      config: mrDiscussionConfig,
-      seed: discussionSeed,
-    },
-  );
   const oldFileConfig = getBufferConfig("GitlaberDiffOldFile");
   const newFileConfig = getBufferConfig("GitlaberDiffNewFile");
   await fn.execute(denops, "diffoff!");
@@ -161,6 +152,15 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
   );
   setDiffOptions(denops, newFileBufnr);
 
+  const mrDiscussionConfig = getBufferConfig("GitlaberMrDiscussion");
+  const discussionSeed = seed;
+  await createBuffer(
+    {
+      denops,
+      config: mrDiscussionConfig,
+      seed: discussionSeed,
+    },
+  );
   await fn.win_gotoid(args.denops, winnr);
   await denops.cmd("redraw");
 }
