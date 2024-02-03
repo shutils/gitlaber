@@ -4,7 +4,18 @@ import * as client from "../client/index.ts";
 import {
   Context,
   Discussion,
+  isBranchListSeed,
+  isIssueListSeed,
+  isIssuePreviewSeed,
+  isMrChangeListSeed,
+  isMrDiscussionInspectSeed,
+  isMrDiscussionSeed,
+  isMrFileWithDiscussionSeed,
+  isMrListSeed,
+  isMrPreviewSeed,
   isPaginationAttributes,
+  isWikiListSeed,
+  isWikiPreviewSeed,
   Lint,
   Node,
   NodeParam,
@@ -87,10 +98,7 @@ export const createIssuesNodes = async (
     } catch {
       pageAttrs = {};
     }
-    const { url, token, id } = u.ensure(
-      seed,
-      u.isObjectOf({ url: u.isString, token: u.isString, id: u.isNumber }),
-    );
+    const { url, token, id } = u.ensure(seed, isIssueListSeed);
     const projectIssues = await client.getProjectIssues(url, token, {
       id,
       ...pageAttrs,
@@ -130,10 +138,7 @@ export const createBranchesNodes = async (
     } catch {
       pageAttrs = {};
     }
-    const { url, token, id } = u.ensure(
-      seed,
-      u.isObjectOf({ url: u.isString, token: u.isString, id: u.isNumber }),
-    );
+    const { url, token, id } = u.ensure(seed, isBranchListSeed);
     const projectBranches = await client.getProjectBranches(url, token, {
       id,
       ...pageAttrs,
@@ -149,10 +154,7 @@ export const createWikiNodes = async (
   seed?: Record<string, unknown>,
 ) => {
   return await makeNode(denops, async (_args) => {
-    const { url, token, id } = u.ensure(
-      seed,
-      u.isObjectOf({ url: u.isString, token: u.isString, id: u.isNumber }),
-    );
+    const { url, token, id } = u.ensure(seed, isWikiListSeed);
     const projectWikis = await client.getProjectWikis(url, token, {
       id,
     });
@@ -166,16 +168,7 @@ export async function createIssueDescriptionNodes(
   _denops: Denops,
   seed?: Record<string, unknown>,
 ) {
-  const { id, issue_iid, url, token } = u.ensure(
-    seed,
-    u.isObjectOf({
-      url: u.isString,
-      token: u.isString,
-      id: u.isNumber,
-      issue_iid: u.isNumber,
-      ...u.isUnknown,
-    }),
-  );
+  const { id, issue_iid, url, token } = u.ensure(seed, isIssuePreviewSeed);
   const issue = await client.getProjectIssue(url, token, {
     id,
     issue_iid,
@@ -197,16 +190,7 @@ export async function createMergeRequestDescriptionNodes(
   _denops: Denops,
   seed?: Record<string, unknown>,
 ) {
-  const { id, merge_request_iid, url, token } = u.ensure(
-    seed,
-    u.isObjectOf({
-      url: u.isString,
-      token: u.isString,
-      id: u.isNumber,
-      merge_request_iid: u.isNumber,
-      ...u.isUnknown,
-    }),
-  );
+  const { id, merge_request_iid, url, token } = u.ensure(seed, isMrPreviewSeed);
   const mergeRequest = await client.getProjectMergeRequest(url, token, {
     id,
     merge_request_iid,
@@ -223,25 +207,6 @@ export async function createMergeRequestDescriptionNodes(
   });
   return await Promise.resolve(nodes);
 }
-
-export const createDescriptionNodes = async (
-  seed: {
-    description: string | null;
-    [key: string]: unknown;
-  },
-) => {
-  const nodes: Node[] = [];
-  if (seed.description === null) {
-    return await Promise.resolve(nodes);
-  }
-  const lines = seed.description.split("\n");
-  lines.map((line) => {
-    nodes.push({
-      display: line,
-    });
-  });
-  return await Promise.resolve(nodes);
-};
 
 export const createWikiPanelNodes = async (
   denops: Denops,
@@ -260,15 +225,7 @@ export const createWikiContentNodes = async (
   seed?: Record<string, unknown>,
 ) => {
   return await makeNode(denops, async (_args) => {
-    const { url, token, id, slug } = u.ensure(
-      seed,
-      u.isObjectOf({
-        url: u.isString,
-        token: u.isString,
-        id: u.isNumber,
-        slug: u.isString,
-      }),
-    );
+    const { url, token, id, slug } = u.ensure(seed, isWikiPreviewSeed);
     const projectWiki = await client.getProjectWiki(url, token, {
       id,
       slug,
@@ -335,12 +292,7 @@ export const createMergeRequestsNodes = async (
   return await makeNode(denops, async (_args) => {
     const { url, token, id, path_with_namespace } = u.ensure(
       seed,
-      u.isObjectOf({
-        url: u.isString,
-        token: u.isString,
-        id: u.isNumber,
-        path_with_namespace: u.isString,
-      }),
+      isMrListSeed,
     );
     const projectMergeRequests = await client.getProjectMergeRequestsGraphQL(
       url,
@@ -382,13 +334,7 @@ export const createMergeRequestChangesNodes = async (
 
     const { id, merge_request_iid, url, token } = u.ensure(
       seed,
-      u.isObjectOf({
-        url: u.isString,
-        token: u.isString,
-        id: u.isNumber,
-        merge_request_iid: u.isNumber,
-        ...u.isUnknown,
-      }),
+      isMrChangeListSeed,
     );
     const projectMergeRequestChanges = await client
       .getProjectMergeRequestChanges(
@@ -418,13 +364,7 @@ export const createMergeRequestDiscussionsNodes = async (
   return await makeNode(denops, async (_args) => {
     const { id, merge_request_iid, url, token } = u.ensure(
       seed,
-      u.isObjectOf({
-        url: u.isString,
-        token: u.isString,
-        id: u.isNumber,
-        merge_request_iid: u.isNumber,
-        ...u.isUnknown,
-      }),
+      isMrDiscussionSeed,
     );
     const projectMergeRequestDiscussions = await client.getProjectMrDiscussions(
       url,
@@ -484,34 +424,11 @@ export const createMrFileWithDiscussionNodes = async (
   seed?: Record<string, unknown>,
 ) => {
   return await makeNode(denops, async (_args) => {
-    if (
-      !u.isObjectOf({
-        url: u.isString,
-        token: u.isString,
-        id: u.isNumber,
-        file_path: u.isString,
-        ref: u.isString,
-        merge_request_iid: u.isNumber,
-        kind: u.isLiteralOneOf(["old", "new"] as const),
-        ...u.isUnknown,
-      })(seed)
-    ) {
+    if (!isMrFileWithDiscussionSeed(seed)) {
       return await Promise.resolve([]);
     }
     const { url, token, id, file_path, ref, merge_request_iid, kind } = u
-      .ensure(
-        seed,
-        u.isObjectOf({
-          url: u.isString,
-          token: u.isString,
-          id: u.isNumber,
-          file_path: u.isString,
-          ref: u.isString,
-          merge_request_iid: u.isNumber,
-          kind: u.isLiteralOneOf(["old", "new"] as const),
-          ...u.isUnknown,
-        }),
-      );
+      .ensure(seed, isMrFileWithDiscussionSeed);
     const discussions = await client.getProjectMrDiscussions(url, token, {
       id,
       merge_request_iid,
@@ -601,14 +518,7 @@ export const createMrDiscussionInspectNodes = async (
   return await makeNode(denops, async (_args) => {
     const { url, token, id, merge_request_iid, discussion_id } = u.ensure(
       seed,
-      u.isObjectOf({
-        url: u.isString,
-        token: u.isString,
-        id: u.isNumber,
-        discussion_id: u.isString,
-        merge_request_iid: u.isNumber,
-        ...u.isUnknown,
-      }),
+      isMrDiscussionInspectSeed,
     );
     const discussion = await client.getProjectMrDiscussion(url, token, {
       id,

@@ -1,12 +1,13 @@
 import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
 import { isWiki } from "./types.ts";
+import { ProjectId } from "../../types.ts";
 
 export async function requestCreateNewProjectWiki(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     content: string;
     title: string;
     format?: "markdown" | "rdoc" | "asciidoc" | "org";
@@ -19,7 +20,7 @@ export async function requestCreateNewProjectWiki(
 export async function getProjectWiki(
   url: string,
   token: string,
-  attrs: { id: number; slug: string; with_content?: boolean },
+  attrs: { id: ProjectId; slug: string; with_content?: boolean },
 ) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
@@ -32,7 +33,7 @@ export async function getProjectWiki(
 export async function getProjectWikis(
   url: string,
   token: string,
-  attrs: { id: number; with_content?: boolean },
+  attrs: { id: ProjectId; with_content?: boolean },
 ) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis?with_content=1`;
@@ -46,7 +47,7 @@ export async function editProjectWiki(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     slug: string;
     content: string;
     title: string;
@@ -62,7 +63,7 @@ export async function editProjectWiki(
 export async function deleteProjectWiki(
   url: string,
   token: string,
-  attrs: { id: number; slug: string },
+  attrs: { id: ProjectId; slug: string },
 ) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;

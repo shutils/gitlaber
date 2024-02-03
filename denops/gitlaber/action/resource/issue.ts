@@ -7,6 +7,9 @@ import {
   isIssue,
   isProjectLabel,
   Issue,
+  IssueEditSeed,
+  IssueListSeed,
+  IssuePreviewSeed,
   Node,
   ProjectLabel,
 } from "../../types.ts";
@@ -25,7 +28,7 @@ import {
 
 export async function openIssueList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberIssueList");
-  const seed = {
+  const seed: IssueListSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
@@ -58,9 +61,9 @@ export async function openIssuePreview(args: ActionArgs): Promise<void> {
   }
   if (issue.description === null) {
     helper.echo(args.denops, "No description.");
-    return
+    return;
   }
-  const seed = {
+  const seed: IssuePreviewSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
@@ -80,7 +83,7 @@ export async function openIssueEdit(args: ActionArgs): Promise<void> {
     return;
   }
   const id = args.ctx.instance.project.id;
-  const seed = {
+  const seed: IssueEditSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id,

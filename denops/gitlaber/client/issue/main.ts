@@ -2,13 +2,13 @@ import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
 import { isIssue, IssueGetAttributes } from "./types.ts";
 import { objectToURLSearchParams } from "../helper.ts";
-import { PaginationAttributes } from "../types.ts";
+import { PaginationAttributes, ProjectId } from "../types.ts";
 
 export async function getProjectIssue(
   url: string,
   token: string,
   attrs: {
-    id: number | string;
+    id: ProjectId;
     issue_iid: number;
   },
 ) {
@@ -23,7 +23,7 @@ export async function getProjectIssue(
 export async function getProjectIssues(
   url: string,
   token: string,
-  attrs: { id: number | string } & IssueGetAttributes & PaginationAttributes,
+  attrs: { id: ProjectId } & IssueGetAttributes & PaginationAttributes,
 ) {
   const baseApiPath = `${url}/api/v4/projects/${attrs.id}/issues`;
 
@@ -38,7 +38,12 @@ export async function getProjectIssues(
 export async function createProjectIssue(
   url: string,
   token: string,
-  attributes: { id: number; iid?: number; title: string; description?: string },
+  attributes: {
+    id: ProjectId;
+    iid?: number;
+    title: string;
+    description?: string;
+  },
 ) {
   const gitlabApiPath = url + "/api/v4/projects/" + attributes.id + "/issues";
   await request(gitlabApiPath, token, "POST", JSON.stringify(attributes));
@@ -47,7 +52,7 @@ export async function createProjectIssue(
 export async function deleteProjectIssue(
   url: string,
   token: string,
-  attrs: { id: number; issue_iid: number },
+  attrs: { id: ProjectId; issue_iid: number },
 ) {
   const gitlabApiPath =
     `${url}/api/v4/projects/${attrs.id}/issues/${attrs.issue_iid}`;
@@ -58,7 +63,7 @@ export async function editProjectIssue(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     issue_iid: number;
     add_labels?: string;
     assignee_ids?: number[];

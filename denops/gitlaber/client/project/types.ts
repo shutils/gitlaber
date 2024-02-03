@@ -1,7 +1,10 @@
 import { unknownutil as u } from "../../deps.ts";
 
+export const isProjectId = u.isOneOf([u.isString, u.isNumber]);
+export type ProjectId = u.PredicateType<typeof isProjectId>;
+
 export const isProject = u.isObjectOf({
-  id: u.isNumber,
+  id: isProjectId,
   description: u.isOneOf([u.isString, u.isNull]),
   web_url: u.isString,
   name: u.isString,

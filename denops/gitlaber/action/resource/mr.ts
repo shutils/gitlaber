@@ -7,6 +7,13 @@ import {
   isDiscussion,
   isMergeRequest,
   MergeRequest,
+  MrChangeListSeed,
+  MrDiscussionInspectSeed,
+  MrDiscussionSeed,
+  MrEditSeed,
+  MrFileWithDiscussionSeed,
+  MrListSeed,
+  MrPreviewSeed,
   Node,
   ProjectLabel,
 } from "../../types.ts";
@@ -37,7 +44,7 @@ import {
 export async function openMrList(args: ActionArgs): Promise<void> {
   const { denops } = args;
   const config = getBufferConfig("GitlaberMrList");
-  const seed = {
+  const seed: MrListSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
@@ -71,7 +78,7 @@ export async function openMrPreview(args: ActionArgs): Promise<void> {
     helper.echo(denops, "No description.");
     return;
   }
-  const seed = {
+  const seed: MrPreviewSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
@@ -90,7 +97,7 @@ export async function openMrEdit(args: ActionArgs): Promise<void> {
     selectMergeRequest(args);
     return;
   }
-  const seed = {
+  const seed: MrEditSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
@@ -118,7 +125,7 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     return;
   }
   const config = getBufferConfig("GitlaberMrChangeList");
-  const seed = {
+  const seed: MrChangeListSeed = {
     url: ctx.url,
     token: ctx.token,
     id: ctx.instance.project.id,
@@ -627,7 +634,7 @@ export async function openMrChangeDiff(args: ActionArgs) {
   if (!mr.diff_refs) {
     return;
   }
-  const oldFileSeed = {
+  const oldFileSeed: MrFileWithDiscussionSeed = {
     url: ctx.url,
     token: ctx.token,
     id: ctx.instance.project.id,
@@ -637,7 +644,7 @@ export async function openMrChangeDiff(args: ActionArgs) {
     kind: "old",
   };
 
-  const newFileSeed = {
+  const newFileSeed: MrFileWithDiscussionSeed = {
     url: ctx.url,
     token: ctx.token,
     id: ctx.instance.project.id,
@@ -829,7 +836,7 @@ export async function inspectMrDiscussion(args: ActionArgs) {
       ...u.isUnknown,
     }),
   );
-  const seed = {
+  const seed: MrDiscussionInspectSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
@@ -860,7 +867,7 @@ export async function openMrDiscussion(args: ActionArgs) {
   if (!activeMr) {
     return;
   }
-  const seed = {
+  const seed: MrDiscussionSeed = {
     url: ctx.url,
     token: ctx.token,
     id: ctx.instance.project.id,

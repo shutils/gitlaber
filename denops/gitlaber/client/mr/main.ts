@@ -1,12 +1,13 @@
 import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
 import { isMergeRequest, isMergeRequestChange, MergeRequest } from "./types.ts";
+import { ProjectId } from "../../types.ts";
 
 export async function createProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     source_branch: string;
     target_branch: string;
     title: string;
@@ -24,7 +25,7 @@ export async function getProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     merge_request_iid: number;
   },
 ) {
@@ -40,7 +41,7 @@ export async function getProjectMergeRequests(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     approved?: "yes" | "no";
     assignee_id?: number;
     author_id?: number;
@@ -59,7 +60,7 @@ export async function getProjectMergeRequestChanges(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     merge_request_iid: number;
   },
 ) {
@@ -75,7 +76,7 @@ export async function editProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     merge_request_iid: number;
     add_labels?: string;
     assignee_id?: number;
@@ -100,7 +101,7 @@ export async function approveProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     merge_request_iid: number;
     approval_password?: string;
     sha?: string;
@@ -115,7 +116,7 @@ export async function unapproveProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     merge_request_iid: number;
   },
 ) {
@@ -128,7 +129,7 @@ export async function mergeProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     merge_request_iid: number;
     merge_commit_message?: string;
     merge_when_pipeline_succeeds?: boolean;
@@ -147,7 +148,7 @@ export async function deleteProjectMergeRequest(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     merge_request_iid: number;
   },
 ) {
@@ -160,7 +161,7 @@ export async function getProjectMergeRequestsGraphQL(
   url: string,
   token: string,
   fullPath: string,
-  projetId: number,
+  projetId: ProjectId,
 ) {
   const query = `
     query getMergeRequests($fullPath: ID!){

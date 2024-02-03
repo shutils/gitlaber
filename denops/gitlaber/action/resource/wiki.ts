@@ -1,7 +1,15 @@
 import { fn, helper, unknownutil as u } from "../../deps.ts";
 
 import * as client from "../../client/index.ts";
-import { ActionArgs, isWiki, Node, Wiki } from "../../types.ts";
+import {
+  ActionArgs,
+  isWiki,
+  Node,
+  Wiki,
+  WikiEditSeed,
+  WikiListSeed,
+  WikiPreviewSeed,
+} from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import * as util from "../../util.ts";
@@ -13,7 +21,7 @@ import { openUiSelect } from "../ui/main.ts";
 
 export async function openWikiList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberWikiList");
-  const seed = {
+  const seed: WikiListSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
@@ -40,7 +48,7 @@ export async function openWikiPreview(args: ActionArgs): Promise<void> {
     selectWiki(args);
     return;
   }
-  const seed = {
+  const seed: WikiPreviewSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
@@ -62,7 +70,7 @@ export async function openWikiEdit(args: ActionArgs): Promise<void> {
   const id = args.ctx.instance.project.id;
   const slug = wiki.slug;
   const title = wiki.title;
-  const seed = {
+  const seed: WikiEditSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,

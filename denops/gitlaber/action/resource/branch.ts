@@ -1,6 +1,6 @@
 import { Denops, fn, helper } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import { ActionArgs, isBranch, isIssue } from "../../types.ts";
+import { ActionArgs, BranchListSeed, isBranch, isIssue } from "../../types.ts";
 import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { getBufferConfig } from "../../helper.ts";
@@ -9,7 +9,7 @@ import * as util from "../../util.ts";
 
 export async function openBranchList(args: ActionArgs): Promise<void> {
   const config = getBufferConfig("GitlaberBranchList");
-  const seed = {
+  const seed: BranchListSeed = {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
