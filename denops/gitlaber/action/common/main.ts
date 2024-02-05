@@ -1,11 +1,11 @@
-import { fn, helper } from "../../deps.ts";
+import { fn, helper, unknownutil as u } from "../../deps.ts";
 
 import { createBuffer } from "../../buffer/core.ts";
 import { createMergedYamlNodes } from "../../node/main.ts";
 import { getBufferConfig, getGitlaberVar } from "../../helper.ts";
 import { ActionArgs } from "../../types.ts";
 import { getLint } from "../../client/index.ts";
-import { flattenBuffer } from "../../util.ts";
+import { flattenBuffer, getBufferWindowId } from "../../util.ts";
 
 export async function echoNode(args: ActionArgs): Promise<void> {
   const { denops, node } = args;
@@ -38,7 +38,34 @@ export async function openMergedYaml(args: ActionArgs): Promise<void> {
 }
 
 export async function closeBuffer(args: ActionArgs): Promise<void> {
-  await fn.execute(args.denops, "bwipe");
+  const actionParams = u.ensure(
+    args.params,
+    u.isOptionalOf(u.isObjectOf({
+      bufnr: u.isNumber,
+      ...u.isUnknown,
+    })),
+  );
+  let bufnr = actionParams?.bufnr;
+  if (!bufnr) {
+    bufnr = await fn.bufnr(args.denops);
+  }
+  await fn.execute(args.denops, `bwipe ${bufnr}`);
+}
+
+export async function hideBuffer(args: ActionArgs): Promise<void> {
+  const actionParams = u.ensure(
+    args.params,
+    u.isOptionalOf(u.isObjectOf({
+      bufnr: u.isNumber,
+      ...u.isUnknown,
+    })),
+  );
+  let bufnr = actionParams?.bufnr;
+  if (!bufnr) {
+    bufnr = await fn.bufnr(args.denops);
+  }
+  const winid = await getBufferWindowId(args.denops, bufnr);
+  await fn.win_execute(args.denops, winid, `hide`);
 }
 
 export async function closeAllBuffer(args: ActionArgs): Promise<void> {

@@ -59,6 +59,7 @@ import {
   openMrPreview,
   reopenMergeRequest,
   resolveMrDiscussion,
+  toggleMrDiscussion,
   unapproveMergeRequest,
   unlabelMergeRequest,
 } from "./resource/mr.ts";
@@ -67,6 +68,7 @@ import {
   closeAllBuffer,
   closeBuffer,
   echoNode,
+  hideBuffer,
   openMergedYaml,
 } from "./common/main.ts";
 import { uiInput, uiSelect } from "./ui/main.ts";
@@ -143,6 +145,7 @@ const actionStore: ActionStore = {
   "mr-discussion-add-note": addMrDiscussionComment,
   "mr-discussion-resolve": resolveMrDiscussion,
   "mr-discussion-open": openMrDiscussion,
+  "mr-discussion-toggle": toggleMrDiscussion,
   "project-browse": browseProject,
   "project-status": openProjectStatus,
   "wiki-browse": browseWiki,
@@ -159,6 +162,7 @@ const actionStore: ActionStore = {
   "ui-input": uiInput,
   "ci-lint": openMergedYaml,
   "buffer-close": closeBuffer,
+  "buffer-hide": hideBuffer,
   "buffer-close-all": closeAllBuffer,
 };
 

@@ -23,7 +23,7 @@ import { openWithBrowser } from "../browse/core.ts";
 import { openUiInput, openUiSelect } from "../ui/main.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import { setDiffOptions } from "../../buffer/helper.ts";
-import { getBufferConfig } from "../../helper.ts";
+import { getBufferConfig, instancePluginBuffer } from "../../helper.ts";
 import {
   getBuffer,
   updateBuffer,
@@ -132,7 +132,7 @@ export async function openMrChangeList(args: ActionArgs): Promise<void> {
     merge_request_iid: mr.iid,
   };
   const bufnr = await createBuffer({ denops, config, seed });
-  const winnr = await util.getBufferWindowNumber(args.denops, bufnr);
+  const winnr = await util.getBufferWindowId(args.denops, bufnr);
   await updateBuffer({
     denops,
     bufnr,
@@ -885,6 +885,23 @@ export async function openMrDiscussion(args: ActionArgs) {
     bufnr,
     seed,
   });
+}
+
+export async function toggleMrDiscussion(args: ActionArgs) {
+  const { denops } = args;
+  const bufnr = await instancePluginBuffer(denops, "GitlaberMrDiscussion");
+  if (bufnr && await util.bufferHasWindow(denops, bufnr)) {
+    await fn.call(denops, "denops#notify", ["gitlaber", "doAction", [{
+      name: "buffer-hide",
+      params: {
+        bufnr: bufnr,
+      },
+    }]]);
+  } else {
+    await fn.call(denops, "denops#notify", ["gitlaber", "doAction", [{
+      name: "mr-discussion-open",
+    }]]);
+  }
 }
 
 export async function addMrDiscussionComment(args: ActionArgs) {

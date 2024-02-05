@@ -23,17 +23,22 @@ export function escapeSlash(str: string) {
   return str.replaceAll("/", "%2F");
 }
 
-export async function getBufferWindowNumber(denops: Denops, bufnr: number) {
+export async function getBufferWindowId(denops: Denops, bufnr: number) {
   const bufInfos = await fn.getbufinfo(denops, bufnr);
-  if (bufInfos.length === 0) {
+  if (!await bufferHasWindow(denops, bufnr)) {
     helper.echoerr(denops, "That buffer is not visible in the window.");
   }
   return bufInfos[0].windows[0];
 }
 
 export async function focusBuffer(denops: Denops, bufnr: number) {
-  const winnr = await getBufferWindowNumber(denops, bufnr);
+  const winnr = await getBufferWindowId(denops, bufnr);
   await fn.win_gotoid(denops, winnr);
+}
+
+export async function bufferHasWindow(denops: Denops, bufnr: number) {
+  const bufInfos = await fn.getbufinfo(denops, bufnr);
+  return !(bufInfos[0].windows.length === 0);
 }
 
 export function predicateFileType(filename: string) {

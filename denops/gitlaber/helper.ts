@@ -180,6 +180,19 @@ export async function updateBuffer(
   await setGitlaberVar(denops, gitlaberVar);
 }
 
+export async function instancePluginBuffer(
+  denops: Denops,
+  kind: BufferKind,
+) {
+  const instance = await getCurrentInstance(denops);
+  const bufname = `${kind}\ [${instance.id}]`;
+  const exists = await fn.bufexists(denops, bufname);
+  if (exists) {
+    return await fn.bufnr(denops, bufname);
+  }
+  return null;
+}
+
 export function getBufferConfig(kind: BufferKind) {
   const config = BUFFER_CONFIGS.find((config) => config.kind === kind);
   if (!config) {
@@ -230,8 +243,4 @@ export function exec(cmd: string, args: string[], cwd?: string) {
       }`,
     );
   }
-}
-
-export function getParentInstanceFromBufnr(denops: Denops, bufnr: number) {
-  return denops.call("gitlaber#helper#get_parent_instance_from_bufnr", bufnr);
 }

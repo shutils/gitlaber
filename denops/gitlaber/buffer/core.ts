@@ -1,6 +1,6 @@
 import { Denops, fn, mapping } from "../deps.ts";
 
-import { getBufferWindowNumber } from "../util.ts";
+import { bufferHasWindow, getBufferWindowId } from "../util.ts";
 import { BufferConfig, Node } from "../types.ts";
 import {
   addBuffer,
@@ -37,6 +37,8 @@ export async function createBuffer(
   const bufnr = await fn.bufadd(denops, bufname);
   if (!exists) {
     await fn.bufload(denops, bufnr);
+  }
+  if (!await bufferHasWindow(denops, bufnr)) {
     await fn.execute(denops, `${config.direction} new ${cmd ?? ""}${bufname}`);
     await fn.execute(denops, `buffer ${bufnr}`);
   }
@@ -67,7 +69,7 @@ export async function createBuffer(
   } else {
     await updateBuffer({ denops, bufnr, nodes: validNodes, seed: args.seed });
   }
-  const winid = await getBufferWindowNumber(denops, bufnr);
+  const winid = await getBufferWindowId(denops, bufnr);
   await fn.win_execute(denops, winid, "clearjumps");
   return bufnr;
 }

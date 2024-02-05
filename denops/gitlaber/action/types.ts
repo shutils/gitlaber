@@ -48,6 +48,7 @@ export const actionNames = [
   "mr-discussion-add-note",
   "mr-discussion-resolve",
   "mr-discussion-open",
+  "mr-discussion-toggle",
   "project-browse",
   "project-status",
   "wiki-browse",
@@ -64,6 +65,7 @@ export const actionNames = [
   "ui-input",
   "ci-lint",
   "buffer-close",
+  "buffer-hide",
   "buffer-close-all",
 ] as const;
 
