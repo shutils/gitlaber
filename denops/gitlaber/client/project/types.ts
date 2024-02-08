@@ -14,6 +14,7 @@ export const isProject = u.isObjectOf({
   created_at: u.isString,
   updated_at: u.isOptionalOf(u.isString),
   default_branch: u.isString,
+  remove_source_branch_after_merge: u.isBoolean,
   issue_branch_template: u.isOneOf([u.isString, u.isNull]),
   _links: u.isObjectOf({
     self: u.isString,

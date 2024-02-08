@@ -292,6 +292,8 @@ export async function createMergeRequest(args: ActionArgs) {
       title: title,
       source_branch: soruce,
       target_branch: terget,
+      remove_source_branch:
+        ctx.instance.project.remove_source_branch_after_merge,
     },
     "Successfully created a new merge request.",
   );
