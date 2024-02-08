@@ -7,6 +7,8 @@ import {
   isBranchListSeed,
   isIssueListSeed,
   isIssuePreviewSeed,
+  isJobListSeed,
+  isJobLogSeed,
   isMrChangeListSeed,
   isMrDiscussionInspectSeed,
   isMrDiscussionSeed,
@@ -547,6 +549,61 @@ export const createMrDiscussionInspectNodes = async (
       });
       nodes.push({
         display: "",
+      });
+    });
+    return await Promise.resolve(nodes);
+  });
+};
+
+export const createJobsNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id } = u.ensure(seed, isJobListSeed);
+    const projectJobs = await client.getProjectJobs(url, token, {
+      id,
+    });
+    return await Promise.resolve(
+      createNodes(projectJobs, "job", [
+        "id",
+        "name",
+        "status",
+        "stage",
+        "ref",
+        "created_at",
+      ]),
+    );
+  });
+};
+
+export const createJobLogNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
+  const removeAnsiEscape = (str: string) => {
+    return str.replace(/\x1b\[[0-9;]*m/g, "");
+  };
+  const removeSectionEscape = (str: string) => {
+    return str.replace(/section.*\x0D/g, "");
+  };
+  const removeAnsiEscapeK = (str: string) => {
+    return str.replace(/\x1b\[[0-9;]*K/g, "");
+  };
+  const getRawString = (str: string) => {
+    return removeAnsiEscapeK(removeAnsiEscape(removeSectionEscape(str)));
+  };
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id, job_id } = u.ensure(seed, isJobLogSeed);
+    const jobLog = await client.getProjectJobLog(url, token, {
+      id,
+      job_id,
+    });
+    const nodes: Node[] = [];
+    const lines = jobLog.split("\n");
+    lines.map((line) => {
+      nodes.push({
+        display: getRawString(line),
       });
     });
     return await Promise.resolve(nodes);

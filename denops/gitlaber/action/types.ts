@@ -60,6 +60,8 @@ export const actionNames = [
   "wiki-new",
   "wiki-new-submit",
   "wiki-preview",
+  "job-list",
+  "job-log",
   "util-echo-node",
   "ui-select",
   "ui-input",

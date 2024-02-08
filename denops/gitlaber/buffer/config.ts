@@ -106,6 +106,16 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: RESOURCE_Mrs_MAPPINGS,
   },
   {
+    kind: "GitlaberJobList",
+    direction: "tab",
+    nodeMaker: node.createJobsNodes,
+    options: {
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
     kind: "GitlaberIssuePreview",
     direction: "vertical botright",
     nodeMaker: node.createIssueDescriptionNodes,
@@ -259,6 +269,17 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     nodeMaker: node.createMrDiscussionInspectNodes,
     options: {
       filetype: "markdown",
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
+    kind: "GitlaberJobLog",
+    direction: "vertical botright",
+    nodeMaker: node.createJobLogNodes,
+    options: {
+      filetype: "sh",
       buftype: "nofile",
       modifiable: false,
     },

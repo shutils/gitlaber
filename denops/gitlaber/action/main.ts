@@ -64,6 +64,7 @@ import {
   unlabelMergeRequest,
 } from "./resource/mr.ts";
 import { nextList, previousList } from "./resource/common.ts";
+import { openJobList, openJobLog } from "./resource/job.ts";
 import {
   closeAllBuffer,
   closeBuffer,
@@ -157,6 +158,8 @@ const actionStore: ActionStore = {
   "wiki-edit": openWikiEdit,
   "wiki-edit-submit": editWikiContent,
   "wiki-preview": openWikiPreview,
+  "job-list": openJobList,
+  "job-log": openJobLog,
   "util-echo-node": echoNode,
   "ui-select": uiSelect,
   "ui-input": uiInput,

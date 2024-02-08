@@ -15,6 +15,8 @@ export const isWikiListSeed = isIssueListSeed;
 export type WikiListSeed = u.PredicateType<typeof isWikiListSeed>;
 export const isBranchListSeed = isIssueListSeed;
 export type BranchListSeed = u.PredicateType<typeof isBranchListSeed>;
+export const isJobListSeed = isIssueListSeed;
+export type JobListSeed = u.PredicateType<typeof isJobListSeed>;
 
 export const isMrListSeed = u.isObjectOf({
   url: isUrl,
@@ -93,3 +95,12 @@ export const isMrDiscussionInspectSeed = u.isObjectOf({
 export type MrDiscussionInspectSeed = u.PredicateType<
   typeof isMrDiscussionInspectSeed
 >;
+
+export const isJobLogSeed = u.isObjectOf({
+  url: isUrl,
+  token: isToken,
+  id: isProjectId,
+  job_id: u.isNumber,
+});
+
+export type JobLogSeed = u.PredicateType<typeof isJobLogSeed>;

@@ -1,6 +1,12 @@
 import { fn, helper, unknownutil as u } from "../../deps.ts";
 
-import { ActionArgs, isBranch, isProjectLabel, Node } from "../../types.ts";
+import {
+  ActionArgs,
+  isBranch,
+  isJob,
+  isProjectLabel,
+  Node,
+} from "../../types.ts";
 import { getBuffer, updateBuffer } from "../../helper.ts";
 import { reRenderBuffer } from "../../buffer/core.ts";
 import * as client from "../../client/index.ts";
@@ -211,4 +217,22 @@ export function argsHasLabel(args: ActionArgs) {
 
 export function getLabelFromArgs(args: ActionArgs) {
   return u.ensure(args.params?.label, isProjectLabel);
+}
+
+export function argsHasJob(args: ActionArgs) {
+  if (isJob(args.params?.job)) {
+    return true;
+  } else if (isJob(args.node?.params?.job)) {
+    return true;
+  }
+  return false;
+}
+
+export function getJobFromArgs(args: ActionArgs) {
+  if (isJob(args.params?.job)) {
+    return args.params.job;
+  } else if (isJob(args.node?.params?.job)) {
+    return args.node.params.job;
+  }
+  throw new Error("Job not found.");
 }

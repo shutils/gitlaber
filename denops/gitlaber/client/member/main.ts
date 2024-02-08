@@ -1,12 +1,13 @@
 import { unknownutil as u } from "../../deps.ts";
 import { request } from "../core.ts";
 import { isMember } from "./types.ts";
+import { ProjectId } from "../../types.ts";
 
 export async function getProjectMembers(
   url: string,
   token: string,
   attrs: {
-    id: number;
+    id: ProjectId;
     query?: string;
     user_ids?: number[];
     skip_users?: number[];

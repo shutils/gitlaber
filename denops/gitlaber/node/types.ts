@@ -34,4 +34,4 @@ export const isNode = u.isObjectOf({
 
 export type Node = u.PredicateType<typeof isNode>;
 
-export type ResourceKind = "project" | "issue" | "mr" | "wiki" | "branch" | "commit" | "member" | "label" | "action";
+export type ResourceKind = "project" | "issue" | "mr" | "wiki" | "branch" | "commit" | "member" | "label" | "action" | "job";

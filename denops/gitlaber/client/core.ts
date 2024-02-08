@@ -35,3 +35,26 @@ export async function request(
       );
   }
 }
+
+export async function requestRaw(
+  url: string,
+  token: string,
+  method?: Method,
+  body?: string,
+) {
+  const res = await fetch(url, {
+    method: method,
+    headers: createHeaders(token),
+    body: body,
+  });
+  switch (res.status) {
+    case http.Status.OK:
+      return await res.text();
+    default:
+      throw new Error(
+        `HTTP request failed. status: ${res.status} ${
+          Deno.inspect(await res.text(), { depth: Infinity })
+        }`,
+      );
+  }
+}

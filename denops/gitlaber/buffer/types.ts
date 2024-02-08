@@ -13,6 +13,7 @@ export const BUFFER_KINDS = [
   "GitlaberBranchList",
   "GitlaberWikiList",
   "GitlaberMrList",
+  "GitlaberJobList",
   "GitlaberIssuePreview",
   "GitlaberIssueEdit",
   "GitlaberMrPreview",
@@ -28,6 +29,7 @@ export const BUFFER_KINDS = [
   "GitlaberDiffNewFile",
   "GitlaberMrDiscussion",
   "GitlaberMrDiscussionInspect",
+  "GitlaberJobLog",
 ] as const;
 
 export const isBufferKind = u.isLiteralOneOf(BUFFER_KINDS);
