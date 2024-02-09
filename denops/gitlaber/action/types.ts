@@ -69,6 +69,7 @@ export const actionNames = [
   "buffer-close",
   "buffer-hide",
   "buffer-close-all",
+  "buffer-reload",
 ] as const;
 
 export const isActionName = u.isLiteralOneOf(actionNames);

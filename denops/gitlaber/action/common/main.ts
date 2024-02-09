@@ -1,6 +1,6 @@
 import { fn, helper, unknownutil as u } from "../../deps.ts";
 
-import { createBuffer } from "../../buffer/core.ts";
+import { createBuffer, reRenderBuffer } from "../../buffer/core.ts";
 import { createMergedYamlNodes } from "../../node/main.ts";
 import { getBufferConfig, getGitlaberVar } from "../../helper.ts";
 import { ActionArgs } from "../../types.ts";
@@ -77,4 +77,20 @@ export async function closeAllBuffer(args: ActionArgs): Promise<void> {
       await fn.execute(args.denops, `bwipe ${buffer.bufnr}`);
     }
   });
+}
+
+export async function reloadBuffer(args: ActionArgs): Promise<void> {
+  let bufnr: number;
+  const params = u.ensure(
+    args.params,
+    u.isOptionalOf(u.isObjectOf({
+      bufnr: u.isOptionalOf(u.isNumber),
+    })),
+  );
+  if (params?.bufnr) {
+    bufnr = params.bufnr;
+  } else {
+    bufnr = await fn.bufnr(args.denops);
+  }
+  await reRenderBuffer(args.denops, bufnr);
 }

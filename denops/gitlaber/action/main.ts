@@ -71,6 +71,7 @@ import {
   echoNode,
   hideBuffer,
   openMergedYaml,
+  reloadBuffer,
 } from "./common/main.ts";
 import { uiInput, uiSelect } from "./ui/main.ts";
 
@@ -167,6 +168,7 @@ const actionStore: ActionStore = {
   "buffer-close": closeBuffer,
   "buffer-hide": hideBuffer,
   "buffer-close-all": closeAllBuffer,
+  "buffer-reload": reloadBuffer,
 };
 
 function verifyActionName(actionName: string): void {
