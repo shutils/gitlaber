@@ -8,10 +8,20 @@ import {
   POPUP_MR_MAPPINGS,
   POPUP_WIKI_MAPPINGS,
   RESOURCE_BRANCHES_MAPPINGS,
+  RESOURCE_DISCUSSION_INSPECT_MAPPINGS,
+  RESOURCE_ISSUE_EDIT_MAPPINGS,
   RESOURCE_ISSUES_MAPPINGS,
+  RESOURCE_JOBS_MAPPINGS,
+  RESOURCE_MR_CHANGE_LIST_MAPPINGS,
+  RESOURCE_MR_DIFF_MAPPINGS,
+  RESOURCE_MR_DISCUSSION_MAPPINGS,
+  RESOURCE_MR_EDIT_MAPPINGS,
   RESOURCE_Mrs_MAPPINGS,
+  RESOURCE_PIPELINES_MAPPINGS,
+  RESOURCE_WIKI_EDIT_MAPPINGS,
   RESOURCE_WIKIS_MAPPINGS,
-  UI_SELECT,
+  UI_INPUT_MAPPINGS,
+  UI_SELECT_MAPPINGS,
 } from "../keymap/main.ts";
 
 export const BUFFER_CONFIGS: BufferConfig[] = [
@@ -113,7 +123,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       buftype: "nofile",
       modifiable: false,
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_PIPELINES_MAPPINGS,
   },
   {
     kind: "GitlaberJobList",
@@ -123,7 +133,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       buftype: "nofile",
       modifiable: false,
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_JOBS_MAPPINGS,
   },
   {
     kind: "GitlaberJobListForPipeline",
@@ -133,7 +143,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       buftype: "nofile",
       modifiable: false,
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_JOBS_MAPPINGS,
   },
   {
     kind: "GitlaberIssuePreview",
@@ -155,7 +165,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       modifiable: true,
       filetype: "markdown",
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_ISSUE_EDIT_MAPPINGS,
   },
   {
     kind: "GitlaberMrPreview",
@@ -177,7 +187,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       modifiable: true,
       filetype: "markdown",
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_MR_EDIT_MAPPINGS,
   },
   {
     kind: "GitlaberWikiPreview",
@@ -199,7 +209,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       modifiable: true,
       filetype: "markdown",
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_WIKI_EDIT_MAPPINGS,
   },
   {
     kind: "GitlaberWikiEdit",
@@ -210,7 +220,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       modifiable: true,
       filetype: "markdown",
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_WIKI_EDIT_MAPPINGS,
   },
   {
     kind: "GitlaberUiSelect",
@@ -220,7 +230,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       modifiable: false,
       filetype: "markdown",
     },
-    keymaps: UI_SELECT,
+    keymaps: UI_SELECT_MAPPINGS,
   },
   {
     kind: "GitlaberUiInput",
@@ -230,7 +240,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       modifiable: true,
       filetype: "markdown",
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: UI_INPUT_MAPPINGS,
   },
   {
     kind: "GitlaberMergedYaml",
@@ -250,7 +260,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       buftype: "nofile",
       modifiable: false,
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_MR_CHANGE_LIST_MAPPINGS,
   },
   {
     kind: "GitlaberDiffOldFile",
@@ -260,7 +270,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       buftype: "nofile",
       modifiable: false,
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_MR_DIFF_MAPPINGS,
   },
   {
     kind: "GitlaberDiffNewFile",
@@ -270,7 +280,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       buftype: "nofile",
       modifiable: false,
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_MR_DIFF_MAPPINGS,
   },
   {
     kind: "GitlaberMrDiscussion",
@@ -281,7 +291,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       buftype: "nofile",
       modifiable: false,
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_MR_DISCUSSION_MAPPINGS,
   },
   {
     kind: "GitlaberMrDiscussionInspect",
@@ -292,7 +302,7 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
       buftype: "nofile",
       modifiable: false,
     },
-    keymaps: BASE_MAPPINGS,
+    keymaps: RESOURCE_DISCUSSION_INSPECT_MAPPINGS,
   },
   {
     kind: "GitlaberJobLog",

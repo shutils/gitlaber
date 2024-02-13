@@ -74,6 +74,7 @@ import { brwosePipeline, openPipelineList } from "./resource/pipeline.ts";
 import {
   closeAllBuffer,
   closeBuffer,
+  echoKeymaps,
   echoNode,
   hideBuffer,
   openMergedYaml,
@@ -172,6 +173,7 @@ const actionStore: ActionStore = {
   "job-list-for-pipeline": openJobListForPipeline,
   "job-log": openJobLog,
   "util-echo-node": echoNode,
+  "util-echo-keymaps": echoKeymaps,
   "ui-select": uiSelect,
   "ui-input": uiInput,
   "ci-lint": openMergedYaml,

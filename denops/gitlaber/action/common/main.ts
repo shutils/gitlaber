@@ -2,7 +2,7 @@ import { fn, helper, unknownutil as u } from "../../deps.ts";
 
 import { createBuffer, reRenderBuffer } from "../../buffer/core.ts";
 import { createMergedYamlNodes } from "../../node/main.ts";
-import { getBufferConfig, getGitlaberVar } from "../../helper.ts";
+import { getBuffer, getBufferConfig, getGitlaberVar } from "../../helper.ts";
 import { ActionArgs } from "../../types.ts";
 import { getLint } from "../../client/index.ts";
 import { flattenBuffer, getBufferWindowId } from "../../util.ts";
@@ -93,4 +93,22 @@ export async function reloadBuffer(args: ActionArgs): Promise<void> {
     bufnr = await fn.bufnr(args.denops);
   }
   await reRenderBuffer(args.denops, bufnr);
+}
+
+export async function echoKeymaps(args: ActionArgs): Promise<void> {
+  const buffer = await getBuffer(args.denops);
+  const kind = buffer.kind;
+  const bufferConfig = getBufferConfig(kind);
+  const keymaps = bufferConfig.keymaps;
+  if (!keymaps) {
+    await helper.echo(args.denops, "No keymaps.");
+    return;
+  }
+  const keymapsString: string[] = [];
+  const maxLhsLength = Math.max(...keymaps.map((keymap) => keymap.lhs.length));
+  keymaps.map((keymap) => {
+    const lhs = keymap.lhs.padEnd(maxLhsLength);
+    keymapsString.push(`${lhs}: ${keymap.description}`);
+  });
+  await helper.echo(args.denops, keymapsString.join("\n"));
 }

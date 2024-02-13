@@ -67,6 +67,7 @@ export const actionNames = [
   "job-browse",
   "job-log",
   "util-echo-node",
+  "util-echo-keymaps",
   "ui-select",
   "ui-input",
   "ci-lint",

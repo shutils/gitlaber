@@ -12,9 +12,9 @@ const MAP_OPTION: mapping.MapOptions = {
 export const BASE_MAPPINGS = [
   {
     lhs: "q",
-    rhs: "<Cmd>bw!<CR>",
+    rhs: "<Plug>(gitlaber-action-buffer-close)",
     option: MAP_OPTION,
-    description: "Close buffer",
+    description: "Close current buffer",
   },
   {
     lhs: "I",
@@ -22,36 +22,60 @@ export const BASE_MAPPINGS = [
     option: MAP_OPTION,
     description: "Show current node",
   },
+  {
+    lhs: "R",
+    rhs: "<Plug>(gitlaber-action-buffer-reload)",
+    option: MAP_OPTION,
+    description: "Reload current buffer",
+  },
+  {
+    lhs: "g?",
+    rhs: "<Plug>(gitlaber-action-util-echo-keymaps)",
+    option: MAP_OPTION,
+    description: "Show keymaps",
+  },
 ];
 
 export const MAIN_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "i",
-    rhs: "<Plug>(gitlaber-action-issue-config)",
+    rhs: "<Plug>(gitlaber-action-issue-list)",
     option: MAP_OPTION,
-    description: "Open popup issue buffer",
-  },
-  {
-    lhs: "w",
-    rhs: "<Plug>(gitlaber-action-wiki-config)",
-    option: MAP_OPTION,
-    description: "Open popup wiki buffer",
-  },
-  {
-    lhs: "b",
-    rhs: "<Plug>(gitlaber-action-branch-config)",
-    option: MAP_OPTION,
-    description: "Open popup branch buffer",
+    description: "Open issue list",
   },
   {
     lhs: "m",
-    rhs: "<Plug>(gitlaber-action-mr-config)",
+    rhs: "<Plug>(gitlaber-action-mr-list)",
     option: MAP_OPTION,
-    description: "Open popup merge request buffer",
+    description: "Open merge request list",
   },
   {
-    lhs: "o",
+    lhs: "w",
+    rhs: "<Plug>(gitlaber-action-wiki-list)",
+    option: MAP_OPTION,
+    description: "Open wiki list",
+  },
+  {
+    lhs: "b",
+    rhs: "<Plug>(gitlaber-action-branch-list)",
+    option: MAP_OPTION,
+    description: "Open branch list",
+  },
+  {
+    lhs: "p",
+    rhs: "<Plug>(gitlaber-action-pipeline-list)",
+    option: MAP_OPTION,
+    description: "Open pipeline list",
+  },
+  {
+    lhs: "J",
+    rhs: "<Plug>(gitlaber-action-job-list)",
+    option: MAP_OPTION,
+    description: "Open job list",
+  },
+  {
+    lhs: "B",
     rhs: "<Plug>(gitlaber-action-project-browse)",
     option: MAP_OPTION,
     description: "Open project with browser",
@@ -107,139 +131,208 @@ export const POPUP_BRANCH_MAPPINGS = [
 export const RESOURCE_ISSUES_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
-    lhs: "o",
+    lhs: "B",
     rhs: "<Plug>(gitlaber-action-issue-browse)",
     option: MAP_OPTION,
     description: "Open issue with browser",
   },
   {
-    lhs: "N",
-    rhs: "<Plug>(gitlaber-action-issue-new)",
+    lhs: "a",
+    rhs: "<Plug>(gitlaber-action-issue-assign)",
     option: MAP_OPTION,
-    description: "Create new issue",
-  },
-  {
-    lhs: "d",
-    rhs: "<Plug>(gitlaber-action-issue-delete)",
-    option: MAP_OPTION,
-    description: "Delete issue",
-  },
-  {
-    lhs: "C",
-    rhs: "<Plug>(gitlaber-action-issue-close)",
-    option: MAP_OPTION,
-    description: "Toggle issue state",
+    description: "Assign issue assignee",
   },
   {
     lhs: "O",
     rhs: "<Plug>(gitlaber-action-issue-reopen)",
     option: MAP_OPTION,
-    description: "Assign issue assignee",
+    description: "Reopen issue",
   },
   {
-    lhs: "la",
-    rhs: "<Plug>(gitlaber-action-issue-label)",
+    lhs: "C",
+    rhs: "<Plug>(gitlaber-action-issue-close)",
     option: MAP_OPTION,
-    description: "Add label to issue",
+    description: "Close issue",
   },
   {
-    lhs: "lr",
-    rhs: "<Plug>(gitlaber-action-issue-unlabel)",
+    lhs: "E",
+    rhs: "<Plug>(gitlaber-action-issue-edit)",
     option: MAP_OPTION,
-    description: "Remove label from issue",
+    description: "Open issue edit",
   },
   {
-    lhs: "b",
-    rhs: "<Plug>(gitlaber-action-branch-new)",
-    option: MAP_OPTION,
-    description: "Create a branch related to the issue",
-  },
-  {
-    lhs: "p",
+    lhs: "P",
     rhs: "<Plug>(gitlaber-action-issue-preview)",
     option: MAP_OPTION,
     description: "Open issue preview",
   },
   {
-    lhs: "A",
-    rhs: "<Plug>(gitlaber-action-issue-assign)",
+    lhs: "la",
+    rhs: "<Plug>(gitlaber-action-issue-label)",
     option: MAP_OPTION,
-    description: "Assign assignee to issue",
+    description: "Label issue",
   },
   {
-    lhs: "e",
-    rhs: "<Plug>(gitlaber-action-issue-edit)",
+    lhs: "lr",
+    rhs: "<Plug>(gitlaber-action-issue-unlabel)",
     option: MAP_OPTION,
-    description: "Edit an issue description",
+    description: "Unlabel issue",
+  },
+  {
+    lhs: "D",
+    rhs: "<Plug>(gitlaber-action-issue-delete)",
+    option: MAP_OPTION,
+    description: "Delete issue",
+  },
+  {
+    lhs: "N",
+    rhs: "<Plug>(gitlaber-action-issue-new)",
+    option: MAP_OPTION,
+    description: "Open issue new",
+  },
+  {
+    lhs: "n",
+    rhs: "<Plug>(gitlaber-action-issue-list-next)",
+    option: MAP_OPTION,
+    description: "Next page",
+  },
+  {
+    lhs: "p",
+    rhs: "<Plug>(gitlaber-action-issue-list-prev)",
+    option: MAP_OPTION,
+    description: "Prev page",
   },
 ];
+
 export const RESOURCE_BRANCHES_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
-    lhs: "o",
+    lhs: "B",
     rhs: "<Plug>(gitlaber-action-branch-browse)",
     option: MAP_OPTION,
     description: "Open branch with browser",
   },
   {
+    lhs: "N",
+    rhs: "<Plug>(gitlaber-action-branch-new)",
+    option: MAP_OPTION,
+    description: "Create new branch",
+  },
+  {
     lhs: "M",
     rhs: "<Plug>(gitlaber-action-mr-new)",
     option: MAP_OPTION,
-    description: "Create a merge request related to the branch",
+    description: "Create new merge request from branch",
   },
 ];
+
 export const RESOURCE_WIKIS_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
-    lhs: "o",
+    lhs: "B",
     rhs: "<Plug>(gitlaber-action-wiki-browse)",
     option: MAP_OPTION,
     description: "Open wiki with browser",
   },
   {
-    lhs: "d",
-    rhs: "<Plug>(gitlaber-action-wiki-delete)",
+    lhs: "N",
+    rhs: "<Plug>(gitlaber-action-wiki-new)",
     option: MAP_OPTION,
-    description: "Delete wiki",
+    description: "Create new wiki",
   },
   {
-    lhs: "p",
+    lhs: "P",
     rhs: "<Plug>(gitlaber-action-wiki-preview)",
     option: MAP_OPTION,
     description: "Open wiki preview",
   },
   {
-    lhs: "e",
+    lhs: "E",
     rhs: "<Plug>(gitlaber-action-wiki-edit)",
     option: MAP_OPTION,
-    description: "Open wiki edit",
+    description: "Edit wiki",
   },
   {
-    lhs: "N",
-    rhs: "<Plug>(gitlaber-action-wiki-new)",
+    lhs: "D",
+    rhs: "<Plug>(gitlaber-action-wiki-delete)",
     option: MAP_OPTION,
-    description: "Open wiki new",
+    description: "Delete wiki",
   },
 ];
+
 export const RESOURCE_Mrs_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
-    lhs: "o",
+    lhs: "B",
     rhs: "<Plug>(gitlaber-action-mr-browse)",
     option: MAP_OPTION,
     description: "Open merge request with browser",
   },
   {
-    lhs: "a",
+    lhs: "aa",
     rhs: "<Plug>(gitlaber-action-mr-assign-assignee)",
     option: MAP_OPTION,
     description: "Assign merge request assignee",
   },
   {
-    lhs: "r",
+    lhs: "ar",
     rhs: "<Plug>(gitlaber-action-mr-assign-reviewer)",
     option: MAP_OPTION,
     description: "Assign merge request reviewer",
+  },
+  {
+    lhs: "O",
+    rhs: "<Plug>(gitlaber-action-mr-reopen)",
+    option: MAP_OPTION,
+    description: "Reopen merge request",
+  },
+  {
+    lhs: "C",
+    rhs: "<Plug>(gitlaber-action-mr-close)",
+    option: MAP_OPTION,
+    description: "Close merge request",
+  },
+  {
+    lhs: "E",
+    rhs: "<Plug>(gitlaber-action-mr-edit)",
+    option: MAP_OPTION,
+    description: "Open merge request edit",
+  },
+  {
+    lhs: "P",
+    rhs: "<Plug>(gitlaber-action-mr-preview)",
+    option: MAP_OPTION,
+    description: "Open merge request preview",
+  },
+  {
+    lhs: "la",
+    rhs: "<Plug>(gitlaber-action-mr-label)",
+    option: MAP_OPTION,
+    description: "Label merge request",
+  },
+  {
+    lhs: "lr",
+    rhs: "<Plug>(gitlaber-action-mr-unlabel)",
+    option: MAP_OPTION,
+    description: "Unlabel merge request",
+  },
+  {
+    lhs: "M",
+    rhs: "<Plug>(gitlaber-action-mr-merge)",
+    option: MAP_OPTION,
+    description: "Merge merge request",
+  },
+  {
+    lhs: "n",
+    rhs: "<Plug>(gitlaber-action-mr-list-next)",
+    option: MAP_OPTION,
+    description: "Next page",
+  },
+  {
+    lhs: "p",
+    rhs: "<Plug>(gitlaber-action-mr-list-prev)",
+    option: MAP_OPTION,
+    description: "Prev page",
   },
   {
     lhs: "A",
@@ -254,43 +347,150 @@ export const RESOURCE_Mrs_MAPPINGS = [
     description: "Unapprove merge request",
   },
   {
-    lhs: "M",
-    rhs: "<Plug>(gitlaber-action-mr-merge)",
+    lhs: "d",
+    rhs: "<Plug>(gitlaber-action-mr-change-list)",
     option: MAP_OPTION,
-    description: "Merge merge request",
-  },
-  {
-    lhs: "p",
-    rhs: "<Plug>(gitlaber-action-mr-preview)",
-    option: MAP_OPTION,
-    description: "Open mr preview",
-  },
-  {
-    lhs: "e",
-    rhs: "<Plug>(gitlaber-action-mr-edit)",
-    option: MAP_OPTION,
-    description: "Open mr edit",
-  },
-  {
-    lhs: "la",
-    rhs: "<Plug>(gitlaber-action-mr-label)",
-    option: MAP_OPTION,
-    description: "Label merge request",
-  },
-  {
-    lhs: "lr",
-    rhs: "<Plug>(gitlaber-action-mr-unlabel)",
-    option: MAP_OPTION,
-    description: "Unlable merge request",
+    description: "Change list",
   },
 ];
-export const UI_SELECT = [
+
+export const RESOURCE_MR_CHANGE_LIST_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "<CR>",
+    rhs: "<Plug>(gitlaber-action-mr-change-diff)",
+    option: MAP_OPTION,
+    description: "Open diff",
+  },
+  {
+    lhs: "<C-o>",
+    rhs: "<Plug>(gitlaber-action-mr-discussion-open)",
+    option: MAP_OPTION,
+    description: "Open discussion list",
+  },
+];
+
+export const RESOURCE_MR_DIFF_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "<C-o>",
+    rhs: "<Plug>(gitlaber-action-mr-discussion-open)",
+    option: MAP_OPTION,
+    description: "Open discussion list",
+  },
+  {
+    lhs: "D",
+    rhs: "<Plug>(gitlaber-action-mr-discussion-new)",
+    option: MAP_OPTION,
+    description: "Create discussion",
+  },
+  {
+    lhs: "i",
+    rhs: "<Plug>(gitlaber-action-mr-discussion-inspect)",
+    option: MAP_OPTION,
+    description: "Inspect discussion",
+  },
+];
+
+export const RESOURCE_MR_DISCUSSION_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "A",
+    rhs: "<Plug>(gitlaber-action-mr-discussion-new-overview)",
+    option: MAP_OPTION,
+    description: "Create discussion",
+  },
+];
+
+export const RESOURCE_DISCUSSION_INSPECT_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "A",
+    rhs: "<Plug>(gitlaber-action-mr-discussion-add-note)",
+    option: MAP_OPTION,
+    description: "Add note",
+  },
+];
+
+export const RESOURCE_PIPELINES_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "B",
+    rhs: "<Plug>(gitlaber-action-pipeline-browse)",
+    option: MAP_OPTION,
+    description: "Open pipeline with browser",
+  },
+  {
+    lhs: "J",
+    rhs: "<Plug>(gitlaber-action-job-list-for-pipeline)",
+    option: MAP_OPTION,
+    description: "Open job list for pipeline",
+  },
+];
+
+export const RESOURCE_JOBS_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "B",
+    rhs: "<Plug>(gitlaber-action-job-browse)",
+    option: MAP_OPTION,
+    description: "Open job with browser",
+  },
+  {
+    lhs: "l",
+    rhs: "<Plug>(gitlaber-action-job-log)",
+    option: MAP_OPTION,
+    description: "Open job log",
+  },
+];
+
+export const RESOURCE_MR_EDIT_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "<C-s>",
+    rhs: "<Plug>(gitlaber-action-mr-edit-submit)",
+    option: MAP_OPTION,
+    description: "Submit merge request",
+  },
+];
+
+export const RESOURCE_ISSUE_EDIT_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "<C-s>",
+    rhs: "<Plug>(gitlaber-action-issue-edit-submit)",
+    option: MAP_OPTION,
+    description: "Submit issue",
+  },
+];
+
+export const RESOURCE_WIKI_EDIT_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "<C-s>",
+    rhs: "<Plug>(gitlaber-action-wiki-edit-submit)",
+    option: MAP_OPTION,
+    description: "Submit wiki",
+  },
+];
+
+export const UI_SELECT_MAPPINGS = [
   ...BASE_MAPPINGS,
   {
     lhs: "<CR>",
     rhs: "<Plug>(gitlaber-action-ui-select)",
     option: MAP_OPTION,
     description: "Select current node",
+  },
+];
+
+export const UI_INPUT_MAPPINGS = [
+  ...BASE_MAPPINGS,
+  {
+    lhs: "<C-s>",
+    rhs: "<Plug>(gitlaber-action-ui-input)",
+    option: MAP_OPTION,
+    description: "Submit input",
   },
 ];
 
