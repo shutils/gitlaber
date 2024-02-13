@@ -105,7 +105,8 @@ export async function browseWiki(args: ActionArgs) {
     selectWiki(args);
     return;
   }
-  await openWithBrowser(denops, baseUrl + wiki.slug);
+  const escapedSlug = encodeURIComponent(wiki.slug);
+  await openWithBrowser(denops, baseUrl + escapedSlug);
 }
 
 export async function deleteWiki(args: ActionArgs) {

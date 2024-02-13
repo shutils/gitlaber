@@ -22,8 +22,9 @@ export async function getProjectWiki(
   token: string,
   attrs: { id: ProjectId; slug: string; with_content?: boolean },
 ) {
+  const escapedSlug = encodeURIComponent(attrs.slug);
   const gitlabApiPath =
-    `${url}/api/v4/projects/${attrs.id}/wikis/${attrs.slug}`;
+    `${url}/api/v4/projects/${attrs.id}/wikis/${escapedSlug}`;
   return u.ensure(
     await request(gitlabApiPath, token, "GET"),
     isWiki,
