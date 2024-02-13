@@ -7,6 +7,7 @@ import {
   isBranchListSeed,
   isIssueListSeed,
   isIssuePreviewSeed,
+  isJobListForPipelineSeed,
   isJobListSeed,
   isJobLogSeed,
   isMrChangeListSeed,
@@ -555,6 +556,28 @@ export const createMrDiscussionInspectNodes = async (
   });
 };
 
+export const createPipelinesNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id } = u.ensure(seed, isIssueListSeed);
+    const projectPipelines = await client.getProjectPipelines(url, token, {
+      id,
+    });
+    return await Promise.resolve(
+      createNodes(projectPipelines, "pipeline", [
+        "id",
+        "iid",
+        "status",
+        "source",
+        "ref",
+        "created_at",
+      ]),
+    );
+  });
+};
+
 export const createJobsNodes = async (
   denops: Denops,
   seed?: Record<string, unknown>,
@@ -566,6 +589,32 @@ export const createJobsNodes = async (
     });
     return await Promise.resolve(
       createNodes(projectJobs, "job", [
+        "id",
+        "name",
+        "status",
+        "stage",
+        "ref",
+        "created_at",
+      ]),
+    );
+  });
+};
+
+export const createJobsForPipelineNodes = async (
+  denops: Denops,
+  seed?: Record<string, unknown>,
+) => {
+  return await makeNode(denops, async (_args) => {
+    const { url, token, id, pipeline_id } = u.ensure(
+      seed,
+      isJobListForPipelineSeed,
+    );
+    const pipelineJobs = await client.getPipelineJobs(url, token, {
+      id,
+      pipeline_id,
+    });
+    return await Promise.resolve(
+      createNodes(pipelineJobs, "job", [
         "id",
         "name",
         "status",

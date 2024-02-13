@@ -1,13 +1,24 @@
-import { fn, helper, unknownutil as u } from "../../deps.ts";
 import * as client from "../../client/index.ts";
-import { ActionArgs, Job, JobListSeed, JobLogSeed, Node } from "../../types.ts";
+import {
+  ActionArgs,
+  Job,
+  JobListForPipelineSeed,
+  JobListSeed,
+  JobLogSeed,
+  Node,
+} from "../../types.ts";
 import * as util from "../../util.ts";
-import { executeRequest } from "./core.ts";
 import { openWithBrowser } from "../browse/core.ts";
 import { openUiSelect } from "../ui/main.ts";
 import { createBuffer } from "../../buffer/core.ts";
 import { getBufferConfig } from "../../helper.ts";
-import { argsHasJob, getJobFromArgs } from "./common.ts";
+import {
+  argsHasJob,
+  argsHasPipeline,
+  getJobFromArgs,
+  getPipelineFromArgs,
+  selectPipeline,
+} from "./common.ts";
 
 export async function openJobList(args: ActionArgs): Promise<void> {
   const { denops } = args;
@@ -16,6 +27,26 @@ export async function openJobList(args: ActionArgs): Promise<void> {
     url: args.ctx.url,
     token: args.ctx.token,
     id: args.ctx.instance.project.id,
+  };
+  const bufnr = await createBuffer({ denops, config, seed });
+  await util.focusBuffer(args.denops, bufnr);
+}
+
+export async function openJobListForPipeline(args: ActionArgs): Promise<void> {
+  const { denops } = args;
+  let pipeline;
+  if (argsHasPipeline(args)) {
+    pipeline = getPipelineFromArgs(args);
+  } else {
+    selectPipeline(args);
+    return;
+  }
+  const config = getBufferConfig("GitlaberJobListForPipeline");
+  const seed: JobListForPipelineSeed = {
+    url: args.ctx.url,
+    token: args.ctx.token,
+    id: args.ctx.instance.project.id,
+    pipeline_id: pipeline.id,
   };
   const bufnr = await createBuffer({ denops, config, seed });
   await util.focusBuffer(args.denops, bufnr);

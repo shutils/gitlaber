@@ -18,6 +18,19 @@ export type BranchListSeed = u.PredicateType<typeof isBranchListSeed>;
 export const isJobListSeed = isIssueListSeed;
 export type JobListSeed = u.PredicateType<typeof isJobListSeed>;
 
+export const idPipelineListSeed = isIssueListSeed;
+export type PipelineListSeed = u.PredicateType<typeof idPipelineListSeed>;
+
+export const isJobListForPipelineSeed = u.isObjectOf({
+  url: isUrl,
+  token: isToken,
+  id: isProjectId,
+  pipeline_id: u.isNumber,
+});
+export type JobListForPipelineSeed = u.PredicateType<
+  typeof isJobListForPipelineSeed
+>;
+
 export const isMrListSeed = u.isObjectOf({
   url: isUrl,
   token: isToken,

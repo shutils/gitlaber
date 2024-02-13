@@ -10,6 +10,7 @@ export * from "./project/types.ts";
 export * from "./wiki/types.ts";
 export * from "./lint/types.ts";
 export * from "./discussion/types.ts";
+export * from "./pipeline/types.ts";
 export * from "./job/types.ts";
 
 export const isPaginationAttributes = u.isObjectOf({

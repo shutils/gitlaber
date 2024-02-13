@@ -14,6 +14,7 @@ export const BUFFER_KINDS = [
   "GitlaberWikiList",
   "GitlaberMrList",
   "GitlaberJobList",
+  "GitlaberJobListForPipeline",
   "GitlaberIssuePreview",
   "GitlaberIssueEdit",
   "GitlaberMrPreview",
@@ -30,6 +31,7 @@ export const BUFFER_KINDS = [
   "GitlaberMrDiscussion",
   "GitlaberMrDiscussionInspect",
   "GitlaberJobLog",
+  "GitlaberPipelineList",
 ] as const;
 
 export const isBufferKind = u.isLiteralOneOf(BUFFER_KINDS);

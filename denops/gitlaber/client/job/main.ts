@@ -31,3 +31,19 @@ export async function getProjectJobLog(
     u.isString,
   );
 }
+
+export async function getPipelineJobs(
+  url: string,
+  token: string,
+  attrs: { id: ProjectId; pipeline_id: number } & PaginationAttributes,
+) {
+  const baseApiPath =
+    `${url}/api/v4/projects/${attrs.id}/pipelines/${attrs.pipeline_id}/jobs`;
+
+  const queryPrams = objectToURLSearchParams(attrs);
+  const gitlabApiPath = baseApiPath + "?" + queryPrams;
+  return u.ensure(
+    await request(gitlabApiPath, token, "GET"),
+    u.isArrayOf(isJob),
+  );
+}

@@ -106,9 +106,29 @@ export const BUFFER_CONFIGS: BufferConfig[] = [
     keymaps: RESOURCE_Mrs_MAPPINGS,
   },
   {
+    kind: "GitlaberPipelineList",
+    direction: "tab",
+    nodeMaker: node.createPipelinesNodes,
+    options: {
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
     kind: "GitlaberJobList",
     direction: "tab",
     nodeMaker: node.createJobsNodes,
+    options: {
+      buftype: "nofile",
+      modifiable: false,
+    },
+    keymaps: BASE_MAPPINGS,
+  },
+  {
+    kind: "GitlaberJobListForPipeline",
+    direction: "tab",
+    nodeMaker: node.createJobsForPipelineNodes,
     options: {
       buftype: "nofile",
       modifiable: false,

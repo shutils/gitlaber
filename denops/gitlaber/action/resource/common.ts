@@ -4,6 +4,7 @@ import {
   ActionArgs,
   isBranch,
   isJob,
+  isPipeline,
   isProjectLabel,
   Node,
 } from "../../types.ts";
@@ -235,4 +236,41 @@ export function getJobFromArgs(args: ActionArgs) {
     return args.node.params.job;
   }
   throw new Error("Job not found.");
+}
+
+export function argsHasPipeline(args: ActionArgs) {
+  if (isPipeline(args.params?.pipeline)) {
+    return true;
+  } else if (isPipeline(args.node?.params?.pipeline)) {
+    return true;
+  }
+  return false;
+}
+
+export function getPipelineFromArgs(args: ActionArgs) {
+  if (isPipeline(args.params?.pipeline)) {
+    return args.params.pipeline;
+  } else if (isPipeline(args.node?.params?.pipeline)) {
+    return args.node.params.pipeline;
+  }
+  throw new Error("Pipeline not found.");
+}
+
+export async function selectPipeline(args: ActionArgs): Promise<void> {
+  const { url, token, instance } = args.ctx;
+  const id = instance.project.id;
+  const pipelines = await client.getProjectPipelines(url, token, { id });
+  const nodes: Node[] = [];
+  pipelines.map((pipeline) => {
+    nodes.push({
+      display: `${pipeline.id} ${pipeline.status} ${pipeline.ref}`,
+      params: {
+        action: {
+          name: args.name,
+          params: { ...args.params, pipeline },
+        },
+      },
+    });
+  });
+  await openUiSelect(args, nodes);
 }

@@ -64,7 +64,13 @@ import {
   unlabelMergeRequest,
 } from "./resource/mr.ts";
 import { nextList, previousList } from "./resource/common.ts";
-import { openJobList, openJobLog } from "./resource/job.ts";
+import {
+  browseJob,
+  openJobList,
+  openJobListForPipeline,
+  openJobLog,
+} from "./resource/job.ts";
+import { brwosePipeline, openPipelineList } from "./resource/pipeline.ts";
 import {
   closeAllBuffer,
   closeBuffer,
@@ -150,6 +156,8 @@ const actionStore: ActionStore = {
   "mr-discussion-toggle": toggleMrDiscussion,
   "project-browse": browseProject,
   "project-status": openProjectStatus,
+  "pipeline-list": openPipelineList,
+  "pipeline-browse": brwosePipeline,
   "wiki-browse": browseWiki,
   "wiki-config": openWikiConfig,
   "wiki-delete": deleteWiki,
@@ -160,6 +168,8 @@ const actionStore: ActionStore = {
   "wiki-edit-submit": editWikiContent,
   "wiki-preview": openWikiPreview,
   "job-list": openJobList,
+  "job-browse": browseJob,
+  "job-list-for-pipeline": openJobListForPipeline,
   "job-log": openJobLog,
   "util-echo-node": echoNode,
   "ui-select": uiSelect,
